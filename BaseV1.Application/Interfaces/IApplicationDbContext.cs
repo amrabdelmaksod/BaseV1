@@ -1,4 +1,5 @@
 ﻿using BaseV1.Domain;
+using BaseV1.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Infrastructure;
@@ -8,7 +9,15 @@ namespace BaseV1.Application.Interfaces
 {
     public interface IApplicationDbContext
     {
-        DbSet<TestClass> Tests { get; set; }
+    
+        DbSet<Reply> Replies { get; set; }
+        DbSet<Post> Posts { get; set; }
+        DbSet<Lesson> Lessons { get; set; }
+        DbSet<Forum> Forums { get; set; }
+        DbSet<EducationalCourse> EducationalCourses { get; set; }
+        DbSet<CourseTopic> CourseTopics { get; set; }
+        DbSet<Comment> Comments { get; set; }
+
 
 
 

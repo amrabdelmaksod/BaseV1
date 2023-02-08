@@ -24,7 +24,7 @@ namespace BaseV1.Application.Tests.Commands
                 {
                     var x = new TestClass { Name = request.Name };
                     
-                    await _context.Tests.AddAsync(x);
+                 
                     await _context.SaveChangesAsync();
                     return x.Id;
                 }

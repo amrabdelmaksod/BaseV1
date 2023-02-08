@@ -1,4 +1,5 @@
-using BaseV1.Application.Tests.Commands;
+using BaseV1.Application.Infrastructure;
+using BaseV1.Application.Interfaces;
 using BaseV1.Infrastructure.Presistence;
 using BaseV1.WebApi.Extensions;
 using BaseV1.WebApi.Interfaces;
@@ -24,8 +25,11 @@ builder.Services.AddDbContext<ApplicationDbContext>(
     );
 
 
-
-builder.Services.AddMediatR(typeof(CreateTestCommand).GetType().Assembly);
+builder.Services.AddDbContext<IApplicationDbContext, ApplicationDbContext>();
+builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(RequestPerformanceBehaviour<,>));
+builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(RequestValidationBehavior<,>));
+builder.Services.AddMediatR(AppDomain.CurrentDomain.GetAssemblies());
+builder.Services.AddMediatR(typeof(ApplicationDbContext).Assembly);
 
 
 builder.Services.AddApiVersioning(opt =>

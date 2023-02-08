@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using BaseV1.WebApi.Interfaces;
+using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
 
 namespace BaseV1.WebApi.Middlewares
@@ -8,15 +9,17 @@ namespace BaseV1.WebApi.Middlewares
         private readonly RequestDelegate _next;
         private readonly IWebHostEnvironment _env;
         private readonly ILogger<ExceptionMiddleware> _logger;
+        private readonly ILoggerManager _loggerManager;
 
         public ExceptionMiddleware(
             RequestDelegate next,
             IWebHostEnvironment env,
-            ILogger<ExceptionMiddleware> logger)
+            ILogger<ExceptionMiddleware> logger, ILoggerManager loggerManager)
         {
             _next = next;
             _env = env;
             _logger = logger;
+            _loggerManager = loggerManager;
         }
 
         public async Task InvokeAsync(HttpContext context)
@@ -28,6 +31,7 @@ namespace BaseV1.WebApi.Middlewares
             catch (Exception ex)
             {
                 _logger.LogError(ex, ex.Message);
+                _loggerManager.LogError(ex.Message);
                 context.Response.ContentType = "application/json";
                 context.Response.StatusCode = StatusCodes.Status500InternalServerError;
 
@@ -36,7 +40,7 @@ namespace BaseV1.WebApi.Middlewares
                     {
                         Status = context.Response.StatusCode,
                         Detail = ex.Message,
-                        Instance = ex.StackTrace
+                        Instance = ex.StackTrace,                        
                     }
                     :
                     new ProblemDetails
