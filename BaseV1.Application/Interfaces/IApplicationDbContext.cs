@@ -17,6 +17,8 @@ namespace BaseV1.Application.Interfaces
         DbSet<EducationalCourse> EducationalCourses { get; set; }
         DbSet<CourseTopic> CourseTopics { get; set; }
         DbSet<Comment> Comments { get; set; }
+        DbSet<TestClass> TestClasses { get; set; }
+        DbSet<TestEntity> TestEntities { get; set; }
 
 
 

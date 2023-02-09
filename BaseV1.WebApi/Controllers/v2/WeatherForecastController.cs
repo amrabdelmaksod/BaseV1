@@ -1,14 +1,15 @@
 ﻿using API.Errors;
 using BaseV1.Application.Tests.Commands;
 using BaseV1.WebApi.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace BaseV1.WebApi.Controllers.v2
 {
     [ApiController]
     [Route("api/v{version:apiVersion}/[controller]")]
     [ApiVersion("2.0")]
+  
     public class WeatherForecastController : BaseController<WeatherForecastController>
     {
         private static readonly string[] Summaries = new[]
@@ -48,10 +49,8 @@ namespace BaseV1.WebApi.Controllers.v2
 
         public async Task<IActionResult> Create(CreateTestCommand command)
            {
-
             _logger.LogInfo("Test Logger Create");
             CreateTestCommandValidator validationRules= new CreateTestCommandValidator();
-
             var validateRes = validationRules.Validate(command);
             if(validateRes.IsValid)
             {

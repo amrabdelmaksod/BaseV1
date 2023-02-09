@@ -6,6 +6,7 @@ namespace BaseV1.Domain
     {
         public int Id { get; set; }
         public required string Name { get; set; }
+       
         public List<TestEntity> TestEntities { get; set; }
     }
 }

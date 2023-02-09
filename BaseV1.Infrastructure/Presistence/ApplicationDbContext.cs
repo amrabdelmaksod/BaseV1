@@ -1,4 +1,5 @@
 ﻿using BaseV1.Application.Interfaces;
+using BaseV1.Domain;
 using BaseV1.Domain.Entities;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -28,6 +29,8 @@ namespace BaseV1.Infrastructure.Presistence
         public DbSet<EducationalCourse> EducationalCourses { get; set; }
         public DbSet<CourseTopic> CourseTopics { get; set; }
         public DbSet<Comment> Comments { get; set; }
+        public DbSet<TestEntity> TestEntities { get; set; }
+        public DbSet<TestClass> TestClasses { get; set; }
         #endregion
 
         public override DatabaseFacade Database => base.Database;

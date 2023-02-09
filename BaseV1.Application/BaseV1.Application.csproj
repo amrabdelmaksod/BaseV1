@@ -16,14 +16,19 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="NLog.Web.AspNetCore" Version="5.2.1" />
+    <PackageReference Include="System.ObjectModel" Version="4.3.0" />
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Members\Commands\Login\" />
+    <Folder Include="Members\DTOs\" />
+    <Folder Include="Members\Queries\" />
     <Folder Include="Tests\DTOs\" />
     <Folder Include="Tests\Queries\" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\BaseV1.Common\BaseV1.Common.csproj" />
     <ProjectReference Include="..\BaseV1.Domain\BaseV1.Domain.csproj" />
   </ItemGroup>
 
