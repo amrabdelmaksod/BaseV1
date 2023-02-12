@@ -1,6 +1,8 @@
 using BaseV1.Application.Infrastructure;
 using BaseV1.Application.Interfaces;
+using BaseV1.Common.Localization;
 using BaseV1.Infrastructure.Presistence;
+using BaseV1.WebApi;
 using BaseV1.WebApi.Extensions;
 using BaseV1.WebApi.Interfaces;
 using BaseV1.WebApi.Middlewares;
@@ -10,6 +12,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Localization;
 using Microsoft.IdentityModel.Tokens;
 using NLog;
 using System.Text;
@@ -38,6 +41,19 @@ builder.Services.AddAuthentication(options =>
 // Add services to the container.
 builder.Services.ConfigureLoggerService();
 builder.Services.AddControllers();
+
+//Add Localization
+builder.Services.AddLocalization();
+builder.Services.AddSingleton<IStringLocalizerFactory, JsonStringLocalizerFactory>();
+builder.Services.AddMvc().AddViewLocalization(Microsoft.AspNetCore.Mvc.Razor.LanguageViewLocationExpanderFormat.Suffix)
+    .AddDataAnnotationsLocalization(options =>
+    {
+        options.DataAnnotationLocalizerProvider = (type, factory) =>
+        factory.Create(typeof(JsonStringLocalizerFactory));
+    });
+
+
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
