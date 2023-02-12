@@ -1,7 +1,6 @@
 ﻿using API.Errors;
 using BaseV1.Application.Tests.Commands;
 using BaseV1.WebApi.Interfaces;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BaseV1.WebApi.Controllers.v2

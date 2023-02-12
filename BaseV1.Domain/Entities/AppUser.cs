@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using BaseV1.Domain.Enums;
+using Microsoft.AspNetCore.Identity;
 
 namespace BaseV1.Domain.Entities
 {
     public class AppUser : IdentityUser
     {
-        public required string FirstName { get; set; }
-        public string LastName { get; set; }
+        public required string Name { get; set; }
+        public UserType UserType { get; set; }
+        public virtual ICollection<AppUserRoles> AppUserRoles { get; set; }
     }
 }

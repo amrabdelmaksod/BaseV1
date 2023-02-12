@@ -1,6 +1,5 @@
 using BaseV1.Application.Infrastructure;
 using BaseV1.Application.Interfaces;
-using BaseV1.Common.Localization;
 using BaseV1.Infrastructure.Presistence;
 using BaseV1.WebApi;
 using BaseV1.WebApi.Extensions;
