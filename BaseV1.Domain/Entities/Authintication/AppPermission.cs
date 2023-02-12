@@ -1,4 +1,4 @@
-﻿namespace BaseV1.Domain.Entities
+﻿namespace BaseV1.Domain.Entities.Authintication
 {
     public class AppPermission
     {

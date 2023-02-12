@@ -1,7 +1,7 @@
 ﻿using BaseV1.Domain.Enums;
 using Microsoft.AspNetCore.Identity;
 
-namespace BaseV1.Domain.Entities
+namespace BaseV1.Domain.Entities.Authintication
 {
     public class AppUser : IdentityUser
     {

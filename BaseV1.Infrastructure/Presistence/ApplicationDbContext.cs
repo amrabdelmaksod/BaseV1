@@ -1,6 +1,7 @@
 ﻿using BaseV1.Application.Interfaces;
 using BaseV1.Domain;
 using BaseV1.Domain.Entities;
+using BaseV1.Domain.Entities.Authintication;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;

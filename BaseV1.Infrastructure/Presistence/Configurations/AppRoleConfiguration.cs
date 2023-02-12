@@ -1,4 +1,4 @@
-﻿using BaseV1.Domain.Entities;
+﻿using BaseV1.Domain.Entities.Authintication;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
