@@ -1,0 +1,59 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.4.33213.308
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hedaya.Application", "Hedaya.Application\Hedaya.Application.csproj", "{72E28019-A28D-45CB-8AEF-C4C0C5B7E9A7}"
+	ProjectSection(ProjectDependencies) = postProject
+		{0F0558DD-449F-48DF-A31E-9472B0BEA2B1} = {0F0558DD-449F-48DF-A31E-9472B0BEA2B1}
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hedaya.Common", "Hedaya.Common\Hedaya.Common.csproj", "{01BB43A9-F0D3-4FFE-9087-CF28FDAF29A4}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hedaya.Domain", "Hedaya.Domain\Hedaya.Domain.csproj", "{0F0558DD-449F-48DF-A31E-9472B0BEA2B1}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hedaya.Infrastructure", "Hedaya.Infrastructure\Hedaya.Infrastructure.csproj", "{1F3576B6-3E00-4B6D-8275-4FB186A8CE29}"
+	ProjectSection(ProjectDependencies) = postProject
+		{0F0558DD-449F-48DF-A31E-9472B0BEA2B1} = {0F0558DD-449F-48DF-A31E-9472B0BEA2B1}
+		{72E28019-A28D-45CB-8AEF-C4C0C5B7E9A7} = {72E28019-A28D-45CB-8AEF-C4C0C5B7E9A7}
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hedaya.WebApi", "Hedaya.WebApi\Hedaya.WebApi.csproj", "{A8F0A197-D175-424D-9E59-DE8A714C83B3}"
+	ProjectSection(ProjectDependencies) = postProject
+		{72E28019-A28D-45CB-8AEF-C4C0C5B7E9A7} = {72E28019-A28D-45CB-8AEF-C4C0C5B7E9A7}
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{72E28019-A28D-45CB-8AEF-C4C0C5B7E9A7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{72E28019-A28D-45CB-8AEF-C4C0C5B7E9A7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{72E28019-A28D-45CB-8AEF-C4C0C5B7E9A7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{72E28019-A28D-45CB-8AEF-C4C0C5B7E9A7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{01BB43A9-F0D3-4FFE-9087-CF28FDAF29A4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{01BB43A9-F0D3-4FFE-9087-CF28FDAF29A4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{01BB43A9-F0D3-4FFE-9087-CF28FDAF29A4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{01BB43A9-F0D3-4FFE-9087-CF28FDAF29A4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0F0558DD-449F-48DF-A31E-9472B0BEA2B1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0F0558DD-449F-48DF-A31E-9472B0BEA2B1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0F0558DD-449F-48DF-A31E-9472B0BEA2B1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0F0558DD-449F-48DF-A31E-9472B0BEA2B1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1F3576B6-3E00-4B6D-8275-4FB186A8CE29}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1F3576B6-3E00-4B6D-8275-4FB186A8CE29}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1F3576B6-3E00-4B6D-8275-4FB186A8CE29}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1F3576B6-3E00-4B6D-8275-4FB186A8CE29}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A8F0A197-D175-424D-9E59-DE8A714C83B3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A8F0A197-D175-424D-9E59-DE8A714C83B3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A8F0A197-D175-424D-9E59-DE8A714C83B3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A8F0A197-D175-424D-9E59-DE8A714C83B3}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {2FF48547-5966-4D5B-BE94-391247C4DB30}
+	EndGlobalSection
+EndGlobal
