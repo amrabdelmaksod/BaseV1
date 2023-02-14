@@ -1,6 +1,6 @@
 ﻿namespace BaseV1.Domain.Entities.Authintication
 {
-    public class AppRole
+    public class AppRole 
     {
         public AppRole()
         {

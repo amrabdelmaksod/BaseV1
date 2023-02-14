@@ -18,7 +18,7 @@ namespace BaseV1.Infrastructure.Presistence
 
 
         #region Users
-
+       public DbSet<AppUser> AppUsers { get; set; }
         #endregion
 
 

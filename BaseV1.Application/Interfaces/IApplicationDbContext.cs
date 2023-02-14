@@ -1,5 +1,6 @@
 ﻿using BaseV1.Domain;
 using BaseV1.Domain.Entities;
+using BaseV1.Domain.Entities.Authintication;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Infrastructure;
@@ -17,6 +18,7 @@ namespace BaseV1.Application.Interfaces
         DbSet<EducationalCourse> EducationalCourses { get; set; }
         DbSet<CourseTopic> CourseTopics { get; set; }
         DbSet<Comment> Comments { get; set; }
+        DbSet<AppUser> AppUsers { get; set; }
         DbSet<TestClass> TestClasses { get; set; }
         DbSet<TestEntity> TestEntities { get; set; }
 

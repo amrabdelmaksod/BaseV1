@@ -1,4 +1,4 @@
-﻿namespace BaseV1.WebApi.Models
+﻿namespace BaseV1.Application.Auth.Models
 {
     public class JWTSettings
     {

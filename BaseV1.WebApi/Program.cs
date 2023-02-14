@@ -1,5 +1,9 @@
+using BaseV1.Application.Auth.Abstractions;
+using BaseV1.Application.Auth.Models;
+using BaseV1.Application.Auth.Services;
 using BaseV1.Application.Infrastructure;
 using BaseV1.Application.Interfaces;
+using BaseV1.Domain.Entities.Authintication;
 using BaseV1.Infrastructure.Presistence;
 using BaseV1.WebApi;
 using BaseV1.WebApi.Extensions;
@@ -8,6 +12,8 @@ using BaseV1.WebApi.Middlewares;
 using BaseV1.WebApi.Models;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.EntityFrameworkCore;
@@ -20,13 +26,15 @@ var builder = WebApplication.CreateBuilder(args);
 
 
 //Add JWT Configurations
+builder.Services.Configure<JWTSettings>(builder.Configuration.GetSection("JWT"));
+builder.Services.AddIdentity<AppUser, IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>();
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
 
 }
-).AddJwtBearer(options => options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+).AddJwtBearer(options => options.TokenValidationParameters = new TokenValidationParameters
 {
     ValidateIssuer = true,
     ValidateAudience = true,
@@ -36,6 +44,38 @@ builder.Services.AddAuthentication(options =>
     ValidAudience = builder.Configuration["JWT:Audience"],
     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Key"]))
 });
+builder.Services.AddScoped<IAuthService, AuthService>();
+
+
+builder.Services.AddIdentityCore<AppUser>(options => options.SignIn.RequireConfirmedAccount = true)
+                .AddEntityFrameworkStores<ApplicationDbContext>()
+                .AddTokenProvider<DataProtectorTokenProvider<AppUser>>(TokenOptions.DefaultProvider);
+
+
+//Add Google External Login Service
+builder.Services.AddAuthentication()
+                              .AddGoogle(options =>
+                          {
+                              IConfigurationSection googleAuthSection = builder.Configuration.GetSection("Authintication:Google");
+                              options.ClientId = googleAuthSection["ClientId"];
+                              options.ClientSecret = googleAuthSection["ClientSecret"];
+                          });
+
+
+
+
+//Add Send Grid Service For Sending Emails
+builder.Services.AddTransient<IEmailSender, EmailSender>();
+builder.Services.Configure<AuthMessageSenderOptions>(builder.Configuration);
+
+
+builder.Services.ConfigureApplicationCookie(o => {
+    o.ExpireTimeSpan = TimeSpan.FromDays(5);
+    o.SlidingExpiration = true;
+}); 
+
+builder.Services.Configure<DataProtectionTokenProviderOptions>(o =>
+       o.TokenLifespan = TimeSpan.FromHours(3));
 
 // Add services to the container.
 builder.Services.ConfigureLoggerService();

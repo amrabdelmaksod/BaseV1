@@ -8,6 +8,8 @@ namespace BaseV1.WebApi.Controllers
     {
         #region Dependency Injection
 
+       
+
         private IMediator _mediator;
         private IApplicationDbContext _ctx;
         protected IApplicationDbContext _context => _ctx??(_ctx = HttpContext.RequestServices.GetService<IApplicationDbContext>());

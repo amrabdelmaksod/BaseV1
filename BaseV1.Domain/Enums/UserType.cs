@@ -6,9 +6,8 @@ namespace BaseV1.Domain.Enums
     {
         [Description("مدير النظام")]
         Admin =1,
-        [Description("مدرب")]
-        Instructor = 2,
-        [Description("متدرب")]
-        Trainee = 3,
+        [Description("مستخدم")]
+        User = 2,
+   
     }
 }
