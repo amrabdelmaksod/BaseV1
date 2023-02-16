@@ -259,13 +259,12 @@ namespace Hedaya.Application.Auth.Services
                 var user = await _userManager.FindByIdAsync(userIdFromToken);
                 if (user == null)
                 {
-                    //modelState.AddModelError("Access Token", "There is no user with that Access token");
+                    modelState.AddModelError("Access Token", "There is no user with that Access token");
                     return null;
                 }
 
 
-                // var location = _context.Locations.Where(loc => loc.Id == user.LocationId).SingleOrDefault();
-
+             
                 return new
                 {
                     result = new
@@ -308,13 +307,7 @@ namespace Hedaya.Application.Auth.Services
                     modelState.AddModelError("user_Phone", "Phone Number Is Already Exist");
                     return null;
                 }
-                //var location = _context.Locations.Where(loc => loc.Id == user.LocationId).SingleOrDefault();
-
-                //location.Lat = userModel.user_lat;
-                //location.Lng = userModel.user_lng;
-                //location.Title = userModel.user_location;
-                //_context.SaveChanges();
-
+            
 
                
                 if (!string.IsNullOrEmpty(userModel.userName))
@@ -339,8 +332,6 @@ namespace Hedaya.Application.Auth.Services
                         return null;
                     }
                 }
-
-                //var locationUpdate = _context.Locations.Where(loc => loc.Id == user.LocationId).SingleOrDefault();
 
 
 
@@ -384,7 +375,6 @@ namespace Hedaya.Application.Auth.Services
 
                 user.Deleted = true;
                 _context.SaveChanges();
-                // var location = _context.Locations.Where(loc => loc.Id == user.LocationId).SingleOrDefault();
 
                 return new
                 {
