@@ -24,7 +24,7 @@ namespace Hedaya.WebApi.Controllers.v1
         {
             if (!ModelState.IsValid)
             {
-                BadRequest(ModelState);
+                return CustomBadRequest.CustomModelStateErrorResponse(ModelState);
             }
             
 
@@ -45,7 +45,7 @@ namespace Hedaya.WebApi.Controllers.v1
         {
             if (!ModelState.IsValid)
             {
-                BadRequest(ModelState);
+                return CustomBadRequest.CustomModelStateErrorResponse(ModelState);
             }
 
 
@@ -169,12 +169,13 @@ namespace Hedaya.WebApi.Controllers.v1
         public async Task<IActionResult> AddRoleAsync([FromBody] AddRoleModel model)
         {
             if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+                return CustomBadRequest.CustomModelStateErrorResponse(ModelState);
 
             var result = await _authService.AddToRoleAsync(ModelState, model);
 
             if (!string.IsNullOrEmpty(result))
-                return BadRequest(result);
+                return CustomBadRequest.CustomModelStateErrorResponse(ModelState);
+        
 
             return Ok(model);
         }
