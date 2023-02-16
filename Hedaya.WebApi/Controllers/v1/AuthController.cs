@@ -91,13 +91,34 @@ namespace Hedaya.WebApi.Controllers.v1
             }
         }
 
+
         [HttpGet("Profile")]
-        public async Task<IActionResult> ProfileUser(string Id)
+        public async Task<IActionResult> ProfileUser()
         {
             try
             {
-                
-                var result = await _authService.GetUserAsync(Id);
+                var headers = Request.Headers;
+                if (!headers.ContainsKey("token"))
+                {
+                    ModelState.AddModelError("token", "Missing tokin");
+                    if (!ModelState.IsValid)
+                    {
+                        return CustomBadRequest.CustomModelStateErrorResponse(ModelState);
+                    }
+                }
+                if (!headers.ContainsKey("lang"))
+                {
+                    ModelState.AddModelError("lang", "Missing lang");
+                    if (!ModelState.IsValid)
+                    {
+                        return CustomBadRequest.CustomModelStateErrorResponse(ModelState);
+                    }
+                }
+                string lang = headers.GetCommaSeparatedValues("lang").First();
+               
+                string token = headers.GetCommaSeparatedValues("token").First();
+
+                var result = await _authService.GetUserAsync(ModelState, token);
                 if (!ModelState.IsValid)
                 {
                     return CustomBadRequest.CustomModelStateErrorResponse(ModelState);
@@ -116,22 +137,32 @@ namespace Hedaya.WebApi.Controllers.v1
 
 
         [HttpPut("UpdateProfile")]
-        public async Task<IActionResult> UpdateProfile(string Id, UpdateProfileModel userModel)
+        public async Task<ActionResult> UpdateProfile([FromForm] UpdateProfileModel userModel)
         {
-           
-              
+            try
+            {
+                var headers = Request.Headers;
+                if (!headers.ContainsKey("token"))
+                {
+                    ModelState.AddModelError("token", "Missing tokin");
+                    if (!ModelState.IsValid)
+                    {
+                        return CustomBadRequest.CustomModelStateErrorResponse(ModelState);
+                    }
+                }
+
+                string token = headers.GetCommaSeparatedValues("token").First();
+                var result = await _authService.UpdateUserAsync(ModelState, userModel, token);
                 if (!ModelState.IsValid)
                 {
                     return CustomBadRequest.CustomModelStateErrorResponse(ModelState);
                 }
-
-                var result = await _authService.UpdateUserAsync(Id,userModel);
-                if (result == null)
-                {
-                    return Unauthorized();
-                }
                 return Ok(result);
-         
+            }
+            catch (Exception ex)
+            {
+                return CustomBadRequest.CustomExErrorResponse(ex);
+            }
         }
 
         [HttpPost("addToRole")]
@@ -149,18 +180,31 @@ namespace Hedaya.WebApi.Controllers.v1
         }
 
         [HttpDelete("DeleteAccount")]
-        public async Task<ActionResult> DeleteAccount(string Id)
+        public async Task<ActionResult> DeleteAccount()
         {
             try
-            {               
-                
+            {
+
+                var headers = Request.Headers;
+
+
+
+                if (!headers.ContainsKey("token"))
+                {
+                    ModelState.AddModelError("token", "Missing tokin");
+                    if (!ModelState.IsValid)
+                    {
+                        return CustomBadRequest.CustomModelStateErrorResponse(ModelState);
+                    }
+                }
+                var token = headers.FirstOrDefault(s => s.Key == "token").Value;
+
+                var result = _authService.DeleteAccount(ModelState, token);
 
                 if (!ModelState.IsValid)
                 {
                     return CustomBadRequest.CustomModelStateErrorResponse(ModelState);
                 }
-
-                var result =await _authService.DeleteAccount(Id);
                 return Ok(result);
             }
             catch (Exception ex)

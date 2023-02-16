@@ -1,5 +1,4 @@
 ﻿using Hedaya.Application.Auth.Models;
-using Hedaya.Common;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace Hedaya.Application.Auth.Abstractions
@@ -10,10 +9,11 @@ namespace Hedaya.Application.Auth.Abstractions
         Task<AuthModel> LoginAsync(TokenRequestModel model);
         Task<dynamic> ForgetPasswordAsync(ModelStateDictionary modelState, ForgotPasswordVM userModel);
         Task<dynamic> RestPasswordAsync(ModelStateDictionary modelState, ResetPasswordModel userModel);
-        Task<dynamic> GetUserAsync(string Id);
-        Task<dynamic> UpdateUserAsync(string Id, UpdateProfileModel userModel);
+        Task<dynamic> GetUserAsync(ModelStateDictionary modelState, string token);
+        Task<dynamic> UpdateUserAsync(ModelStateDictionary modelState, UpdateProfileModel userModel, string token);
+     
         Task<string> AddToRoleAsync(AddRoleModel model);
-        Task<dynamic> DeleteAccount(string Id);
+        Task<dynamic> DeleteAccount(ModelStateDictionary modelState, string token);
 
 
         //object LogOut(ModelStateDictionary modelState, string authorization, string MobilID);

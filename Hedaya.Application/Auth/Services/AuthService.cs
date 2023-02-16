@@ -24,16 +24,19 @@ namespace Hedaya.Application.Auth.Services
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly JWTSettings _jwt;
         private readonly IEmailSender _sender;
-     
+        private IConfiguration _configuration;
+
+
         private IApplicationDbContext _context;
 
-        public AuthService(UserManager<AppUser> userManager, IApplicationDbContext context, IOptions<JWTSettings> jwt, RoleManager<IdentityRole> roleManager, IEmailSender sender)
+        public AuthService(UserManager<AppUser> userManager, IApplicationDbContext context, IOptions<JWTSettings> jwt, RoleManager<IdentityRole> roleManager, IEmailSender sender, IConfiguration configuration)
         {
             _userManager = userManager;
             _jwt = jwt.Value;
             _roleManager = roleManager;
-            _sender = sender;           
+            _sender = sender;
             _context = context;
+            _configuration = configuration;
         }
 
         public async Task<AuthModel> LoginAsync(TokenRequestModel model)
@@ -132,24 +135,7 @@ namespace Hedaya.Application.Auth.Services
 
 
 
-        //public async Task<Response> ForgotPasswordAsync(string Email)
-        //{
-        //    if (await _userManager.FindByEmailAsync(Email) is null)
-        //    {
-        //        return new Response { Message = "User Not Found!", Result=new { } };
-        //    }
-        //  // Send Forgot Password Email
-        //  var appUser = await _userManager.FindByEmailAsync(Email);
-        //  var code = await _userManager.GeneratePasswordResetTokenAsync(appUser);
-        //    var callBackUrl = $"https://localhost/api/v1/Auth?id={appUser.Id}&code=${code}";
-        //    var subject = $"Hi {appUser.Name} Please Click On This Link To Reset Password";
-        //  code = HttpUtility.UrlEncode(code);
-
-        //    await _sender.SendEmailAsync(appUser.Email, subject, callBackUrl);
-
-        //    return new Response { Message = "Email Sent Successfully", Result= new {appUser.Id } };
-
-        //}
+   
 
 
         public async Task<dynamic> ForgetPasswordAsync(ModelStateDictionary modelState, ForgotPasswordVM userModel)
@@ -247,15 +233,20 @@ namespace Hedaya.Application.Auth.Services
         }
 
 
-        public async Task<dynamic> GetUserAsync(string Id)
+        public async Task<dynamic> GetUserAsync(ModelStateDictionary modelState, string token)
         {
-            
-                var user = await _userManager.FindByIdAsync(Id);
-                
+            try
+            {
+                string userIdFromToken = JWTHelper.GetPrincipal(token, _configuration);
+                var user = await _userManager.FindByIdAsync(userIdFromToken);
                 if (user == null)
                 {
-                  return new Response { Message ="User Not Found", Result = new {Id = Id} };
-                }                
+                    //modelState.AddModelError("Access Token", "There is no user with that Access token");
+                    return null;
+                }
+
+
+                // var location = _context.Locations.Where(loc => loc.Id == user.LocationId).SingleOrDefault();
 
                 return new
                 {
@@ -263,32 +254,48 @@ namespace Hedaya.Application.Auth.Services
                     {
                         user = new
                         {
-                            userId = user.Id,
-                            userName = user.Name,
-                            userEmail = user.Email,
-                            userPhone = user.PhoneNumber,                                               
+                            user_id = user.Id,
+                            user_name = user.UserName,
+                            user_email = user.Email,
+                            user_phone = user.PhoneNumber,
+                   
                         }
                     }
-                };                      
+                };
+            }
+            catch (Exception ex)
+            {
+                modelState.AddModelError(string.Join(",", ex.Data), string.Join(",", ex.InnerException));
+                return null;
+            }
         }
 
 
-
-
-        public async Task<dynamic> UpdateUserAsync(string Id, UpdateProfileModel userModel)
+        public async Task<dynamic> UpdateUserAsync(ModelStateDictionary modelState, UpdateProfileModel userModel, string token)
         {
-           
-                var user = await _context.AppUsers.FirstOrDefaultAsync(a=>a.Id == Id);
+            try
+            {
+                string userIdFromToken = JWTHelper.GetPrincipal(token, _configuration);
+                var user = await _userManager.FindByIdAsync(userIdFromToken);
                 if (user == null)
                 {
-                    return new Response { Message = "User Not Found", Result = new { Id = Id } };
+                    modelState.AddModelError("Access Token", "There is no user with that Access token");
+                    return null;
                 }
+
 
                 var phoneisexist = _context.AppUsers.FirstOrDefault(s => s.PhoneNumber == userModel.userPhone && s.Id != user.Id);
                 if (phoneisexist != null)
                 {
-                    return new Response { Message = "Phone Is Already Exists", Result = new { Id = Id } };
+                    modelState.AddModelError("user_Phone", "Phone Number Is Already Exist");
+                    return null;
                 }
+                //var location = _context.Locations.Where(loc => loc.Id == user.LocationId).SingleOrDefault();
+
+                //location.Lat = userModel.user_lat;
+                //location.Lng = userModel.user_lng;
+                //location.Title = userModel.user_location;
+                //_context.SaveChanges();
 
 
                
@@ -306,53 +313,60 @@ namespace Hedaya.Application.Auth.Services
                 }
 
                 var result = await _userManager.UpdateAsync(user);
-               await _context.SaveChangesAsync();
-            if (!result.Succeeded)
+                if (!result.Succeeded)
                 {
                     foreach (var error in result.Errors)
                     {
-                        return new Response { Message = "Something Went Wrong!", Result = new { Id = Id } };
+                        modelState.AddModelError(error.Code, error.Description);
+                        return null;
                     }
                 }
 
-               
+                //var locationUpdate = _context.Locations.Where(loc => loc.Id == user.LocationId).SingleOrDefault();
+
+
 
                 return new
                 {
                     result = new
                     {
                         activate = user.EmailConfirmed,
-                       
+                        access_token = token,
                         user = new
                         {
                             userId = user.Id,
                             userName = user.Name,
                             userEmail = user.Email,
-                            userPhone = user.PhoneNumber,                          
+                            userPhone = user.PhoneNumber,                                                
                         }
                     },
                     msg = "Successfully Message"
                 };
-            
-  
+            }
+            catch (Exception ex)
+            {
+                modelState.AddModelError(string.Join(",", ex.Data), string.Join(",", ex.InnerException));
+                return null;
+            }
 
         }
 
 
-        public async Task<dynamic> DeleteAccount(string Id)
+        public async Task<dynamic> DeleteAccount(ModelStateDictionary modelState, string token)
         {
             try
             {
-                _context.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.TrackAll;
-                var user = await _context.AppUsers.Where(a => a.Id == Id).FirstOrDefaultAsync();
+                string userIdFromToken = JWTHelper.GetPrincipal(token, _configuration);
+                var user = await _userManager.FindByIdAsync(userIdFromToken);
                 if (user == null)
                 {
-                    return new Response { Message = "User Not Found!", Result = new { Id = Id } };
+                    modelState.AddModelError("Access Token", "There is no user with that Access token");
+                    return null;
                 }
 
                 user.Deleted = true;
-              await _context.SaveChangesAsync();    
-       
+                _context.SaveChanges();
+                // var location = _context.Locations.Where(loc => loc.Id == user.LocationId).SingleOrDefault();
 
                 return new
                 {
@@ -364,9 +378,9 @@ namespace Hedaya.Application.Auth.Services
                 };
             }
             catch (Exception ex)
-            { 
-
-                throw new Exception(ex.Message);
+            {
+                modelState.AddModelError(string.Join(",", ex.Data), string.Join(",", ex.InnerException));
+                return null;
             }
         }
 
