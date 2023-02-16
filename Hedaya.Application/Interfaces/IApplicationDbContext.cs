@@ -29,9 +29,13 @@ namespace Hedaya.Application.Interfaces
 
         ChangeTracker ChangeTracker { get;}
         void Dispose();
-
-        Task<int> SaveChangesAsync(CancellationToken cancellationToken = default(CancellationToken));
         int SaveChanges();
+        Task<int> SaveChangesAsync(CancellationToken cancellationToken = default(CancellationToken));
+
+
+
+
+
 
         EntityEntry<TEntity> Entry<TEntity>([NotNullAttribute] TEntity entity) where TEntity : class;
     }

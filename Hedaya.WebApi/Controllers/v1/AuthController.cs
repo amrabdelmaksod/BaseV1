@@ -73,7 +73,7 @@ namespace Hedaya.WebApi.Controllers.v1
 
         }
 
-        [HttpPost("RestPassowrd")]
+        [HttpPost("ResetPassowrd")]
         public async Task<IActionResult> RestPassword([FromBody] ResetPasswordModel userModel)
         {
             try

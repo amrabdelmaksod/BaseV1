@@ -38,7 +38,7 @@ namespace Hedaya.Infrastructure.Presistence
         public override DatabaseFacade Database => base.Database;
         public override ChangeTracker ChangeTracker => base.ChangeTracker;
 
-
+       
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

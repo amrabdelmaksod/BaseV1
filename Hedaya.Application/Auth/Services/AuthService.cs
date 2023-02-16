@@ -7,9 +7,11 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Org.BouncyCastle.Ocsp;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -22,16 +24,15 @@ namespace Hedaya.Application.Auth.Services
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly JWTSettings _jwt;
         private readonly IEmailSender _sender;
-        private IConfiguration _configuration;
+     
         private IApplicationDbContext _context;
 
-        public AuthService(UserManager<AppUser> userManager, IOptions<JWTSettings> jwt, RoleManager<IdentityRole> roleManager, IEmailSender sender, IConfiguration configuration,IApplicationDbContext context)
+        public AuthService(UserManager<AppUser> userManager, IApplicationDbContext context, IOptions<JWTSettings> jwt, RoleManager<IdentityRole> roleManager, IEmailSender sender)
         {
             _userManager = userManager;
             _jwt = jwt.Value;
             _roleManager = roleManager;
-            _sender = sender;
-            _configuration = configuration;
+            _sender = sender;           
             _context = context;
         }
 
@@ -277,7 +278,7 @@ namespace Hedaya.Application.Auth.Services
         public async Task<dynamic> UpdateUserAsync(string Id, UpdateProfileModel userModel)
         {
            
-                var user = await _userManager.FindByIdAsync(Id);
+                var user = await _context.AppUsers.FirstOrDefaultAsync(a=>a.Id == Id);
                 if (user == null)
                 {
                     return new Response { Message = "User Not Found", Result = new { Id = Id } };
@@ -342,8 +343,8 @@ namespace Hedaya.Application.Auth.Services
         {
             try
             {
-               
-                var user = await _userManager.FindByIdAsync(Id);
+                _context.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.TrackAll;
+                var user = await _context.AppUsers.Where(a => a.Id == Id).FirstOrDefaultAsync();
                 if (user == null)
                 {
                     return new Response { Message = "User Not Found!", Result = new { Id = Id } };
@@ -363,7 +364,7 @@ namespace Hedaya.Application.Auth.Services
                 };
             }
             catch (Exception ex)
-            {
+            { 
 
                 throw new Exception(ex.Message);
             }

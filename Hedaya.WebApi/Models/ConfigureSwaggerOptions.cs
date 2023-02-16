@@ -51,7 +51,7 @@ namespace Hedaya.WebApi.Models
         {
             var info = new OpenApiInfo()
             {
-                Title = ".NET Core (.NET 7) Web API",
+                Title = "Hedaya Web API",
                 Version = desc.ApiVersion.ToString()
             };
 
