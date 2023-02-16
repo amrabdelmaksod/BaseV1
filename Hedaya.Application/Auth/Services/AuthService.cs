@@ -39,15 +39,18 @@ namespace Hedaya.Application.Auth.Services
             _configuration = configuration;
         }
 
-        public async Task<AuthModel> LoginAsync(TokenRequestModel model)
+        public async Task<AuthModel> LoginAsync(ModelStateDictionary modelState,TokenRequestModel model)
         {
             var authModel = new AuthModel();
 
             var user = await _userManager.FindByEmailAsync(model.Email);
             if (user is null || !await _userManager.CheckPasswordAsync(user, model.Password))
             {
-                authModel.Message = "Email Or Password Is Incorrect";
-                return authModel;
+
+                modelState.AddModelError("Invalid Login", "Email Or Password Is Incorrect");
+
+                return null;
+              
             }
 
             var jwtSecurityToken = await CreateJwtToken(user);
@@ -65,15 +68,20 @@ namespace Hedaya.Application.Auth.Services
             return authModel;
         }
 
-        public async Task<AuthModel> RegisterAsync(RegisterModel model)
+        public async Task<AuthModel> RegisterAsync(ModelStateDictionary modelState,RegisterModel model)
         {
             if (await _userManager.FindByEmailAsync(model.Email) is not null)
             {
-                return new AuthModel { Message = "Email Is Already Exists!" };
+                modelState.AddModelError("userEmail", "Email Is Already Exists!");
+
+                return null;
             }
             if (await _userManager.FindByNameAsync(model.UserName) is not null)
             {
-                return new AuthModel { Message = "User name Is Already Exists!" };
+                modelState.AddModelError("userName", "User name Is Already Exists!");
+
+                return null;
+               
             }
             string code = RandomHelper.RandonString(5);
 
@@ -115,15 +123,25 @@ namespace Hedaya.Application.Auth.Services
         }
 
 
-        public async Task<string> AddToRoleAsync(AddRoleModel model)
+        public async Task<string> AddToRoleAsync(ModelStateDictionary modelState, AddRoleModel model)
         {
             var user = await _userManager.FindByIdAsync(model.UserId);
 
             if (user is null || !await _roleManager.RoleExistsAsync(model.Role))
-                return "Invalid user ID or Role";
+            {
+                modelState.AddModelError("Invalid", "Invalid user ID or Role");
+                return null;
+            }
+             
+            
 
             if (await _userManager.IsInRoleAsync(user, model.Role))
-                return "User already assigned to this role";
+            {
+                modelState.AddModelError("Invalid", "User already assigned to this role");
+                return null;
+               
+            }
+                
 
             var result = await _userManager.AddToRoleAsync(user, model.Role);
 

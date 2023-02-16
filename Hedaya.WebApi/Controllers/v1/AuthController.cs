@@ -28,10 +28,10 @@ namespace Hedaya.WebApi.Controllers.v1
             }
             
 
-            var result =await _authService.RegisterAsync(model);
+            var result =await _authService.RegisterAsync(ModelState, model);
             if(!result.IsAuthinticated)
             {
-                return BadRequest(result.Message);
+                return CustomBadRequest.CustomModelStateErrorResponse(ModelState);
             }
            
             return Ok(result);
@@ -49,10 +49,10 @@ namespace Hedaya.WebApi.Controllers.v1
             }
 
 
-            var result = await _authService.LoginAsync(model);
+            var result = await _authService.LoginAsync(ModelState, model);
             if (!result.IsAuthinticated)
             {
-                return BadRequest(result.Message);
+                return CustomBadRequest.CustomModelStateErrorResponse(ModelState);
             }
 
             return Ok(result);
@@ -171,7 +171,7 @@ namespace Hedaya.WebApi.Controllers.v1
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var result = await _authService.AddToRoleAsync(model);
+            var result = await _authService.AddToRoleAsync(ModelState, model);
 
             if (!string.IsNullOrEmpty(result))
                 return BadRequest(result);

@@ -145,7 +145,8 @@ app.UseMiddleware<ExceptionMiddleware>();
 var apiVersionDescriptionProvider = app.Services.GetRequiredService<IApiVersionDescriptionProvider>();
 // Configure the HTTP request pipeline.
 
-
+if (app.Environment.IsDevelopment())
+{
     app.UseSwagger();
     app.UseSwaggerUI(options =>
     {
@@ -155,7 +156,7 @@ var apiVersionDescriptionProvider = app.Services.GetRequiredService<IApiVersionD
                 description.GroupName.ToUpperInvariant());
         }
     });
-
+}
 
 
 
