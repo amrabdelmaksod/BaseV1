@@ -372,7 +372,8 @@ namespace Hedaya.Application.Auth.Services
                 }
 
                 user.Deleted = true;
-                _context.SaveChanges();
+                
+              await _context.SaveChangesAsync();
 
                 return new
                 {
