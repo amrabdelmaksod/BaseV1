@@ -19,6 +19,7 @@ namespace Hedaya.Application.Interfaces
         DbSet<CourseTopic> CourseTopics { get; set; }
         DbSet<Comment> Comments { get; set; }
         DbSet<AppUser> AppUsers { get; set; }
+        DbSet<Blog> Blogs { get; set; }
         DbSet<TestClass> TestClasses { get; set; }
         DbSet<TestEntity> TestEntities { get; set; }
 

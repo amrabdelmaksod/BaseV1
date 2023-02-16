@@ -23,6 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Blogs\Commands\" />
     <Folder Include="Members\Commands\Login\" />
     <Folder Include="Members\DTOs\" />
     <Folder Include="Members\Queries\" />

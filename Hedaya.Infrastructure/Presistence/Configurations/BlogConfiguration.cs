@@ -8,7 +8,11 @@ namespace Hedaya.Infrastructure.Presistence.Configurations
     {
         public void Configure(EntityTypeBuilder<Blog> builder)
         {
-            throw new NotImplementedException();
+            builder.ToTable("Blogs");
+            builder.HasKey(x => x.Id);
+            builder.Property(a=>a.Title).HasMaxLength(500).IsRequired();
+            builder.Property(a=>a.Description).HasMaxLength(2000);
+            builder.Property(a=>a.ImagePath).HasMaxLength(200);
         }
     }
 }

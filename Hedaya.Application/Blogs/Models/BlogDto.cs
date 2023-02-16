@@ -1,10 +1,12 @@
-﻿namespace Hedaya.Domain.Entities
+﻿using MediatR;
+
+namespace Hedaya.Application.Blogs.Models
 {
-    public class Blog
+    public class BlogDto
     {
         public int Id { get; set; }
         public required string Title { get; set; }
         public string Description { get; set; }
-        public string ImagePath { get; set; }
+        public string ImgUrl { get; set; }
     }
 }

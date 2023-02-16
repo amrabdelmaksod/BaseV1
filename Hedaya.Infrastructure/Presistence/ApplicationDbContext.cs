@@ -19,11 +19,11 @@ namespace Hedaya.Infrastructure.Presistence
 
 
         #region Users
-       public DbSet<AppUser> AppUsers { get; set; }
+        public DbSet<AppUser> AppUsers { get; set; }
         #endregion
 
 
-        #region Entities
+        #region Hedaya Entities
         public DbSet<Reply> Replies { get; set; }
         public DbSet<Post> Posts { get; set; }
         public DbSet<Lesson> Lessons { get; set; }
@@ -33,12 +33,13 @@ namespace Hedaya.Infrastructure.Presistence
         public DbSet<Comment> Comments { get; set; }
         public DbSet<TestEntity> TestEntities { get; set; }
         public DbSet<TestClass> TestClasses { get; set; }
+        public DbSet<Blog> Blogs { get; set; }
         #endregion
 
         public override DatabaseFacade Database => base.Database;
         public override ChangeTracker ChangeTracker => base.ChangeTracker;
 
-       
+
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
