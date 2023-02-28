@@ -2,6 +2,7 @@
 using Hedaya.Application.Interfaces;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using System.Globalization;
 
 namespace Hedaya.Application.Blogs.Queries
 {
@@ -18,15 +19,21 @@ namespace Hedaya.Application.Blogs.Queries
             }
 
             public async Task<IEnumerable<BlogDto>> Handle(GetAllBlogsQuery request, CancellationToken cancellationToken)
-            {
+             {
                 try
-                {                  
+                {
+                    var x = CultureInfo.CurrentCulture.TwoLetterISOLanguageName;
                   var blogs = await _context.Blogs.Select(a=>new BlogDto
                   { 
                       Id = a.Id,
-                      Title= a.Title,
+                      Title = a.Title,                   
                       Description= a.Description,
                       ImgUrl = a.ImagePath,
+                      Facebook = a.Facebook,
+                      Instagram = a.Instagram,
+                      Twitter = a.Twitter,
+                      Whatsapp = a.Whatsapp,
+                      Youtube = a.Youtube, 
                   }).ToListAsync(cancellationToken);
                     return blogs;
        

@@ -14,20 +14,25 @@ using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Localization;
 using Microsoft.IdentityModel.Tokens;
 using NLog;
+using System.Globalization;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
 
-//Add JWT Configurations
+
+
+
+    //Add JWT Configurations
 builder.Services.Configure<JWTSettings>(builder.Configuration.GetSection("JWT"));
-builder.Services.AddIdentity<AppUser, IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>();
+builder.Services.AddIdentity<AppUser, IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultUI();
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -50,6 +55,14 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddIdentityCore<AppUser>(options => options.SignIn.RequireConfirmedAccount = true)
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddTokenProvider<DataProtectorTokenProvider<AppUser>>(TokenOptions.DefaultProvider);
+
+
+
+
+
+
+
+
 
 
 //Add Google External Login Service
@@ -77,6 +90,12 @@ builder.Services.ConfigureApplicationCookie(o => {
 builder.Services.Configure<DataProtectionTokenProviderOptions>(o =>
        o.TokenLifespan = TimeSpan.FromHours(3));
 
+
+
+//Add Twilio SMS Service
+builder.Services.Configure<TwilioSettings>(builder.Configuration.GetSection("Twilio"));
+builder.Services.AddTransient<ISMSService, SMSService>();
+
 // Add services to the container.
 builder.Services.ConfigureLoggerService();
 builder.Services.AddControllers();
@@ -90,7 +109,18 @@ builder.Services.AddMvc().AddViewLocalization(Microsoft.AspNetCore.Mvc.Razor.Lan
         options.DataAnnotationLocalizerProvider = (type, factory) =>
         factory.Create(typeof(JsonStringLocalizerFactory));
     });
+builder.Services.Configure<RequestLocalizationOptions>(options =>
+{
+    var supportedCultures = new[]
+    {
+        new CultureInfo("en-US"),
+        new CultureInfo("ar-EG"),
+    };
 
+    options.DefaultRequestCulture = new RequestCulture(culture: supportedCultures[0], uiCulture: supportedCultures[0]);
+    options.SupportedCultures= supportedCultures;
+    options.SupportedUICultures= supportedCultures;
+});
 
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -135,9 +165,42 @@ builder.Services.AddSwaggerGen();
 builder.Services.ConfigureOptions<ConfigureSwaggerOptions>();
 
 var app = builder.Build();
+
+//seeding default users and roles
+
+var scope = app.Services.CreateScope();
+
+
+var services = scope.ServiceProvider;
+
+var loggerFactory = services.GetRequiredService<ILoggerFactory>();
+
+var logger = loggerFactory.CreateLogger("app");
+
+try
+{
+    var userManager = services.GetRequiredService<UserManager<AppUser>>();
+    var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+
+    await Hedaya.Domain.Entities.Seeds.DefaultRoles.SeedAsync(roleManager);
+    await Hedaya.Domain.Entities.Seeds.DefaultUsers.SeedBasicUserAsync(userManager);
+    await Hedaya.Domain.Entities.Seeds.DefaultUsers.SeedSuperAdminUserAsync(userManager,roleManager);
+
+    logger.LogInformation("Data Seeded");
+
+}
+catch (Exception)
+{
+
+    logger.LogWarning("Ann error occured while seeding default data!");
+}
+
+
+
+
 LogManager.LoadConfiguration(string.Concat(Directory.GetCurrentDirectory(), "/nlog.config"));
-var logger = app.Services.GetRequiredService<ILoggerManager>();
-app.ConfigureExceptionHandler(logger);
+var loggerManager = app.Services.GetRequiredService<ILoggerManager>();
+app.ConfigureExceptionHandler(loggerManager);
 
 
 app.UseMiddleware<ExceptionMiddleware>();
@@ -163,6 +226,12 @@ var apiVersionDescriptionProvider = app.Services.GetRequiredService<IApiVersionD
 app.UseHttpsRedirection();
 
 app.UseAuthentication();
+
+var supportedCultures = new[] {"en-US", "ar-EG" };
+var localizationOptions = new RequestLocalizationOptions().SetDefaultCulture(supportedCultures[0]).AddSupportedCultures(supportedCultures).AddSupportedUICultures(supportedCultures);
+
+app.UseRequestLocalization(localizationOptions);
+
 
 app.UseAuthorization();
 

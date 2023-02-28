@@ -4,7 +4,7 @@ namespace Hedaya.Common
 {
     public class RandomHelper
     {
-        public static string RandonString(int length)
+        public static string RandomString(int length)
         {
             var random = new Random();
             const string chars = "123456789";

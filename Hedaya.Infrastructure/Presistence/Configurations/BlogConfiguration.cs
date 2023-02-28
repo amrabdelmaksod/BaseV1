@@ -17,11 +17,8 @@ namespace Hedaya.Infrastructure.Presistence.Configurations
             builder.Property(a=>a.Twitter).HasMaxLength(200);
             builder.Property(a=>a.Youtube).HasMaxLength(200);
             builder.Property(a=>a.Instagram).HasMaxLength(200);
-            builder.Property(a=>a.Whatsapp).HasMaxLength(200);
-            builder.Property(b => b.CreationDate).HasColumnType("DATETIME").HasDefaultValueSql("CURRENT_TIMESTAMP()").IsRequired();
-
-            builder.Property(b => b.ModificationDate).HasColumnType("DATETIME");
-
+            builder.Property(a=>a.Whatsapp).HasMaxLength(200); 
+            
             builder.Property(a => a.Deleted).HasDefaultValue(false);
         }
     }

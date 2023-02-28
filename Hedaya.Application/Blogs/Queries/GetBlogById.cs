@@ -26,6 +26,11 @@ namespace Hedaya.Application.Blogs.Queries
                         Title = a.Title,
                         Description = a.Description,
                         ImgUrl = a.ImagePath,
+                        Facebook = a.Facebook,
+                        Instagram = a.Instagram,
+                        Twitter = a.Twitter,
+                        Whatsapp = a.Whatsapp,
+                        Youtube = a.Youtube,
                     }).FirstOrDefaultAsync(cancellationToken);
 
                     if (blog == null)

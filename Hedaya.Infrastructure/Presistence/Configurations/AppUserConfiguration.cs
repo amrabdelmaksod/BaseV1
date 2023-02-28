@@ -10,6 +10,7 @@ namespace Hedaya.Infrastructure.Presistence.Configurations
         {
             builder.ToTable("AppUsers");
             builder.Property(a=>a.Name).HasMaxLength(100).IsRequired();
+            builder.Property(a=>a.SecurityCode).HasMaxLength(10);
         }
     }
 }

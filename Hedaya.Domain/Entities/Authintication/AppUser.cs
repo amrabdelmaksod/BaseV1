@@ -7,7 +7,7 @@ namespace Hedaya.Domain.Entities.Authintication
     {
         public required string Name { get; set; }
         public UserType UserType { get; set; }
-        public string SecurityCode { get; set; }
+        public string? SecurityCode { get; set; }
         public bool Deleted { get; set; }
         //public Country Country { get; set; }       
         public virtual ICollection<AppUserRoles> AppUserRoles { get; set; }

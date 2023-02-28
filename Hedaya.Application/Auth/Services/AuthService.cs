@@ -12,7 +12,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Text;
+using System.Text; 
 
 namespace Hedaya.Application.Auth.Services
 {
@@ -23,11 +23,12 @@ namespace Hedaya.Application.Auth.Services
         private readonly JWTSettings _jwt;
         private readonly IEmailSender _sender;
         private IConfiguration _configuration;
+        private readonly ISMSService _smsService;
 
 
         private IApplicationDbContext _context;
 
-        public AuthService(UserManager<AppUser> userManager, IApplicationDbContext context, IOptions<JWTSettings> jwt, RoleManager<IdentityRole> roleManager, IEmailSender sender, IConfiguration configuration)
+        public AuthService(UserManager<AppUser> userManager, IApplicationDbContext context, IOptions<JWTSettings> jwt, RoleManager<IdentityRole> roleManager, IEmailSender sender, IConfiguration configuration, ISMSService smsService)
         {
             _userManager = userManager;
             _jwt = jwt.Value;
@@ -35,6 +36,7 @@ namespace Hedaya.Application.Auth.Services
             _sender = sender;
             _context = context;
             _configuration = configuration;
+            _smsService = smsService;
         }
 
         public async Task<AuthModel> LoginAsync(ModelStateDictionary modelState,TokenRequestModel model)
@@ -56,9 +58,9 @@ namespace Hedaya.Application.Auth.Services
             authModel.IsAuthinticated = true;
             authModel.Token = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
             authModel.Email = user.Email;
-            authModel.UseName = user.UserName;
+            authModel.UserName = user.UserName;
             authModel.ExpiresOn = jwtSecurityToken.ValidTo;
-
+            
             var rolesList = await _userManager.GetRolesAsync(user);
             authModel.Roles = rolesList.ToList();
 
@@ -78,10 +80,10 @@ namespace Hedaya.Application.Auth.Services
             {
                 modelState.AddModelError("userName", "User name Is Already Exists!");
 
-                return null;
+                return null;    
                
             }
-            string code = RandomHelper.RandonString(5);
+            string code = RandomHelper.RandomString(5);
 
             var user = new AppUser
             {
@@ -89,7 +91,7 @@ namespace Hedaya.Application.Auth.Services
                 UserName = model.UserName,
                 Email = model.Email,
                 PhoneNumber = model.PhoneNumber,
-                UserType = Hedaya.Domain.Enums.UserType.User,
+                UserType = Domain.Enums.UserType.User,
                 EmailConfirmed = true,
                 SecurityCode= code,
             };
@@ -115,7 +117,7 @@ namespace Hedaya.Application.Auth.Services
                 IsAuthinticated = true,
                 Roles = new List<string> { "Users" },
                 Token = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken),
-                UseName = user.UserName,
+                UserName = user.UserName,
                 Message = "Registered Successfully!"
             };
         }
@@ -169,13 +171,16 @@ namespace Hedaya.Application.Auth.Services
 
                 var encodedToken = Encoding.UTF8.GetBytes(token);
                 var validToken = WebEncoders.Base64UrlEncode(encodedToken);
-                var activateCode = RandomHelper.RandonString(5);
+                var activateCode = RandomHelper.RandomString(5);
 
                 ///ToDo Send mail
-             
 
-               var message = $"Hi {user.Name}, To Reset Your Password Please Use This Code : {activateCode}";
-              await _sender.SendEmailAsync(user.Email, message, activateCode);
+
+                var message = $"Hi {user.Name}, To Reset Your Password Please Use This Code : {activateCode}";
+                await _sender.SendEmailAsync(user.Email, message, activateCode);
+
+                //Send SMS Message With Security Code
+                //_smsService.send(user.PhoneNumber, activateCode);
 
 
                 user.SecurityCode = activateCode;
