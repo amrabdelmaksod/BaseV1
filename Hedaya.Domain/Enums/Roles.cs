@@ -11,7 +11,7 @@ namespace Hedaya.Domain.Enums
         Support = 2,
 
         [Description("مستخدم")]
-        User = 2,
+        User = 3,
 
 
     }

@@ -1,105 +1,23 @@
-using Hedaya.Application.Auth.Abstractions;
-using Hedaya.Application.Auth.Models;
-using Hedaya.Application.Auth.Services;
 using Hedaya.Application.Infrastructure;
 using Hedaya.Application.Interfaces;
+using Hedaya.Dashboard.Models;
 using Hedaya.Domain.Entities.Authintication;
 using Hedaya.Domain.Entities.Seeds;
 using Hedaya.Infrastructure.Presistence;
-using Hedaya.WebApi;
-using Hedaya.WebApi.Extensions;
-using Hedaya.WebApi.Interfaces;
-using Hedaya.WebApi.Middlewares;
-using Hedaya.WebApi.Models;
 using MediatR;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Localization;
-using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Localization;
-using Microsoft.IdentityModel.Tokens;
-using NLog;
 using System.Globalization;
-using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-
-
-
-
-    //Add JWT Configurations
-builder.Services.Configure<JWTSettings>(builder.Configuration.GetSection("JWT"));
-builder.Services.AddIdentity<AppUser, IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultUI();
-builder.Services.AddAuthentication(options =>
-{
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-
-}
-).AddJwtBearer(options => options.TokenValidationParameters = new TokenValidationParameters
-{
-    ValidateIssuer = true,
-    ValidateAudience = true,
-    ValidateLifetime = true,
-    ValidateIssuerSigningKey = true,
-    ValidIssuer = builder.Configuration["JWT:Issuer"],
-    ValidAudience = builder.Configuration["JWT:Audience"],
-    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Key"]))
-});
-builder.Services.AddScoped<IAuthService, AuthService>();
-
-
-builder.Services.AddIdentityCore<AppUser>(options => options.SignIn.RequireConfirmedAccount = true)
-                .AddEntityFrameworkStores<ApplicationDbContext>()
-                .AddTokenProvider<DataProtectorTokenProvider<AppUser>>(TokenOptions.DefaultProvider);
-
-
-
-
-
-
-
-
-
-
-//Add Google External Login Service
-builder.Services.AddAuthentication()
-                              .AddGoogle(options =>
-                          {
-                              IConfigurationSection googleAuthSection = builder.Configuration.GetSection("Authintication:Google");
-                              options.ClientId = googleAuthSection["ClientId"];
-                              options.ClientSecret = googleAuthSection["ClientSecret"];
-                          });
-
-
-
-
-//Add Send Grid Service For Sending Emails
-builder.Services.AddTransient<IEmailSender, EmailSender>();
-builder.Services.Configure<AuthMessageSenderOptions>(builder.Configuration);
-
-
-builder.Services.ConfigureApplicationCookie(o => {
-    o.ExpireTimeSpan = TimeSpan.FromDays(5);
-    o.SlidingExpiration = true;
-}); 
-
-builder.Services.Configure<DataProtectionTokenProviderOptions>(o =>
-       o.TokenLifespan = TimeSpan.FromHours(3));
-
-
-
-//Add Twilio SMS Service
-builder.Services.Configure<TwilioSettings>(builder.Configuration.GetSection("Twilio"));
-builder.Services.AddTransient<ISMSService, SMSService>();
-
 // Add services to the container.
-builder.Services.ConfigureLoggerService();
+builder.Services.AddIdentity<AppUser, IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultUI();
 builder.Services.AddControllers();
+
 
 //Add Localization
 builder.Services.AddLocalization();
@@ -119,8 +37,8 @@ builder.Services.Configure<RequestLocalizationOptions>(options =>
     };
 
     options.DefaultRequestCulture = new RequestCulture(culture: supportedCultures[0], uiCulture: supportedCultures[0]);
-    options.SupportedCultures= supportedCultures;
-    options.SupportedUICultures= supportedCultures;
+    options.SupportedCultures = supportedCultures;
+    options.SupportedUICultures = supportedCultures;
 });
 
 
@@ -163,7 +81,10 @@ builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddSwaggerGen();
 
-builder.Services.ConfigureOptions<ConfigureSwaggerOptions>();
+builder.Services.ConfigureOptions<Hedaya.Dashboard.Models.ConfigureSwaggerOptions>();
+// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
@@ -185,7 +106,7 @@ try
 
     await DefaultRoles.SeedAsync(roleManager);
     await DefaultUsers.SeedBasicUserAsync(userManager);
-    await DefaultUsers.SeedSuperAdminUserAsync(userManager,roleManager);
+    await DefaultUsers.SeedSuperAdminUserAsync(userManager, roleManager);
 
     logger.LogInformation("Data Seeded");
 
@@ -196,45 +117,22 @@ catch (Exception)
     logger.LogWarning("Ann error occured while seeding default data!");
 }
 
-
-
-
-LogManager.LoadConfiguration(string.Concat(Directory.GetCurrentDirectory(), "/nlog.config"));
-var loggerManager = app.Services.GetRequiredService<ILoggerManager>();
-app.ConfigureExceptionHandler(loggerManager);
-
-
-app.UseMiddleware<ExceptionMiddleware>();
-
-var apiVersionDescriptionProvider = app.Services.GetRequiredService<IApiVersionDescriptionProvider>();
 // Configure the HTTP request pipeline.
-
-
+if (app.Environment.IsDevelopment())
+{
     app.UseSwagger();
-    app.UseSwaggerUI(options =>
-    {
-        foreach (var description in apiVersionDescriptionProvider.ApiVersionDescriptions)
-        {
-            options.SwaggerEndpoint($"/swagger/{description.GroupName}/swagger.json",
-                description.GroupName.ToUpperInvariant());
-        }
-    });
-
-
-
-
+    app.UseSwaggerUI();
+}
 
 app.UseHttpsRedirection();
 
-app.UseAuthentication();
+app.UseAuthorization();
 
-var supportedCultures = new[] {"en-US", "ar-EG" };
+var supportedCultures = new[] { "en-US", "ar-EG" };
 var localizationOptions = new RequestLocalizationOptions().SetDefaultCulture(supportedCultures[0]).AddSupportedCultures(supportedCultures).AddSupportedUICultures(supportedCultures);
 
 app.UseRequestLocalization(localizationOptions);
 
-
-app.UseAuthorization();
 
 app.MapControllers();
 

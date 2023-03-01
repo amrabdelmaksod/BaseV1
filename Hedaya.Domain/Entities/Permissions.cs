@@ -1,6 +1,4 @@
-﻿using System.Reflection;
-
-namespace Hedaya.Domain.Entities
+﻿namespace Hedaya.Domain.Entities
 {
     public static class Permissions
     {

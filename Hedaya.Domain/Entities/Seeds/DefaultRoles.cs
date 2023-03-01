@@ -8,6 +8,8 @@ namespace Hedaya.Domain.Entities.Seeds
 
         
         public static async Task SeedAsync(RoleManager<IdentityRole> roleManager)
+        
+        
         {
             if(!roleManager.Roles.Any())
             {

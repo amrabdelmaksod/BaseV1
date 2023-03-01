@@ -7,6 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Members\**" />
+    <EmbeddedResource Remove="Members\**" />
+    <None Remove="Members\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="FluentValidation" Version="11.4.0" />
     <PackageReference Include="MediatR" Version="10.0.1" />
     <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="10.0.1" />
@@ -25,9 +31,6 @@
 
   <ItemGroup>
     <Folder Include="Blogs\Commands\" />
-    <Folder Include="Members\Commands\Login\" />
-    <Folder Include="Members\DTOs\" />
-    <Folder Include="Members\Queries\" />
     <Folder Include="Tests\DTOs\" />
     <Folder Include="Tests\Queries\" />
   </ItemGroup>
