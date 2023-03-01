@@ -7,10 +7,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Hedaya.Application.Users.Queries
 {
-    public class GetAllUsersQuery : IRequest<PagedList<UsersLiDto>>
+    public class GetAllUsersQuery : IRequest<IEnumerable<UsersLiDto>>
     {
         public UserParams userParams { get; set; } 
-        public class Handler : IRequestHandler<GetAllUsersQuery, PagedList<UsersLiDto>>
+        public class Handler : IRequestHandler<GetAllUsersQuery, IEnumerable<UsersLiDto>>
         {
          
             private readonly UserManager<AppUser> _userManager;
@@ -20,20 +20,20 @@ namespace Hedaya.Application.Users.Queries
                 _userManager = userManager;
             }
 
-            public async Task<PagedList<UsersLiDto>> Handle(GetAllUsersQuery request, CancellationToken cancellationToken)
+            public async Task<IEnumerable<UsersLiDto>> Handle(GetAllUsersQuery request, CancellationToken cancellationToken)
             {
                 try
                 {
-                    var users =  _userManager.Users
+                    var users =await _userManager.Users
             
                         .Select(user => new UsersLiDto { Id = user.Id, userName = user.UserName, Email = user.Email, Roles = _userManager.GetRolesAsync(user).Result })
             
-                        .AsQueryable();
+                        .ToListAsync();
 
             
-                    var data = await PagedList<UsersLiDto>.CreateAsync(users.AsNoTracking(), request.userParams.PageNumber, request.userParams.PageSize);
+                    //var data = await PagedList<UsersLiDto>.CreateAsync(users.AsNoTracking(), request.userParams.PageNumber, request.userParams.PageSize);
 
-                    return data;
+                    return users;
 
                 }
                 catch (Exception ex)

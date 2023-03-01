@@ -34,11 +34,12 @@ namespace Hedaya.Infrastructure.Presistence
         public DbSet<TestEntity> TestEntities { get; set; }
         public DbSet<TestClass> TestClasses { get; set; }
         public DbSet<Blog> Blogs { get; set; }
+
+        public DbSet<Complex> Complexes { get; set; }
         #endregion
 
         public override DatabaseFacade Database => base.Database;
         public override ChangeTracker ChangeTracker => base.ChangeTracker;
-
 
 
         protected override void OnModelCreating(ModelBuilder builder)

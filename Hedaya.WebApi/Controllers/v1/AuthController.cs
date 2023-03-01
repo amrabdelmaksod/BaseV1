@@ -1,6 +1,7 @@
 ﻿  using API.Errors;
 using Hedaya.Application.Auth.Abstractions;
 using Hedaya.Application.Auth.Models;
+using Hedaya.Application.Complexes.Queries;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hedaya.WebApi.Controllers.v1
@@ -9,7 +10,7 @@ namespace Hedaya.WebApi.Controllers.v1
     [ApiController]
     [Route("api/v{version:apiVersion}/[controller]")]
     [ApiVersion("1.0")]
-    public class AuthController :ControllerBase
+    public class AuthController :BaseController<AuthController>
     {
         private readonly IAuthService _authService;
 
@@ -213,5 +214,16 @@ namespace Hedaya.WebApi.Controllers.v1
                 return CustomBadRequest.CustomExErrorResponse(ex);
             }
         }
+
+
+
+        [HttpGet("TermsAndConditions")]
+        public async Task<IActionResult> TermsAndConditions()
+        {
+
+            return Ok(await Mediator.Send(new GetComplexDataQuery()));
+        }
+
+
     }
 }

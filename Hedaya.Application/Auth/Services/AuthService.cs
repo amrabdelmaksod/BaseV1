@@ -242,7 +242,7 @@ namespace Hedaya.Application.Auth.Services
                 }
                 return new
                 {
-                    result = new { }
+                    result = new {Message = "Password Changed Successfully" }
                 };
 
             }

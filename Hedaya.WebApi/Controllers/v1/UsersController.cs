@@ -1,5 +1,6 @@
 ﻿using Hedaya.Application.Users.Commands.UpdateRoles;
 using Hedaya.Application.Users.Queries;
+using Hedaya.Domain.Common;
 using Microsoft.AspNetCore.Mvc;
 
 
@@ -11,9 +12,10 @@ namespace Hedaya.WebApi.Controllers.v1
     public class UsersController : BaseController<UsersController>
     {
         [HttpGet("getAllUsers")]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll([FromHeader] UserParams userParams)
         {
-            var result = await Mediator.Send(new GetAllUsersQuery());
+
+            var result = await Mediator.Send(new GetAllUsersQuery { userParams = userParams });
             return Ok(result);
         }
 

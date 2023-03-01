@@ -22,6 +22,7 @@ namespace Hedaya.Application.Interfaces
         DbSet<Blog> Blogs { get; set; }
         DbSet<TestClass> TestClasses { get; set; }
         DbSet<TestEntity> TestEntities { get; set; }
+        DbSet<Complex> Complexes { get; set; }
 
 
 
