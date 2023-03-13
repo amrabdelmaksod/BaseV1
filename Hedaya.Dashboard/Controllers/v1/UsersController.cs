@@ -7,7 +7,7 @@ namespace Hedaya.Dashboard.Controllers.v1
 {
     [ApiController]
     [Route("api/v{version:apiVersion}/[controller]")]
-    [ApiVersion("1.0")]
+
     public class UsersController : BaseController<UsersController>
     {
         private readonly ILogger<UsersController> _logger;

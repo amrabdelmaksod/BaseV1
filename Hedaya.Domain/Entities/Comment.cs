@@ -1,6 +1,6 @@
 ﻿namespace Hedaya.Domain.Entities
 {
-    public class Comment : BaseEntity
+    public class Comment 
     {
         public Comment()
         {

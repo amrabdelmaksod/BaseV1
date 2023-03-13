@@ -2,11 +2,11 @@
 using Hedaya.WebApi.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Hedaya.WebApi.Controllers.v1
+namespace Hedaya.WebApi.Controllers.v1.Settings
 {
     [ApiController]
     [Route("api/v{version:apiVersion}/[controller]")]
-    [ApiVersion("1.0")]
+  
     public class BlogsController : BaseController<BlogsController>
     {
         private readonly ILoggerManager _logger;
@@ -25,7 +25,7 @@ namespace Hedaya.WebApi.Controllers.v1
         [HttpGet("details")]
         public async Task<IActionResult> GetBlogById(int id)
         {
-            return Ok(await Mediator.Send(new GetBlogById { Id = id}));
+            return Ok(await Mediator.Send(new GetBlogById { Id = id }));
         }
     }
 }

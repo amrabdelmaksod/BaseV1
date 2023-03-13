@@ -2,7 +2,7 @@
 
 namespace Hedaya.Domain.Enums
 {
-    public enum Country
+    public enum Nationality
     {
         [Description("مصر")]
         Egypt = 1,
@@ -12,6 +12,5 @@ namespace Hedaya.Domain.Enums
         Emirates = 3,
         [Description("ماليزيا")]
         Malysia = 4,
-
     }
 }

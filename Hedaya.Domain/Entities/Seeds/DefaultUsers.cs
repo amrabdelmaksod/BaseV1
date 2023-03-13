@@ -12,8 +12,8 @@ namespace Hedaya.Domain.Entities.Seeds
         {
             var defaultUser = new AppUser
             {
-                Name = "basicUser",
-                UserName = "basicuser@hedaya.com",
+                
+                UserName = "basicUser",
                 Email = "basicuser@hedaya.com",
                 EmailConfirmed = true,
             };
@@ -29,8 +29,8 @@ namespace Hedaya.Domain.Entities.Seeds
         {
             var defaultUser = new AppUser
             {
-                Name = "superadmin",
-                UserName = "superadmin@hedaya.com",
+             
+                UserName = "superadmin",
                 Email = "superadmin@hedaya.com",
                 EmailConfirmed = true
             };

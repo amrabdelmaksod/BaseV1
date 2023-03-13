@@ -2,7 +2,7 @@
 
 namespace Hedaya.Domain.Entities
 {
-    public class Post : BaseEntity
+    public class Post
     {
         public Post()
         {

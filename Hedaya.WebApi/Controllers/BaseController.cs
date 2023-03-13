@@ -14,6 +14,7 @@ namespace Hedaya.WebApi.Controllers
         private IApplicationDbContext _ctx;
         protected IApplicationDbContext _context => _ctx??(_ctx = HttpContext.RequestServices.GetService<IApplicationDbContext>());
        protected IMediator Mediator => _mediator ?? (_mediator = HttpContext.RequestServices.GetService<IMediator>());
+      
         #endregion
     }
 }

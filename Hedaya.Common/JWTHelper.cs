@@ -85,5 +85,16 @@ namespace Hedaya.Common
                 return ex.Message;
             }
         }
+
+
+        public static string GetUserIdFromToken(string token)
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var decodedToken = tokenHandler.ReadJwtToken(token);
+
+            // Extract the user ID claim
+            string userId = decodedToken.Claims.FirstOrDefault(c => c.Type == "uid").Value;
+            return userId;
+        }
     }
 }

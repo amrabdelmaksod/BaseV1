@@ -1,6 +1,6 @@
 ﻿namespace Hedaya.Domain.Entities
 {
-    public class Lesson : BaseEntity
+    public class Lesson 
     {
         public Lesson()
         {

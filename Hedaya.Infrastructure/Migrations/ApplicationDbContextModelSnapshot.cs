@@ -34,6 +34,11 @@ namespace Hedaya.Infrastructure.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTime>("DateOfBirth")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValue(new DateTime(1997, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified));
+
                     b.Property<bool>("Deleted")
                         .HasColumnType("bit");
 
@@ -44,16 +49,19 @@ namespace Hedaya.Infrastructure.Migrations
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
 
+                    b.Property<int>("Gender")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");
 
                     b.Property<DateTimeOffset?>("LockoutEnd")
                         .HasColumnType("datetimeoffset");
 
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                    b.Property<int>("Nationality")
+                        .HasColumnType("int");
 
                     b.Property<string>("NormalizedEmail")
                         .HasMaxLength(256)
@@ -153,9 +161,6 @@ namespace Hedaya.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime>("CreationDate")
-                        .HasColumnType("datetime2");
-
                     b.Property<bool>("Deleted")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bit")
@@ -176,9 +181,6 @@ namespace Hedaya.Infrastructure.Migrations
                     b.Property<string>("Instagram")
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
-
-                    b.Property<DateTime>("ModificationDate")
-                        .HasColumnType("datetime2");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -202,6 +204,63 @@ namespace Hedaya.Infrastructure.Migrations
                     b.ToTable("Blogs", (string)null);
                 });
 
+            modelBuilder.Entity("Hedaya.Domain.Entities.Certificate", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<byte[]>("CertificateContent")
+                        .IsRequired()
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<string>("CertificateType")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<int>("CourseId")
+                        .HasMaxLength(50)
+                        .HasColumnType("int");
+
+                    b.Property<string>("CreatedById")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<DateTime>("CreationDate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("DATETIME")
+                        .HasDefaultValueSql("GETDATE()");
+
+                    b.Property<bool>("Deleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<DateTime?>("ModificationDate")
+                        .HasColumnType("DATETIME");
+
+                    b.Property<string>("ModifiedById")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("TraineeId")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CourseId");
+
+                    b.HasIndex("TraineeId");
+
+                    b.ToTable("Certificates", (string)null);
+                });
+
             modelBuilder.Entity("Hedaya.Domain.Entities.Comment", b =>
                 {
                     b.Property<int>("Id")
@@ -210,18 +269,9 @@ namespace Hedaya.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime>("CreationDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("Deleted")
-                        .HasColumnType("bit");
-
                     b.Property<string>("ImagePath")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("ModificationDate")
-                        .HasColumnType("datetime2");
 
                     b.Property<int>("PostId")
                         .HasColumnType("int");
@@ -237,6 +287,29 @@ namespace Hedaya.Infrastructure.Migrations
                     b.ToTable("Comments");
                 });
 
+            modelBuilder.Entity("Hedaya.Domain.Entities.CommonQuestion", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Question")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Response")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("CommonQuestions", (string)null);
+                });
+
             modelBuilder.Entity("Hedaya.Domain.Entities.Complex", b =>
                 {
                     b.Property<int>("Id")
@@ -250,6 +323,14 @@ namespace Hedaya.Infrastructure.Migrations
                         .HasMaxLength(2000)
                         .HasColumnType("nvarchar(2000)");
 
+                    b.Property<string>("Cookies")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LogFiles")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Terms")
                         .IsRequired()
                         .HasMaxLength(1000)
@@ -260,6 +341,32 @@ namespace Hedaya.Infrastructure.Migrations
                     b.ToTable("Complexes", (string)null);
                 });
 
+            modelBuilder.Entity("Hedaya.Domain.Entities.Course", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(50)
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("InstructorId")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(265)
+                        .HasColumnType("nvarchar(265)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("InstructorId");
+
+                    b.ToTable("Courses", (string)null);
+                });
+
             modelBuilder.Entity("Hedaya.Domain.Entities.CourseTopic", b =>
                 {
                     b.Property<int>("Id")
@@ -268,17 +375,8 @@ namespace Hedaya.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime>("CreationDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("Deleted")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("EducationalCourseId")
+                    b.Property<int>("CourseId")
                         .HasColumnType("int");
-
-                    b.Property<DateTime>("ModificationDate")
-                        .HasColumnType("datetime2");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -286,56 +384,9 @@ namespace Hedaya.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("EducationalCourseId");
+                    b.HasIndex("CourseId");
 
                     b.ToTable("CourseTopics");
-                });
-
-            modelBuilder.Entity("Hedaya.Domain.Entities.EducationalCourse", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<byte>("CategoryId")
-                        .HasColumnType("tinyint");
-
-                    b.Property<DateTime>("CreationDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("Deleted")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("ModificationDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Objectives")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Pros")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("StartDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("StudyDuration")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("EducationalCourses");
                 });
 
             modelBuilder.Entity("Hedaya.Domain.Entities.Forum", b =>
@@ -346,23 +397,123 @@ namespace Hedaya.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime>("CreationDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("Deleted")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("EducationalCourseId")
+                    b.Property<int>("CourseId")
                         .HasColumnType("int");
-
-                    b.Property<DateTime>("ModificationDate")
-                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("EducationalCourseId");
+                    b.HasIndex("CourseId");
 
                     b.ToTable("Forums");
+                });
+
+            modelBuilder.Entity("Hedaya.Domain.Entities.Friendship", b =>
+                {
+                    b.Property<string>("TraineeId")
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("FriendId")
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<DateTime?>("AcceptedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("RequestDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.HasKey("TraineeId", "FriendId");
+
+                    b.HasIndex("FriendId");
+
+                    b.ToTable("Friendships");
+                });
+
+            modelBuilder.Entity("Hedaya.Domain.Entities.GentlemenScholar", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.Property<string>("Facebook")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<string>("Title")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("Twitter")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("Youtube")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("GentlemenScholars", (string)null);
+                });
+
+            modelBuilder.Entity("Hedaya.Domain.Entities.Instructor", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("AppUserId")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("CreatedById")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<DateTime>("CreationDate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("DATETIME")
+                        .HasDefaultValueSql("GETDATE()");
+
+                    b.Property<bool>("Deleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.Property<DateTime?>("ModificationDate")
+                        .HasColumnType("DATETIME");
+
+                    b.Property<string>("ModifiedById")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AppUserId");
+
+                    b.ToTable("Instructors", (string)null);
                 });
 
             modelBuilder.Entity("Hedaya.Domain.Entities.Lesson", b =>
@@ -375,15 +526,6 @@ namespace Hedaya.Infrastructure.Migrations
 
                     b.Property<int>("CourseTopicId")
                         .HasColumnType("int");
-
-                    b.Property<DateTime>("CreationDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("Deleted")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime>("ModificationDate")
-                        .HasColumnType("datetime2");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -404,6 +546,141 @@ namespace Hedaya.Infrastructure.Migrations
                     b.ToTable("Lessons");
                 });
 
+            modelBuilder.Entity("Hedaya.Domain.Entities.PlatformFeature", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("CreatedById")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<DateTime>("CreationDate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("DATETIME")
+                        .HasDefaultValueSql("GETDATE()");
+
+                    b.Property<bool>("Deleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.Property<DateTime?>("ModificationDate")
+                        .HasColumnType("DATETIME");
+
+                    b.Property<string>("ModifiedById")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("PlatformFeatures", (string)null);
+                });
+
+            modelBuilder.Entity("Hedaya.Domain.Entities.PlatformField", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("CreatedById")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<DateTime>("CreationDate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("DATETIME")
+                        .HasDefaultValueSql("GETDATE()");
+
+                    b.Property<bool>("Deleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.Property<DateTime?>("ModificationDate")
+                        .HasColumnType("DATETIME");
+
+                    b.Property<string>("ModifiedById")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("PlatformFields", (string)null);
+                });
+
+            modelBuilder.Entity("Hedaya.Domain.Entities.PlatformWorkAxes", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("CreatedById")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<DateTime>("CreationDate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("DATETIME")
+                        .HasDefaultValueSql("GETDATE()");
+
+                    b.Property<bool>("Deleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.Property<DateTime?>("ModificationDate")
+                        .HasColumnType("DATETIME");
+
+                    b.Property<string>("ModifiedById")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("PlatformWorkAxes", (string)null);
+                });
+
             modelBuilder.Entity("Hedaya.Domain.Entities.Post", b =>
                 {
                     b.Property<int>("Id")
@@ -412,21 +689,12 @@ namespace Hedaya.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime>("CreationDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("Deleted")
-                        .HasColumnType("bit");
-
                     b.Property<int>("ForumId")
                         .HasColumnType("int");
 
                     b.Property<string>("ImagePath")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("ModificationDate")
-                        .HasColumnType("datetime2");
 
                     b.Property<string>("Text")
                         .IsRequired()
@@ -450,18 +718,9 @@ namespace Hedaya.Infrastructure.Migrations
                     b.Property<int>("CommentId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("CreationDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("Deleted")
-                        .HasColumnType("bit");
-
                     b.Property<string>("ImagePath")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("ModificationDate")
-                        .HasColumnType("datetime2");
 
                     b.Property<string>("Text")
                         .IsRequired()
@@ -497,6 +756,79 @@ namespace Hedaya.Infrastructure.Migrations
                     b.HasIndex("TestClassId");
 
                     b.ToTable("TestEntities");
+                });
+
+            modelBuilder.Entity("Hedaya.Domain.Entities.Trainee", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("AppUserId")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("CreatedById")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<DateTime>("CreationDate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("DATETIME")
+                        .HasDefaultValueSql("GETDATE()");
+
+                    b.Property<bool>("Deleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<int>("EducationalDegree")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
+                    b.Property<string>("Facebook")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("FullName")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("JobTitle")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<DateTime?>("ModificationDate")
+                        .HasColumnType("DATETIME");
+
+                    b.Property<string>("ModifiedById")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<byte[]>("ProfilePicture")
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<string>("Telegram")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Twitter")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Whatsapp")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AppUserId");
+
+                    b.ToTable("Trainees", (string)null);
                 });
 
             modelBuilder.Entity("Hedaya.Domain.TestClass", b =>
@@ -660,6 +992,25 @@ namespace Hedaya.Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Hedaya.Domain.Entities.Certificate", b =>
+                {
+                    b.HasOne("Hedaya.Domain.Entities.Course", "Course")
+                        .WithMany()
+                        .HasForeignKey("CourseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Hedaya.Domain.Entities.Trainee", "Trainee")
+                        .WithMany("Certificates")
+                        .HasForeignKey("TraineeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Course");
+
+                    b.Navigation("Trainee");
+                });
+
             modelBuilder.Entity("Hedaya.Domain.Entities.Comment", b =>
                 {
                     b.HasOne("Hedaya.Domain.Entities.Post", "Post")
@@ -671,26 +1022,67 @@ namespace Hedaya.Infrastructure.Migrations
                     b.Navigation("Post");
                 });
 
-            modelBuilder.Entity("Hedaya.Domain.Entities.CourseTopic", b =>
+            modelBuilder.Entity("Hedaya.Domain.Entities.Course", b =>
                 {
-                    b.HasOne("Hedaya.Domain.Entities.EducationalCourse", "EducationalCourse")
-                        .WithMany("CourseTopics")
-                        .HasForeignKey("EducationalCourseId")
+                    b.HasOne("Hedaya.Domain.Entities.Instructor", "Instructor")
+                        .WithMany("Courses")
+                        .HasForeignKey("InstructorId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("EducationalCourse");
+                    b.Navigation("Instructor");
+                });
+
+            modelBuilder.Entity("Hedaya.Domain.Entities.CourseTopic", b =>
+                {
+                    b.HasOne("Hedaya.Domain.Entities.Course", "Course")
+                        .WithMany("CourseTopics")
+                        .HasForeignKey("CourseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Course");
                 });
 
             modelBuilder.Entity("Hedaya.Domain.Entities.Forum", b =>
                 {
-                    b.HasOne("Hedaya.Domain.Entities.EducationalCourse", "EducationalCourse")
+                    b.HasOne("Hedaya.Domain.Entities.Course", "Course")
                         .WithMany()
-                        .HasForeignKey("EducationalCourseId")
+                        .HasForeignKey("CourseId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("EducationalCourse");
+                    b.Navigation("Course");
+                });
+
+            modelBuilder.Entity("Hedaya.Domain.Entities.Friendship", b =>
+                {
+                    b.HasOne("Hedaya.Domain.Entities.Trainee", "Friend")
+                        .WithMany()
+                        .HasForeignKey("FriendId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Hedaya.Domain.Entities.Trainee", "Trainee")
+                        .WithMany("Friends")
+                        .HasForeignKey("TraineeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Friend");
+
+                    b.Navigation("Trainee");
+                });
+
+            modelBuilder.Entity("Hedaya.Domain.Entities.Instructor", b =>
+                {
+                    b.HasOne("Hedaya.Domain.Entities.Authintication.AppUser", "AppUser")
+                        .WithMany()
+                        .HasForeignKey("AppUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("AppUser");
                 });
 
             modelBuilder.Entity("Hedaya.Domain.Entities.Lesson", b =>
@@ -735,6 +1127,17 @@ namespace Hedaya.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("TestClass");
+                });
+
+            modelBuilder.Entity("Hedaya.Domain.Entities.Trainee", b =>
+                {
+                    b.HasOne("Hedaya.Domain.Entities.Authintication.AppUser", "AppUser")
+                        .WithMany()
+                        .HasForeignKey("AppUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("AppUser");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -793,14 +1196,14 @@ namespace Hedaya.Infrastructure.Migrations
                     b.Navigation("Replies");
                 });
 
+            modelBuilder.Entity("Hedaya.Domain.Entities.Course", b =>
+                {
+                    b.Navigation("CourseTopics");
+                });
+
             modelBuilder.Entity("Hedaya.Domain.Entities.CourseTopic", b =>
                 {
                     b.Navigation("Lessons");
-                });
-
-            modelBuilder.Entity("Hedaya.Domain.Entities.EducationalCourse", b =>
-                {
-                    b.Navigation("CourseTopics");
                 });
 
             modelBuilder.Entity("Hedaya.Domain.Entities.Forum", b =>
@@ -808,9 +1211,21 @@ namespace Hedaya.Infrastructure.Migrations
                     b.Navigation("Posts");
                 });
 
+            modelBuilder.Entity("Hedaya.Domain.Entities.Instructor", b =>
+                {
+                    b.Navigation("Courses");
+                });
+
             modelBuilder.Entity("Hedaya.Domain.Entities.Post", b =>
                 {
                     b.Navigation("Comments");
+                });
+
+            modelBuilder.Entity("Hedaya.Domain.Entities.Trainee", b =>
+                {
+                    b.Navigation("Certificates");
+
+                    b.Navigation("Friends");
                 });
 
             modelBuilder.Entity("Hedaya.Domain.TestClass", b =>

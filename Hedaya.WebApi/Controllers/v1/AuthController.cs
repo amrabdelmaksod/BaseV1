@@ -9,7 +9,7 @@ namespace Hedaya.WebApi.Controllers.v1
   
     [ApiController]
     [Route("api/v{version:apiVersion}/[controller]")]
-    [ApiVersion("1.0")]
+    
     public class AuthController :BaseController<AuthController>
     {
         private readonly IAuthService _authService;
@@ -98,28 +98,11 @@ namespace Hedaya.WebApi.Controllers.v1
         {
             try
             {
-                var headers = Request.Headers;
-                if (!headers.ContainsKey("token"))
-                {
-                    ModelState.AddModelError("token", "Missing tokin");
-                    if (!ModelState.IsValid)
-                    {
-                        return CustomBadRequest.CustomModelStateErrorResponse(ModelState);
-                    }
-                }
-                if (!headers.ContainsKey("lang"))
-                {
-                    ModelState.AddModelError("lang", "Missing lang");
-                    if (!ModelState.IsValid)
-                    {
-                        return CustomBadRequest.CustomModelStateErrorResponse(ModelState);
-                    }
-                }
-                string lang = headers.GetCommaSeparatedValues("lang").First();
-               
-                string token = headers.GetCommaSeparatedValues("token").First();
 
-                var result = await _authService.GetUserAsync(ModelState, token);
+                // Get the current user ID from the JWT token
+                var userId = User.Claims.FirstOrDefault(c => c.Type == "uid")?.Value;
+
+                var result = await _authService.GetUserAsync(ModelState, userId);
                 if (!ModelState.IsValid)
                 {
                     return CustomBadRequest.CustomModelStateErrorResponse(ModelState);
@@ -142,18 +125,10 @@ namespace Hedaya.WebApi.Controllers.v1
         {
             try
             {
-                var headers = Request.Headers;
-                if (!headers.ContainsKey("token"))
-                {
-                    ModelState.AddModelError("token", "Missing tokin");
-                    if (!ModelState.IsValid)
-                    {
-                        return CustomBadRequest.CustomModelStateErrorResponse(ModelState);
-                    }
-                }
 
-                string token = headers.GetCommaSeparatedValues("token").First();
-                var result = await _authService.UpdateUserAsync(ModelState, userModel, token);
+                var userId = User.Claims.FirstOrDefault(c => c.Type == "uid")?.Value;
+
+                var result = await _authService.UpdateUserAsync(ModelState, userModel, userId);
                 if (!ModelState.IsValid)
                 {
                     return CustomBadRequest.CustomModelStateErrorResponse(ModelState);
@@ -166,20 +141,39 @@ namespace Hedaya.WebApi.Controllers.v1
             }
         }
 
-        [HttpPost("addToRole")]
-        public async Task<IActionResult> AddRoleAsync([FromBody] AddRoleModel model)
+
+        [HttpPost("change-password")]
+        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordModel model)
         {
             if (!ModelState.IsValid)
-                return CustomBadRequest.CustomModelStateErrorResponse(ModelState);
+            {
+                return BadRequest(ModelState);
+            }
 
-            var result = await _authService.AddToRoleAsync(ModelState, model);
+            var userId = User.Claims.FirstOrDefault(c => c.Type == "uid")?.Value;
+            var result = await _authService.ChangePasswordAsync(userId, model.CurrentPassword, model.NewPassword, ModelState);
+            if (!result)
+            {
+                return BadRequest(ModelState);
+            }
 
-            if (!string.IsNullOrEmpty(result))
-                return CustomBadRequest.CustomModelStateErrorResponse(ModelState);
+            return Ok();
+        }
+
+        //[HttpPost("addToRole")]
+        //public async Task<IActionResult> AddRoleAsync([FromBody] AddRoleModel model)
+        //{
+        //    if (!ModelState.IsValid)
+        //        return CustomBadRequest.CustomModelStateErrorResponse(ModelState);
+
+        //    var result = await _authService.AddToRoleAsync(ModelState, model);
+
+        //    if (!string.IsNullOrEmpty(result))
+        //        return CustomBadRequest.CustomModelStateErrorResponse(ModelState);
         
 
-            return Ok(model);
-        }
+        //    return Ok(model);
+        //}
 
         [HttpDelete("DeleteAccount")]
         public async Task<ActionResult> DeleteAccount()
@@ -187,21 +181,9 @@ namespace Hedaya.WebApi.Controllers.v1
             try
             {
 
-                var headers = Request.Headers;
 
-
-
-                if (!headers.ContainsKey("token"))
-                {
-                    ModelState.AddModelError("token", "Missing tokin");
-                    if (!ModelState.IsValid)
-                    {
-                        return CustomBadRequest.CustomModelStateErrorResponse(ModelState);
-                    }
-                }
-                var token = headers.FirstOrDefault(s => s.Key == "token").Value;
-
-                var result = _authService.DeleteAccount(ModelState, token);
+                var userId = User.Claims.FirstOrDefault(c => c.Type == "uid")?.Value;
+                var result = _authService.DeleteAccount(ModelState, userId);
 
                 if (!ModelState.IsValid)
                 {

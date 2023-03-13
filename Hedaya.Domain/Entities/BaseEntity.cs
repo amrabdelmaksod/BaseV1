@@ -2,9 +2,10 @@
 {
     public partial class BaseEntity
     {
-        //public string CreatedById { get; set; }
+        public string CreatedById { get; set; }
         public DateTime CreationDate { get; set; }
-        public DateTime ModificationDate { get; set; }
+        public string? ModifiedById { get; set; }
+        public DateTime? ModificationDate { get; set; }
         public bool Deleted { get; set; }
     }
 }

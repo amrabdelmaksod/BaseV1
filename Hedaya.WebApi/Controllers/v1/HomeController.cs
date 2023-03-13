@@ -7,7 +7,7 @@ namespace Hedaya.WebApi.Controllers.v1
 {
     [ApiController]
     [Route("api/v{version:apiVersion}/[controller]")]
-    [ApiVersion("1.0")]
+
     public class HomeController : BaseController<HomeController>
     {
         private readonly ILoggerManager _loggerManager;

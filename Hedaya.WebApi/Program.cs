@@ -1,8 +1,10 @@
 using Hedaya.Application.Auth.Abstractions;
 using Hedaya.Application.Auth.Models;
 using Hedaya.Application.Auth.Services;
+using Hedaya.Application.Certificates.Services;
 using Hedaya.Application.Infrastructure;
 using Hedaya.Application.Interfaces;
+using Hedaya.Application.Services;
 using Hedaya.Domain.Entities.Authintication;
 using Hedaya.Domain.Entities.Seeds;
 using Hedaya.Infrastructure.Presistence;
@@ -21,6 +23,7 @@ using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Localization;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using NLog;
 using System.Globalization;
 using System.Text;
@@ -52,6 +55,8 @@ builder.Services.AddAuthentication(options =>
 });
 builder.Services.AddScoped<IAuthService, AuthService>();
 
+builder.Services.AddTransient<ICertificateRepository, CertificateRepository>();
+builder.Services.AddTransient<IPdfService, PdfService>();
 
 builder.Services.AddIdentityCore<AppUser>(options => options.SignIn.RequireConfirmedAccount = true)
                 .AddEntityFrameworkStores<ApplicationDbContext>()
@@ -126,7 +131,34 @@ builder.Services.Configure<RequestLocalizationOptions>(options =>
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v4", new OpenApiInfo { Title = "My API", Version = "v1" });
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
+        Name = "Authorization",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer",
+        BearerFormat = "JWT"
+    });
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            new string[] { }
+        }
+    });
+});
+
 
 builder.Services.AddDbContext<ApplicationDbContext>(
     dbContextOptions => dbContextOptions.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
@@ -161,7 +193,7 @@ builder.Services.AddVersionedApiExplorer(setup =>
 
 builder.Services.AddEndpointsApiExplorer();
 
-builder.Services.AddSwaggerGen();
+
 
 builder.Services.ConfigureOptions<ConfigureSwaggerOptions>();
 

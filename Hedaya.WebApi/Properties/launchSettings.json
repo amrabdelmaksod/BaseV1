@@ -19,7 +19,7 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
-    "https": {
+    "Hedaya.WebAPI": {
       "commandName": "Project",
       "dotnetRunMessages": true,
       "launchBrowser": true,
@@ -37,5 +37,7 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     }
+
+
   }
 }

@@ -15,7 +15,7 @@ namespace Hedaya.Application.Interfaces
         DbSet<Post> Posts { get; set; }
         DbSet<Lesson> Lessons { get; set; }
         DbSet<Forum> Forums { get; set; }
-        DbSet<EducationalCourse> EducationalCourses { get; set; }
+        DbSet<Course> Courses { get; set; }
         DbSet<CourseTopic> CourseTopics { get; set; }
         DbSet<Comment> Comments { get; set; }
         DbSet<AppUser> AppUsers { get; set; }
@@ -23,6 +23,17 @@ namespace Hedaya.Application.Interfaces
         DbSet<TestClass> TestClasses { get; set; }
         DbSet<TestEntity> TestEntities { get; set; }
         DbSet<Complex> Complexes { get; set; }
+        DbSet<GentlemenScholar> GentlemenScholars { get; set; }
+        DbSet<PlatformField> PlatformFields { get; set; }
+        DbSet<PlatformWorkAxes> PlatformWorkAxes { get; set; }
+        DbSet<PlatformFeature> PlatformFeatures { get; set; }
+        DbSet<Trainee> Trainees { get; set; }
+        DbSet<Instructor> Instructors { get; set; }
+        DbSet<Certificate> Certificates { get; set; }
+        DbSet<Friendship> Friendships { get; set; }
+        DbSet<CommonQuestion> CommonQuestions { get; set; }
+        
+
 
 
 
@@ -31,7 +42,9 @@ namespace Hedaya.Application.Interfaces
 
         ChangeTracker ChangeTracker { get;}
         void Dispose();
+        DbSet<TEntity> Set<TEntity>() where TEntity : class;
         int SaveChanges();
+       
         Task<int> SaveChangesAsync(CancellationToken cancellationToken = default(CancellationToken));
 
 

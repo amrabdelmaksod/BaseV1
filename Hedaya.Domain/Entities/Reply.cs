@@ -1,6 +1,6 @@
 ﻿namespace Hedaya.Domain.Entities
 {
-    public class Reply : BaseEntity
+    public class Reply 
     {
         public Reply()
         {

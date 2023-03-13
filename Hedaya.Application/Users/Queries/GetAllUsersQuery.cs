@@ -3,7 +3,6 @@ using Hedaya.Domain.Common;
 using Hedaya.Domain.Entities.Authintication;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 
 namespace Hedaya.Application.Users.Queries
 {
@@ -24,11 +23,11 @@ namespace Hedaya.Application.Users.Queries
             {
                 try
                 {
-                    var users =await _userManager.Users
+                    var users = _userManager.Users
             
                         .Select(user => new UsersLiDto { Id = user.Id, userName = user.UserName, Email = user.Email, Roles = _userManager.GetRolesAsync(user).Result })
             
-                        .ToListAsync();
+                        .ToList();
 
             
                     //var data = await PagedList<UsersLiDto>.CreateAsync(users.AsNoTracking(), request.userParams.PageNumber, request.userParams.PageSize);

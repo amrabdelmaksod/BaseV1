@@ -2,7 +2,7 @@
 {
     public class Response
     {
-        public required object Result { get; set; }
-        public required string Message { get; set; }
-}
+        public  object Result { get; set; }
+        public  string Message { get; set; }
+    }
 }

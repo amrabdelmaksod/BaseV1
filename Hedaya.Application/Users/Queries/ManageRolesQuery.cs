@@ -32,7 +32,7 @@ namespace Hedaya.Application.Users.Queries
 
                     var roles = await _roleManager.Roles.ToListAsync();
 
-                    var data = new UserRolesDto
+                    var data = new UserRolesDto 
                     {
                         UserId = user.Id,
                         UserName = user.UserName,

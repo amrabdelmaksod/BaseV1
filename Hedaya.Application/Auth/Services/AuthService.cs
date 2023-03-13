@@ -2,17 +2,24 @@
 using Hedaya.Application.Auth.Models;
 using Hedaya.Application.Interfaces;
 using Hedaya.Common;
+using Hedaya.Domain.Entities;
 using Hedaya.Domain.Entities.Authintication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
+using Microsoft.Identity.Client;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
+using System.Reflection.Metadata.Ecma335;
 using System.Security.Claims;
-using System.Text; 
+using System.Text;
+using Twilio;
+using Twilio.Rest.Api.V2010.Account;
+using Twilio.Types;
 
 namespace Hedaya.Application.Auth.Services
 {
@@ -27,8 +34,9 @@ namespace Hedaya.Application.Auth.Services
 
 
         private IApplicationDbContext _context;
+        private readonly SignInManager<AppUser> _signInManager;
 
-        public AuthService(UserManager<AppUser> userManager, IApplicationDbContext context, IOptions<JWTSettings> jwt, RoleManager<IdentityRole> roleManager, IEmailSender sender, IConfiguration configuration, ISMSService smsService)
+        public AuthService(UserManager<AppUser> userManager, IApplicationDbContext context, IOptions<JWTSettings> jwt, RoleManager<IdentityRole> roleManager, IEmailSender sender, IConfiguration configuration, ISMSService smsService, SignInManager<AppUser> signInManager)
         {
             _userManager = userManager;
             _jwt = jwt.Value;
@@ -37,63 +45,37 @@ namespace Hedaya.Application.Auth.Services
             _context = context;
             _configuration = configuration;
             _smsService = smsService;
+            _signInManager = signInManager;
         }
 
-        public async Task<AuthModel> LoginAsync(ModelStateDictionary modelState,TokenRequestModel model)
-        {
-            var authModel = new AuthModel();
-
-            var user = await _userManager.FindByEmailAsync(model.Email);
-            if (user is null || !await _userManager.CheckPasswordAsync(user, model.Password))
-            {
-
-                modelState.AddModelError("Invalid Login", "Email Or Password Is Incorrect");
-
-                return null;
-              
-            }
-
-            var jwtSecurityToken = await CreateJwtToken(user);
-            authModel.Message = "Login Successfully";
-            authModel.IsAuthinticated = true;
-            authModel.Token = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
-            authModel.Email = user.Email;
-            authModel.UserName = user.UserName;
-            authModel.ExpiresOn = jwtSecurityToken.ValidTo;
-            
-            var rolesList = await _userManager.GetRolesAsync(user);
-            authModel.Roles = rolesList.ToList();
 
 
-            return authModel;
-        }
+        const string accountSid = "AC506a6a755cc66accb4d4913600aed0ee";
+        const string authToken = "d26d77a6670a369ec76cb91650dd3f8d";
 
-        public async Task<AuthModel> RegisterAsync(ModelStateDictionary modelState,RegisterModel model)
+        public async Task<dynamic> RegisterAsync(ModelStateDictionary modelState, RegisterModel model)
         {
             if (await _userManager.FindByEmailAsync(model.Email) is not null)
             {
                 modelState.AddModelError("userEmail", "Email Is Already Exists!");
 
-                return null;
-            }
-            if (await _userManager.FindByNameAsync(model.UserName) is not null)
-            {
-                modelState.AddModelError("userName", "User name Is Already Exists!");
+                return new { Message = $"There user with this Email is already exists!  {model.Email}" };
 
-                return null;    
-               
+
             }
+
             string code = RandomHelper.RandomString(5);
 
             var user = new AppUser
             {
-                Name = model.UserName,
-                UserName = model.UserName,
+
+                UserName = model.PhoneNumber,
                 Email = model.Email,
                 PhoneNumber = model.PhoneNumber,
+                Nationality = model.Country,
                 UserType = Domain.Enums.UserType.User,
                 EmailConfirmed = true,
-                SecurityCode= code,
+                SecurityCode = code,
             };
             var result = await _userManager.CreateAsync(user, model.Password);
             if (!result.Succeeded)
@@ -108,6 +90,18 @@ namespace Hedaya.Application.Auth.Services
 
             }
 
+            var TraineeUser = new Trainee
+            {
+                Id = user.Id,
+                FullName = model.FullName,
+                AppUserId = user.Id,
+                CreatedById = "2b07b902-5701-439d-b157-1bcfdf9a3466",
+                CreationDate = DateTime.Now,
+            };
+
+            await _context.Trainees.AddAsync(TraineeUser);
+            await _context.SaveChangesAsync();
+
             await _userManager.AddToRoleAsync(user, "User");
             var jwtSecurityToken = await CreateJwtToken(user);
             return new AuthModel
@@ -117,98 +111,148 @@ namespace Hedaya.Application.Auth.Services
                 IsAuthinticated = true,
                 Roles = new List<string> { "Users" },
                 Token = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken),
-                UserName = user.UserName,
+                Mobile = user.PhoneNumber,
                 Message = "Registered Successfully!"
             };
         }
 
-
-        public async Task<string> AddToRoleAsync(ModelStateDictionary modelState, AddRoleModel model)
+        public async Task<AuthModel> LoginAsync(ModelStateDictionary modelState, TokenRequestModel model)
         {
-            var user = await _userManager.FindByIdAsync(model.UserId);
+            var authModel = new AuthModel();
 
-            if (user is null || !await _roleManager.RoleExistsAsync(model.Role))
+            var user = await _userManager.FindByNameAsync(model.Mobile);
+            if (user is null || !await _userManager.CheckPasswordAsync(user, model.Password))
             {
-                modelState.AddModelError("Invalid", "Invalid user ID or Role");
-                return null;
+                modelState.AddModelError("Invalid Login", "Mobile number or password is incorrect.");
+                authModel.Message = "Invalid Login";
+                authModel.IsAuthinticated = false; // Set IsAuthenticated to false
+                return authModel;
             }
-             
-            
 
-            if (await _userManager.IsInRoleAsync(user, model.Role))
-            {
-                modelState.AddModelError("Invalid", "User already assigned to this role");
-                return null;
-               
-            }
-                
+            var jwtSecurityToken = await CreateJwtToken(user);
+            authModel.Message = "Login Successfully";
+            authModel.Email = user.Email;
+            authModel.IsAuthinticated = true;
+            authModel.Token = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
+            authModel.Mobile = user.UserName; // assuming the mobile number is stored in the UserName property
+            authModel.ExpiresOn = jwtSecurityToken.ValidTo;
 
-            var result = await _userManager.AddToRoleAsync(user, model.Role);
+            var rolesList = await _userManager.GetRolesAsync(user);
+            authModel.Roles = rolesList.ToList();
 
-            return result.Succeeded ? string.Empty : "Something went wrong";
+            return authModel;
         }
 
 
 
 
 
+        //public async Task<string> AddToRoleAsync(ModelStateDictionary modelState, AddRoleModel model)
+        //{
+        //    var user = await _userManager.FindByIdAsync(model.UserId);
 
-   
+        //    if (user is null || !await _roleManager.RoleExistsAsync(model.Role))
+        //    {
+        //        modelState.AddModelError("Invalid", "Invalid user ID or Role");
+        //        return null;
+        //    }
+
+
+
+        //    if (await _userManager.IsInRoleAsync(user, model.Role))
+        //    {
+        //        modelState.AddModelError("Invalid", "User already assigned to this role");
+        //        return null;
+
+        //    }
+
+
+        //    var result = await _userManager.AddToRoleAsync(user, model.Role);
+
+        //    return result.Succeeded ? string.Empty : "Something went wrong";
+        //}
+
+
+
+
+
+
+
 
 
         public async Task<dynamic> ForgetPasswordAsync(ModelStateDictionary modelState, ForgotPasswordVM userModel)
         {
             try
             {
-                var user = await _userManager.FindByEmailAsync(userModel.Email);
-                if (user == null)
-                {
-                    modelState.AddModelError("user_email", "There is no user with that Email Address");
-                    return null;
-                }
 
-                var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+                var user = await _userManager.FindByNameAsync(userModel.MobileNumber);
+                // Generate a random 6-digit verification code
+                var verificationCode = new Random().Next(100000, 999999).ToString();
 
-                var encodedToken = Encoding.UTF8.GetBytes(token);
-                var validToken = WebEncoders.Base64UrlEncode(encodedToken);
-                var activateCode = RandomHelper.RandomString(5);
+                // Send the verification code to the user's phone number via SMS
 
-                ///ToDo Send mail
+                //TwilioClient.Init(accountSid, authToken);
+                //var message = MessageResource.Create(
+                //    body: $"Hi {user.UserName}, To Reset Your Password Please Use This Code: {verificationCode}",
+                //    from: new PhoneNumber("your_twilio_phone_number_here"),
+                //    to: new PhoneNumber(user.PhoneNumber)
+                //);
 
-
-                var message = $"Hi {user.Name}, To Reset Your Password Please Use This Code : {activateCode}";
-                await _sender.SendEmailAsync(user.Email, message, activateCode);
-
-                //Send SMS Message With Security Code
-                //_smsService.send(user.PhoneNumber, activateCode);
-
-
-                user.SecurityCode = activateCode;
+                // Update the user's SecurityCode with the verification code
+                user.SecurityCode = verificationCode;
                 var result = await _userManager.UpdateAsync(user);
                 if (!result.Succeeded)
                 {
                     foreach (var error in result.Errors)
                     {
                         modelState.AddModelError(error.Code, error.Description);
-                        return null;
+                        return new { Message = $"{error.Description}" };
                     }
                 }
 
-                
                 return new
                 {
                     result = new
                     {
-                        code = activateCode
+                        code = verificationCode
                     }
                 };
+
             }
             catch (Exception ex)
             {
                 modelState.AddModelError(string.Join(",", ex.Data), string.Join(",", ex.InnerException));
-                return null;
+                return new { Message = $"{ex.Message}" };
             }
         }
+
+        public async Task<bool> VerifyUserByMobileNumberAsync(string mobileNumber, string verificationCode)
+        {
+            // Find the user by mobile number
+            var user = await _userManager.FindByNameAsync(mobileNumber);
+            if (user == null)
+            {
+                return false; // User not found
+            }
+
+            // Verify the user's phone number with the verification code
+
+            if (user.SecurityCode != verificationCode)
+            {
+                return false;
+            }
+
+            // Update the user's phone number confirmation status
+            user.PhoneNumberConfirmed = true;
+            var updateResult = await _userManager.UpdateAsync(user);
+            if (!updateResult.Succeeded)
+            {
+                return false; // Failed to update user
+            }
+
+            return true; // User verified successfully
+        }
+
 
 
 
@@ -220,13 +264,13 @@ namespace Hedaya.Application.Auth.Services
                 if (user == null)
                 {
                     modelState.AddModelError("user_email", "There is no user with that Email Address");
-                    return null;
+                    return new { Message = "There is no user with that Email Address" };
                 }
 
                 if (userModel.user_password != userModel.user_password_confirm)
                 {
                     modelState.AddModelError("Password Or Confirm Password", "Confirm password doesn't match the password");
-                    return null;
+                    return new { Message = "Confirm password doesn't match the password" };
                 }
 
                 var token = await _userManager.GeneratePasswordResetTokenAsync(user);
@@ -237,48 +281,62 @@ namespace Hedaya.Application.Auth.Services
                     foreach (var error in result.Errors)
                     {
                         modelState.AddModelError(error.Code, error.Description);
-                        return null;
+                        return new { Message = $"{error.Code}, {error.Description}" };
                     }
                 }
                 return new
                 {
-                    result = new {Message = "Password Changed Successfully" }
+                    result = new { Message = "Password Changed Successfully" }
                 };
 
             }
             catch (Exception ex)
             {
                 modelState.AddModelError(string.Join(",", ex.Data), string.Join(",", ex.InnerException));
-                return null;
+                return new { Message = $"{ex.Message}" };
             }
         }
 
 
-        public async Task<dynamic> GetUserAsync(ModelStateDictionary modelState, string token)
+        public async Task<dynamic> GetUserAsync(ModelStateDictionary modelState, string userId)
         {
             try
             {
-                string userIdFromToken = JWTHelper.GetPrincipal(token, _configuration);
-                var user = await _userManager.FindByIdAsync(userIdFromToken);
+                var user = await _userManager.FindByIdAsync(userId);
+
+                var trainee = await _context.Trainees.FirstAsync(a => a.AppUserId == userId);
                 if (user == null)
                 {
-                    modelState.AddModelError("Access Token", "There is no user with that Access token");
-                    return null;
+                    modelState.AddModelError("Access Token", $"There is no user with this Id : {userId}");
+                    return new { Message = $"There is no user with this Id : {userId}" };
                 }
 
+                string profilePictureBase64 = null;
+                if (trainee.ProfilePicture != null && trainee.ProfilePicture.Length > 0)
+                {
+                    profilePictureBase64 = Convert.ToBase64String(trainee.ProfilePicture);
+                }
 
-             
                 return new
                 {
                     result = new
                     {
                         user = new
                         {
-                            user_id = user.Id,
-                            user_name = user.UserName,
-                            user_email = user.Email,
-                            user_phone = user.PhoneNumber,
-                   
+                            Id = user.Id,
+                            Email = user.Email,
+                            Phone = user.PhoneNumber,
+                            FullName = trainee.FullName,
+                            DateOfBirth = user.DateOfBirth,
+                            Country = user.Nationality,
+                            Gender = user.Gender,
+                            EducationalDegree = trainee.EducationalDegree,
+                            JobTitle = trainee.JobTitle ?? "",
+                            Facebook = trainee.Facebook ?? "",
+                            Twitter = trainee.Twitter ?? "",
+                            Whatsapp = trainee.Whatsapp ?? "",
+                            Telegram = trainee.Telegram ?? "",
+                            profilePictureBase64 = profilePictureBase64,
                         }
                     }
                 };
@@ -286,45 +344,92 @@ namespace Hedaya.Application.Auth.Services
             catch (Exception ex)
             {
                 modelState.AddModelError(string.Join(",", ex.Data), string.Join(",", ex.InnerException));
-                return null;
+                return new { Message = $"{ex.Message}" };
             }
         }
 
 
-        public async Task<dynamic> UpdateUserAsync(ModelStateDictionary modelState, UpdateProfileModel userModel, string token)
+
+        public async Task<dynamic> UpdateUserAsync(ModelStateDictionary modelState, UpdateProfileModel userModel, string userId)
         {
             try
             {
-                string userIdFromToken = JWTHelper.GetPrincipal(token, _configuration);
-                var user = await _userManager.FindByIdAsync(userIdFromToken);
+
+                var user = await _userManager.FindByIdAsync(userId);
+                var Trainee = await _context.Trainees.FirstAsync(a => a.AppUserId == userId);
                 if (user == null)
                 {
-                    modelState.AddModelError("Access Token", "There is no user with that Access token");
-                    return null;
+                    modelState.AddModelError("Access Token", $"There is no user with this Id : {userId}");
+                    return new { Message = $"There is no user with this Id : {userId}" };
                 }
 
 
-                var phoneisexist = _context.AppUsers.FirstOrDefault(s => s.PhoneNumber == userModel.userPhone && s.Id != user.Id);
+                var phoneisexist = _context.AppUsers.FirstOrDefault(s => s.PhoneNumber == userModel.Phone && s.Id != user.Id);
                 if (phoneisexist != null)
                 {
                     modelState.AddModelError("user_Phone", "Phone Number Is Already Exist");
-                    return null;
+                    return new { Message = $"Phone Number Is Already Exist : {userModel.Phone}" };
                 }
-            
 
-               
-                if (!string.IsNullOrEmpty(userModel.userName))
+
+
+
+                if (!string.IsNullOrEmpty(userModel.Email))
                 {
-                    user.Name = userModel.userName;
+                    user.Email = userModel.Email;
                 }
-                if (!string.IsNullOrEmpty(userModel.userEmail))
+                if (!string.IsNullOrEmpty(userModel.Phone))
                 {
-                    user.Email = userModel.userEmail;
+                    user.PhoneNumber = userModel.Phone;
+                    user.UserName = userModel.Phone;
                 }
-                if (!string.IsNullOrEmpty(userModel.userPhone))
+
+                if (!string.IsNullOrEmpty(userModel.FullName))
                 {
-                    user.PhoneNumber = userModel.userPhone;
+                    Trainee.FullName = userModel.FullName;
                 }
+
+                if (!string.IsNullOrEmpty(userModel.Twitter))
+                {
+                    Trainee.Twitter = userModel.Twitter;
+                }
+
+                if (!string.IsNullOrEmpty(userModel.Facebook))
+                {
+                    Trainee.Facebook = userModel.Facebook;
+                }
+                if (!string.IsNullOrEmpty(userModel.JobTitle))
+                {
+                    Trainee.JobTitle = userModel.JobTitle;
+                }
+                if (!string.IsNullOrEmpty(userModel.Whatsapp))
+                {
+                    Trainee.Whatsapp = userModel.Whatsapp;
+                }
+                if (!string.IsNullOrEmpty(userModel.Telegram))
+                {
+                    Trainee.Telegram = userModel.Telegram;
+                }
+                if (!string.IsNullOrEmpty(userModel.EducationalDegree.ToString()))
+                {
+                    Trainee.EducationalDegree = userModel.EducationalDegree;
+                }
+
+                if (!string.IsNullOrEmpty(userModel.ProfilePicture.ToString()))
+                {
+                    // Save the new profile picture to the database
+                    using (var ms = new MemoryStream())
+                    {
+                        userModel.ProfilePicture.CopyTo(ms);
+                        Trainee.ProfilePicture = ms.ToArray();
+                    }
+
+                }
+
+                _context.Trainees.Update(Trainee);
+                await _context.SaveChangesAsync();
+
+
 
                 var result = await _userManager.UpdateAsync(user);
                 if (!result.Succeeded)
@@ -332,7 +437,7 @@ namespace Hedaya.Application.Auth.Services
                     foreach (var error in result.Errors)
                     {
                         modelState.AddModelError(error.Code, error.Description);
-                        return null;
+                        return new { Message = $"Something Went Wrong!" };
                     }
                 }
 
@@ -343,13 +448,12 @@ namespace Hedaya.Application.Auth.Services
                     result = new
                     {
                         activate = user.EmailConfirmed,
-                        access_token = token,
+
                         user = new
                         {
                             userId = user.Id,
-                            userName = user.Name,
                             userEmail = user.Email,
-                            userPhone = user.PhoneNumber,                                                
+                            userPhone = user.PhoneNumber,
                         }
                     },
                     msg = "Successfully Message"
@@ -358,27 +462,51 @@ namespace Hedaya.Application.Auth.Services
             catch (Exception ex)
             {
                 modelState.AddModelError(string.Join(",", ex.Data), string.Join(",", ex.InnerException));
-                return null;
+                return new { Message = $"{ex.Message}" };
             }
 
         }
 
 
-        public async Task<dynamic> DeleteAccount(ModelStateDictionary modelState, string token)
+        public async Task<bool> ChangePasswordAsync(string userId, string currentPassword, string newPassword, ModelStateDictionary modelState)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                modelState.AddModelError("UserId", "User not found");
+                return false;
+            }
+
+            var result = await _userManager.ChangePasswordAsync(user, currentPassword, newPassword);
+            if (!result.Succeeded)
+            {
+                foreach (var error in result.Errors)
+                {
+                    modelState.AddModelError(error.Code, error.Description);
+                }
+                return false;
+            }
+
+            await _signInManager.RefreshSignInAsync(user);
+
+            return true;
+        }
+
+
+        public async Task<dynamic> DeleteAccount(ModelStateDictionary modelState, string userId)
         {
             try
             {
-                string userIdFromToken = JWTHelper.GetPrincipal(token, _configuration);
-                var user = await _userManager.FindByIdAsync(userIdFromToken);
+                var user = await _userManager.FindByIdAsync(userId);
                 if (user == null)
                 {
-                    modelState.AddModelError("Access Token", "There is no user with that Access token");
-                    return null;
+                    modelState.AddModelError("Access Token", $"There is no user with this Id : {userId}");
+                    return new { Message = $"There is no user with this Id : {userId}" };
                 }
 
                 user.Deleted = true;
-                
-              await _context.SaveChangesAsync();
+
+                await _context.SaveChangesAsync();
 
                 return new
                 {
@@ -392,7 +520,7 @@ namespace Hedaya.Application.Auth.Services
             catch (Exception ex)
             {
                 modelState.AddModelError(string.Join(",", ex.Data), string.Join(",", ex.InnerException));
-                return null;
+                return new { Message = $"{ex.Message}" };
             }
         }
 
@@ -433,7 +561,37 @@ namespace Hedaya.Application.Auth.Services
             return jwtSecurityToken;
         }
 
-  
+
+        private static bool IsUsernameTaken(string username, IApplicationDbContext context)
+        {
+            return context.AppUsers.Any(u => u.UserName == username);
+        }
+
+        public static string GenerateUsername(string fullName, IApplicationDbContext context)
+        {
+            // Remove any leading or trailing white spaces from the full name
+            fullName = fullName.Trim();
+
+            // Split the full name into parts using space as the delimiter
+            var nameParts = fullName.Split(' ');
+
+            // Combine the first name and last name (if available) to form the username
+            var username = nameParts[0];
+            if (nameParts.Length > 1)
+            {
+                username += nameParts[nameParts.Length - 1];
+            }
+
+            // If the generated username already exists, append a number to it
+            var suffix = 1;
+            while (IsUsernameTaken(username, context))
+            {
+                username = $"{nameParts[0]}{nameParts[nameParts.Length - 1]}{suffix}";
+                suffix++;
+            }
+
+            return username;
+        }
 
 
     }
