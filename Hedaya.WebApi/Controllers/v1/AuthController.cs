@@ -1,8 +1,11 @@
 ﻿  using API.Errors;
+using FluentValidation;
 using Hedaya.Application.Auth.Abstractions;
 using Hedaya.Application.Auth.Models;
+using Hedaya.Application.Auth.Validators;
 using Hedaya.Application.Complexes.Queries;
 using Microsoft.AspNetCore.Mvc;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace Hedaya.WebApi.Controllers.v1
 {
@@ -23,11 +26,17 @@ namespace Hedaya.WebApi.Controllers.v1
         [HttpPost("register")]
         public async Task<IActionResult> RegisterAsync([FromBody] RegisterModel model)
         {
-            if (!ModelState.IsValid)
+
+            var validator = new RegisterModelValidator();
+            var validationResult = await validator.ValidateAsync(model);
+
+            if (!validationResult.IsValid)
             {
-                return CustomBadRequest.CustomModelStateErrorResponse(ModelState);
+                return BadRequest(validationResult.Errors);
             }
-            
+
+
+
 
             var result =await _authService.RegisterAsync(ModelState, model);
             if(!result.IsAuthinticated)
@@ -44,10 +53,16 @@ namespace Hedaya.WebApi.Controllers.v1
         [HttpPost("login")]
         public async Task<IActionResult> LoginAsync([FromBody]  TokenRequestModel model)
         {
-            if (!ModelState.IsValid)
+            var validator = new TokenRequestModelValidator();
+            var validationResult = await validator.ValidateAsync(model);
+
+            if (!validationResult.IsValid)
             {
-                return CustomBadRequest.CustomModelStateErrorResponse(ModelState);
+                return BadRequest(validationResult.Errors);
             }
+
+
+
 
 
             var result = await _authService.LoginAsync(ModelState, model);
@@ -203,7 +218,7 @@ namespace Hedaya.WebApi.Controllers.v1
         public async Task<IActionResult> TermsAndConditions()
         {
 
-            return Ok(await Mediator.Send(new GetComplexDataQuery()));
+            return Ok(await Mediator.Send(new GetTermsAndConditionQuery()));
         }
 
 

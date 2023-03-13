@@ -1,13 +1,15 @@
 ﻿using Hedaya.Application.Complexes.DTOs;
+using Hedaya.Application.Infrastructure;
 using Hedaya.Application.Interfaces;
+using Hedaya.Common;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 namespace Hedaya.Application.Complexes.Queries
 {
-    public class GetComplexDataQuery : IRequest<ComplexDto>
+    public class GetCookiesAndLogFilesQuery : IRequest<object>
     {
-        public class Handler : IRequestHandler<GetComplexDataQuery, ComplexDto>
+        public class Handler : IRequestHandler<GetCookiesAndLogFilesQuery, object>
         {
 
             private readonly IApplicationDbContext _context;
@@ -16,19 +18,17 @@ namespace Hedaya.Application.Complexes.Queries
                 _context = context;
             }
 
-            public async Task<ComplexDto> Handle(GetComplexDataQuery request, CancellationToken cancellationToken)
+            public async Task<object> Handle(GetCookiesAndLogFilesQuery request, CancellationToken cancellationToken)
             {
                 try
                 {
-                    var Complex = await _context.Complexes.Select(a=>new ComplexDto { Conditions = a.Conditions, Terms = a.Terms}).FirstOrDefaultAsync();
+                    var Complex = await _context.Complexes.Select(a => new CookiesAndLogFilesDto { Cookies = a.Cookies, LogFiles = a.LogFiles }).FirstOrDefaultAsync();
                     if (Complex == null)
                     {
-                        return null;
+                        return new  { Message = "Not Found" }; ;
                     }
 
-                    //var data = await PagedList<UsersLiDto>.CreateAsync(users.AsNoTracking(), request.userParams.PageNumber, request.userParams.PageSize);
-
-                    return Complex;
+                    return new  { Result = Complex };
 
                 }
                 catch (Exception ex)

@@ -32,6 +32,7 @@ namespace Hedaya.Application.Interfaces
         DbSet<Certificate> Certificates { get; set; }
         DbSet<Friendship> Friendships { get; set; }
         DbSet<CommonQuestion> CommonQuestions { get; set; }
+        DbSet<SuggestionAndComplaint> SuggestionAndComplaints { get; set; }
         
 
 

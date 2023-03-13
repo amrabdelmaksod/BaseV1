@@ -46,6 +46,7 @@ namespace Hedaya.Infrastructure.Presistence
         public DbSet<Certificate> Certificates { get; set; }
         public DbSet<Friendship> Friendships { get; set; }
         public DbSet<CommonQuestion> CommonQuestions { get; set; }
+        public DbSet<SuggestionAndComplaint> SuggestionAndComplaints { get; set; }
 
         #endregion
 

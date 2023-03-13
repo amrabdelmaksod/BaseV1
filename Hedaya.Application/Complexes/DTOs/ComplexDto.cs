@@ -2,7 +2,10 @@
 {
     public class ComplexDto
     {
-        public required string Terms { get; set; }
-        public required string Conditions { get; set; }     
+        public string Title { get; set; }
+        public string AddressDescription { get; set; }
+        public string Email { get; set; }
+        public string Mobile { get; set; }
+        public string LandlinePhone { get; set; }
     }
 }

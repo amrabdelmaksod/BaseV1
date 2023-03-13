@@ -7,19 +7,13 @@ using Hedaya.Domain.Entities.Authintication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
-using Microsoft.Identity.Client;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
-using System.Reflection.Metadata.Ecma335;
 using System.Security.Claims;
 using System.Text;
-using Twilio;
-using Twilio.Rest.Api.V2010.Account;
-using Twilio.Types;
 
 namespace Hedaya.Application.Auth.Services
 {
@@ -68,7 +62,6 @@ namespace Hedaya.Application.Auth.Services
 
             var user = new AppUser
             {
-
                 UserName = model.PhoneNumber,
                 Email = model.Email,
                 PhoneNumber = model.PhoneNumber,
