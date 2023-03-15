@@ -4,12 +4,13 @@ using Newtonsoft.Json;
 
 namespace Hedaya.WebApi.Controllers.v1.Settings
 {
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("api/v{version:apiVersion}/[controller]")]
+
     public class PrayerTimesController : BaseController<PrayerTimesController>
     {
         [HttpGet("{latitude}/{longitude}")]
-        public async Task<ActionResult<string>> GetPrayerTimes(double latitude, double longitude)
+        public async Task<ActionResult<string>> GetPrayerTimes(double latitude = 30.033333, double longitude = 31.233334)
         {
             try
             {
