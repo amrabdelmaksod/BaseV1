@@ -5,10 +5,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Hedaya.Application.GentlemenScholars.Queries
 {
-    public class GetGentlemenScholarByIdQuery : IRequest<GentlemenScholarDto>
+    public class GetGentlemenScholarByIdQuery : IRequest<object>
     {
         public string Id { get; set; }
-        public class Handler : IRequestHandler<GetGentlemenScholarByIdQuery, GentlemenScholarDto>
+        public class Handler : IRequestHandler<GetGentlemenScholarByIdQuery, object>
         {
             public string Id { get; set; }
             private readonly IApplicationDbContext _context;
@@ -18,7 +18,7 @@ namespace Hedaya.Application.GentlemenScholars.Queries
                 _context = context;
             }
 
-            public async Task<GentlemenScholarDto> Handle(GetGentlemenScholarByIdQuery request, CancellationToken cancellationToken)
+            public async Task<object> Handle(GetGentlemenScholarByIdQuery request, CancellationToken cancellationToken)
             {
                 try
                 {
@@ -36,7 +36,7 @@ namespace Hedaya.Application.GentlemenScholars.Queries
                         })
                        .FirstOrDefaultAsync(cancellationToken);
 
-                    return Gentlemens;
+                    return new { Result = Gentlemens }  ;
 
                 }
                 catch (Exception ex)

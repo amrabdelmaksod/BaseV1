@@ -4,12 +4,12 @@ using Hedaya.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-public class GetPendingFriendRequestsQuery : IRequest<List<FriendRequestDto>>
+public class GetPendingFriendRequestsQuery : IRequest<object>
 {
     public string TraineeId { get; set; }
 }
 
-public class GetPendingFriendRequestsQueryHandler : IRequestHandler<GetPendingFriendRequestsQuery, List<FriendRequestDto>>
+public class GetPendingFriendRequestsQueryHandler : IRequestHandler<GetPendingFriendRequestsQuery, object>
 {
     private readonly IApplicationDbContext _context;
 
@@ -18,7 +18,7 @@ public class GetPendingFriendRequestsQueryHandler : IRequestHandler<GetPendingFr
         _context = context;
     }
 
-    public async Task<List<FriendRequestDto>> Handle(GetPendingFriendRequestsQuery request, CancellationToken cancellationToken)
+    public async Task<object> Handle(GetPendingFriendRequestsQuery request, CancellationToken cancellationToken)
     {
         // Retrieve the pending friend requests for the trainee with the given ID
         var pendingFriendships = await _context.Friendships
@@ -42,6 +42,6 @@ public class GetPendingFriendRequestsQueryHandler : IRequestHandler<GetPendingFr
             });
         }
 
-        return friendRequestDtos;
+        return new { Result = friendRequestDtos}  ;
     }
 }

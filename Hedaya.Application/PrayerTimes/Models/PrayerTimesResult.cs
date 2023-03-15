@@ -1,4 +1,6 @@
-﻿namespace Hedaya.Application.PrayerTimes.Models
+﻿using Hedaya.Domain.Enums;
+
+namespace Hedaya.Application.PrayerTimes.Models
 {
     public class PrayerTimesResult
     {
@@ -9,7 +11,7 @@
         public TimeSpan Asr { get; set; }
         public TimeSpan Maghrib { get; set; }
         public TimeSpan Isha { get; set; }
-        public string NextPrayer { get; set; }
+        public PrayerTimeType NextPrayer { get; set; }
     }
 
 }

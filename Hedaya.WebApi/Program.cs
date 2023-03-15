@@ -123,7 +123,7 @@ builder.Services.Configure<RequestLocalizationOptions>(options =>
         new CultureInfo("ar-EG"),
     };
 
-    options.DefaultRequestCulture = new RequestCulture(culture: supportedCultures[0], uiCulture: supportedCultures[0]);
+    options.DefaultRequestCulture = new RequestCulture(culture: supportedCultures[1], uiCulture: supportedCultures[1]);
     options.SupportedCultures= supportedCultures;
     options.SupportedUICultures= supportedCultures;
 });
@@ -236,7 +236,7 @@ var loggerManager = app.Services.GetRequiredService<ILoggerManager>();
 app.ConfigureExceptionHandler(loggerManager);
 
 
-app.UseMiddleware<ExceptionMiddleware>();
+app.UseMiddleware<ExceptionHandlerMiddleware>();
 
 var apiVersionDescriptionProvider = app.Services.GetRequiredService<IApiVersionDescriptionProvider>();
 // Configure the HTTP request pipeline.
@@ -261,7 +261,7 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 
 var supportedCultures = new[] {"en-US", "ar-EG" };
-var localizationOptions = new RequestLocalizationOptions().SetDefaultCulture(supportedCultures[0]).AddSupportedCultures(supportedCultures).AddSupportedUICultures(supportedCultures);
+var localizationOptions = new RequestLocalizationOptions().SetDefaultCulture(supportedCultures[1]).AddSupportedCultures(supportedCultures).AddSupportedUICultures(supportedCultures);
 
 app.UseRequestLocalization(localizationOptions);
 

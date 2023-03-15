@@ -6,11 +6,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Hedaya.Application.CommonQuestions.Queries
 {
-    public class GetCommonQuestionsQuery : IRequest<List<CommonQuestionDto>>
+    public class GetCommonQuestionsQuery : IRequest<object>
     {
     }
 
-    public class GetCommonQuestionsQueryHandler : IRequestHandler<GetCommonQuestionsQuery, List<CommonQuestionDto>>
+    public class GetCommonQuestionsQueryHandler : IRequestHandler<GetCommonQuestionsQuery, object>
     {
         private readonly IApplicationDbContext _context;
 
@@ -19,7 +19,7 @@ namespace Hedaya.Application.CommonQuestions.Queries
             _context = context;
         }
 
-        public async Task<List<CommonQuestionDto>> Handle(GetCommonQuestionsQuery request, CancellationToken cancellationToken)
+        public async Task<object> Handle(GetCommonQuestionsQuery request, CancellationToken cancellationToken)
         {
 
 
@@ -32,7 +32,7 @@ namespace Hedaya.Application.CommonQuestions.Queries
                 })
                 .ToListAsync();
 
-            return commonQuestions;
+            return new { Result = commonQuestions }  ;
         }
     }
 

@@ -5,9 +5,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Hedaya.Application.GentlemenScholars.Queries
 {
-    public class GetAllGentlemenQuery : IRequest<IEnumerable<GentlemenScholarDto>>
+    public class GetAllGentlemenQuery : IRequest<object>
     {
-        public class Handler : IRequestHandler<GetAllGentlemenQuery, IEnumerable<GentlemenScholarDto>>
+        public class Handler : IRequestHandler<GetAllGentlemenQuery, object>
         {
 
             private readonly IApplicationDbContext _context;
@@ -17,7 +17,7 @@ namespace Hedaya.Application.GentlemenScholars.Queries
                 _context = context;
             }
 
-            public async Task<IEnumerable<GentlemenScholarDto>> Handle(GetAllGentlemenQuery request, CancellationToken cancellationToken)
+            public async Task<object> Handle(GetAllGentlemenQuery request, CancellationToken cancellationToken)
             {
                 try
                 {
@@ -36,7 +36,7 @@ namespace Hedaya.Application.GentlemenScholars.Queries
                        .ToListAsync();
 
 
-                    return Gentlemens;
+                    return  new { Result = Gentlemens };
 
                 }
                 catch (Exception ex)

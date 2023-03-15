@@ -15,6 +15,7 @@ namespace Hedaya.Infrastructure.Presistence.Configurations
             builder.Property(a=>a.Facebook).HasMaxLength(200);
             builder.Property(a=>a.Twitter).HasMaxLength(200);
             builder.Property(a=>a.Youtube).HasMaxLength(200);
+            builder.Property(a=>a.ImageUrl).HasMaxLength(200);
         }
     }
 }

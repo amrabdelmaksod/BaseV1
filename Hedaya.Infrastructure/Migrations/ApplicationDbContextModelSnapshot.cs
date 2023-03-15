@@ -481,6 +481,10 @@ namespace Hedaya.Infrastructure.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
+                    b.Property<string>("ImageUrl")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(250)
@@ -581,6 +585,109 @@ namespace Hedaya.Infrastructure.Migrations
                     b.HasIndex("CourseTopicId");
 
                     b.ToTable("Lessons");
+                });
+
+            modelBuilder.Entity("Hedaya.Domain.Entities.MainCategory", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ImgIconUrl")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("NameAr")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("NameEn")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("MainCategories", (string)null);
+                });
+
+            modelBuilder.Entity("Hedaya.Domain.Entities.MassCulture", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<TimeSpan>("Duration")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("time")
+                        .HasDefaultValue(new TimeSpan(0, 0, 0, 0, 0));
+
+                    b.Property<int>("SubCategoryId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("TitleAr")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("TitleEn")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SubCategoryId");
+
+                    b.ToTable("MassCultures", (string)null);
+                });
+
+            modelBuilder.Entity("Hedaya.Domain.Entities.Notification", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("AppUserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("UrlLink")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AppUserId");
+
+                    b.ToTable("Notifications", (string)null);
                 });
 
             modelBuilder.Entity("Hedaya.Domain.Entities.PlatformFeature", b =>
@@ -718,6 +825,43 @@ namespace Hedaya.Infrastructure.Migrations
                     b.ToTable("PlatformWorkAxes", (string)null);
                 });
 
+            modelBuilder.Entity("Hedaya.Domain.Entities.Podcast", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("AudioUrl")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<TimeSpan>("Duration")
+                        .HasColumnType("time");
+
+                    b.Property<DateTime>("PublishDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Podcasts", (string)null);
+                });
+
             modelBuilder.Entity("Hedaya.Domain.Entities.Post", b =>
                 {
                     b.Property<int>("Id")
@@ -770,6 +914,39 @@ namespace Hedaya.Infrastructure.Migrations
                     b.ToTable("Replies");
                 });
 
+            modelBuilder.Entity("Hedaya.Domain.Entities.SubCategory", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ImgIconUrl")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<int>("MainCategoryId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("NameAr")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("NameEn")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MainCategoryId");
+
+                    b.ToTable("SubCategories", (string)null);
+                });
+
             modelBuilder.Entity("Hedaya.Domain.Entities.SuggestionAndComplaint", b =>
                 {
                     b.Property<int>("Id")
@@ -811,6 +988,46 @@ namespace Hedaya.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("SuggestionAndComplaints", (string)null);
+                });
+
+            modelBuilder.Entity("Hedaya.Domain.Entities.TeachingStaff", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("Facebook")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("FullName")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("ImageURL")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Twitter")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("Youtube")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("TeachingStaff", (string)null);
                 });
 
             modelBuilder.Entity("Hedaya.Domain.Entities.TestEntity", b =>
@@ -909,6 +1126,30 @@ namespace Hedaya.Infrastructure.Migrations
                     b.HasIndex("AppUserId");
 
                     b.ToTable("Trainees", (string)null);
+                });
+
+            modelBuilder.Entity("Hedaya.Domain.Entities.Tutorial", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("TeachingStaffId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TeachingStaffId");
+
+                    b.ToTable("Tutorials", (string)null);
                 });
 
             modelBuilder.Entity("Hedaya.Domain.TestClass", b =>
@@ -1176,6 +1417,28 @@ namespace Hedaya.Infrastructure.Migrations
                     b.Navigation("CourseTopic");
                 });
 
+            modelBuilder.Entity("Hedaya.Domain.Entities.MassCulture", b =>
+                {
+                    b.HasOne("Hedaya.Domain.Entities.SubCategory", "SubCategory")
+                        .WithMany("MassCultures")
+                        .HasForeignKey("SubCategoryId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("SubCategory");
+                });
+
+            modelBuilder.Entity("Hedaya.Domain.Entities.Notification", b =>
+                {
+                    b.HasOne("Hedaya.Domain.Entities.Authintication.AppUser", "AppUser")
+                        .WithMany("Notifications")
+                        .HasForeignKey("AppUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("AppUser");
+                });
+
             modelBuilder.Entity("Hedaya.Domain.Entities.Post", b =>
                 {
                     b.HasOne("Hedaya.Domain.Entities.Forum", "Forum")
@@ -1198,6 +1461,17 @@ namespace Hedaya.Infrastructure.Migrations
                     b.Navigation("Comment");
                 });
 
+            modelBuilder.Entity("Hedaya.Domain.Entities.SubCategory", b =>
+                {
+                    b.HasOne("Hedaya.Domain.Entities.MainCategory", "MainCategory")
+                        .WithMany("SubCategories")
+                        .HasForeignKey("MainCategoryId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("MainCategory");
+                });
+
             modelBuilder.Entity("Hedaya.Domain.Entities.TestEntity", b =>
                 {
                     b.HasOne("Hedaya.Domain.TestClass", "TestClass")
@@ -1218,6 +1492,17 @@ namespace Hedaya.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("AppUser");
+                });
+
+            modelBuilder.Entity("Hedaya.Domain.Entities.Tutorial", b =>
+                {
+                    b.HasOne("Hedaya.Domain.Entities.TeachingStaff", "TeachingStaff")
+                        .WithMany("Tutorials")
+                        .HasForeignKey("TeachingStaffId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("TeachingStaff");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -1271,6 +1556,11 @@ namespace Hedaya.Infrastructure.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Hedaya.Domain.Entities.Authintication.AppUser", b =>
+                {
+                    b.Navigation("Notifications");
+                });
+
             modelBuilder.Entity("Hedaya.Domain.Entities.Comment", b =>
                 {
                     b.Navigation("Replies");
@@ -1296,9 +1586,24 @@ namespace Hedaya.Infrastructure.Migrations
                     b.Navigation("Courses");
                 });
 
+            modelBuilder.Entity("Hedaya.Domain.Entities.MainCategory", b =>
+                {
+                    b.Navigation("SubCategories");
+                });
+
             modelBuilder.Entity("Hedaya.Domain.Entities.Post", b =>
                 {
                     b.Navigation("Comments");
+                });
+
+            modelBuilder.Entity("Hedaya.Domain.Entities.SubCategory", b =>
+                {
+                    b.Navigation("MassCultures");
+                });
+
+            modelBuilder.Entity("Hedaya.Domain.Entities.TeachingStaff", b =>
+                {
+                    b.Navigation("Tutorials");
                 });
 
             modelBuilder.Entity("Hedaya.Domain.Entities.Trainee", b =>

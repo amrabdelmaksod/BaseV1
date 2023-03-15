@@ -6,10 +6,10 @@ using Microsoft.AspNetCore.Identity;
 
 namespace Hedaya.Application.Users.Queries
 {
-    public class GetAllUsersQuery : IRequest<IEnumerable<UsersLiDto>>
+    public class GetAllUsersQuery : IRequest<object>
     {
         public UserParams userParams { get; set; } 
-        public class Handler : IRequestHandler<GetAllUsersQuery, IEnumerable<UsersLiDto>>
+        public class Handler : IRequestHandler<GetAllUsersQuery, object>
         {
          
             private readonly UserManager<AppUser> _userManager;
@@ -19,7 +19,7 @@ namespace Hedaya.Application.Users.Queries
                 _userManager = userManager;
             }
 
-            public async Task<IEnumerable<UsersLiDto>> Handle(GetAllUsersQuery request, CancellationToken cancellationToken)
+            public async Task<object> Handle(GetAllUsersQuery request, CancellationToken cancellationToken)
             {
                 try
                 {
@@ -30,9 +30,9 @@ namespace Hedaya.Application.Users.Queries
                         .ToList();
 
             
-                    //var data = await PagedList<UsersLiDto>.CreateAsync(users.AsNoTracking(), request.userParams.PageNumber, request.userParams.PageSize);
+                 
 
-                    return users;
+                    return new { Result = users } ;
 
                 }
                 catch (Exception ex)

@@ -4,6 +4,7 @@ using Hedaya.Application.Interfaces;
 using Hedaya.Common;
 using Hedaya.Domain.Entities;
 using Hedaya.Domain.Entities.Authintication;
+using Hedaya.Domain.Enums;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
@@ -12,8 +13,10 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
+using System.Reflection;
 using System.Security.Claims;
 using System.Text;
+using Twilio.Jwt.AccessToken;
 
 namespace Hedaya.Application.Auth.Services
 {
@@ -49,15 +52,7 @@ namespace Hedaya.Application.Auth.Services
 
         public async Task<dynamic> RegisterAsync(ModelStateDictionary modelState, RegisterModel model)
         {
-            if (await _userManager.FindByEmailAsync(model.Email) is not null)
-            {
-                modelState.AddModelError("userEmail", "Email Is Already Exists!");
-
-                return new { Message = $"There user with this Email is already exists!  {model.Email}" };
-
-
-            }
-
+                     
             string code = RandomHelper.RandomString(5);
 
             var user = new AppUser
@@ -73,14 +68,8 @@ namespace Hedaya.Application.Auth.Services
             var result = await _userManager.CreateAsync(user, model.Password);
             if (!result.Succeeded)
             {
-
-                var erros = string.Empty;
-                foreach (var error in result.Errors)
-                {
-                    erros += $"{error.Description},";
-                    return new AuthModel { Message = erros };
-                }
-
+                var errors = result.Errors.Select(e => new { error = e.Description }).ToList();
+                return new { errors };
             }
 
             var TraineeUser = new Trainee
@@ -97,9 +86,11 @@ namespace Hedaya.Application.Auth.Services
 
             await _userManager.AddToRoleAsync(user, "User");
             var jwtSecurityToken = await CreateJwtToken(user);
-            return new AuthModel
+
+            var authModel = new AuthModel
             {
                 Email = user.Email,
+                FullName = TraineeUser.FullName,
                 ExpiresOn = jwtSecurityToken.ValidTo,
                 IsAuthinticated = true,
                 Roles = new List<string> { "Users" },
@@ -107,39 +98,48 @@ namespace Hedaya.Application.Auth.Services
                 Mobile = user.PhoneNumber,
                 Message = "Registered Successfully!"
             };
+
+            return new { Result = authModel };
+               
+        
         }
 
-        public async Task<AuthModel> LoginAsync(ModelStateDictionary modelState, TokenRequestModel model)
+        public async Task<dynamic> LoginAsync(ModelStateDictionary modelState, TokenRequestModel model)
         {
             var authModel = new AuthModel();
 
             var user = await _userManager.FindByNameAsync(model.Mobile);
-            if (user is null || !await _userManager.CheckPasswordAsync(user, model.Password))
+         
+          
+
+            var trainee = await _context.Trainees.FirstOrDefaultAsync(a => a.AppUserId == user.Id);
+
+
+            string profilePictureBase64 = null;
+            if (trainee.ProfilePicture != null && trainee.ProfilePicture.Length > 0)
             {
-                modelState.AddModelError("Invalid Login", "Mobile number or password is incorrect.");
-                authModel.Message = "Invalid Login";
-                authModel.IsAuthinticated = false; // Set IsAuthenticated to false
-                return authModel;
+                profilePictureBase64 = Convert.ToBase64String(trainee.ProfilePicture);
             }
 
             var jwtSecurityToken = await CreateJwtToken(user);
             authModel.Message = "Login Successfully";
             authModel.Email = user.Email;
+            authModel.ProfilePicture = profilePictureBase64;
             authModel.IsAuthinticated = true;
             authModel.Token = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
             authModel.Mobile = user.UserName; // assuming the mobile number is stored in the UserName property
             authModel.ExpiresOn = jwtSecurityToken.ValidTo;
+            authModel.FullName = trainee.FullName;
 
             var rolesList = await _userManager.GetRolesAsync(user);
             authModel.Roles = rolesList.ToList();
 
-            return authModel;
+            return new {Result = authModel } ;
         }
 
 
 
-
-
+        #region AddToRole
         //public async Task<string> AddToRoleAsync(ModelStateDictionary modelState, AddRoleModel model)
         //{
         //    var user = await _userManager.FindByIdAsync(model.UserId);
@@ -164,14 +164,7 @@ namespace Hedaya.Application.Auth.Services
 
         //    return result.Succeeded ? string.Empty : "Something went wrong";
         //}
-
-
-
-
-
-
-
-
+        #endregion
 
         public async Task<dynamic> ForgetPasswordAsync(ModelStateDictionary modelState, ForgotPasswordVM userModel)
         {
@@ -179,8 +172,9 @@ namespace Hedaya.Application.Auth.Services
             {
 
                 var user = await _userManager.FindByNameAsync(userModel.MobileNumber);
+             
                 // Generate a random 6-digit verification code
-                var verificationCode = new Random().Next(100000, 999999).ToString();
+                var verificationCode = new Random().Next(1000, 9999).ToString();
 
                 // Send the verification code to the user's phone number via SMS
 
@@ -196,16 +190,13 @@ namespace Hedaya.Application.Auth.Services
                 var result = await _userManager.UpdateAsync(user);
                 if (!result.Succeeded)
                 {
-                    foreach (var error in result.Errors)
-                    {
-                        modelState.AddModelError(error.Code, error.Description);
-                        return new { Message = $"{error.Description}" };
-                    }
+                    var errors = result.Errors.Select(e => new { error = e.Description }).ToList();
+                    return new { errors };
                 }
 
                 return new
                 {
-                    result = new
+                    Result = new
                     {
                         code = verificationCode
                     }
@@ -253,29 +244,28 @@ namespace Hedaya.Application.Auth.Services
         {
             try
             {
-                var user = await _userManager.FindByEmailAsync(userModel.user_email);
+                var user = await _userManager.FindByNameAsync(userModel.Mobile);
                 if (user == null)
                 {
-                    modelState.AddModelError("user_email", "There is no user with that Email Address");
-                    return new { Message = "There is no user with that Email Address" };
+                  
+                    var errors = new List<object> { new { error = "There is no user with that Email Address" } };
+                    return new { errors };
                 }
 
-                if (userModel.user_password != userModel.user_password_confirm)
+                if (userModel.Password != userModel.ConfirmPassword)
                 {
-                    modelState.AddModelError("Password Or Confirm Password", "Confirm password doesn't match the password");
-                    return new { Message = "Confirm password doesn't match the password" };
+                   
+                    var errors = new List<object> { new { error = "Confirm password doesn't match the password" } };
+                    return new { errors };
                 }
 
                 var token = await _userManager.GeneratePasswordResetTokenAsync(user);
 
-                var result = await _userManager.ResetPasswordAsync(user, token, userModel.user_password);
+                var result = await _userManager.ResetPasswordAsync(user, token, userModel.Password);
                 if (!result.Succeeded)
                 {
-                    foreach (var error in result.Errors)
-                    {
-                        modelState.AddModelError(error.Code, error.Description);
-                        return new { Message = $"{error.Code}, {error.Description}" };
-                    }
+                    var errors = result.Errors.Select(e => new { error = e.Description }).ToList();
+                    return new { errors };
                 }
                 return new
                 {
@@ -285,8 +275,8 @@ namespace Hedaya.Application.Auth.Services
             }
             catch (Exception ex)
             {
-                modelState.AddModelError(string.Join(",", ex.Data), string.Join(",", ex.InnerException));
-                return new { Message = $"{ex.Message}" };
+              
+                return new { errors = $"{ex.Message}" };
             }
         }
 

@@ -1,10 +1,11 @@
 ﻿using Hedaya.Application.PrayerTimes.Models;
+using Hedaya.Domain.Enums;
 using MediatR;
 using PrayerTimes;
 
 namespace Hedaya.Application.PrayerTimes.Queries
 {
-    public class GetPrayerTimesQuery : IRequest<PrayerTimesResult>
+    public class GetPrayerTimesQuery : IRequest<object>
     {
         public double Latitude { get; }
         public double Longitude { get; }
@@ -16,9 +17,9 @@ namespace Hedaya.Application.PrayerTimes.Queries
            
         }
     }
-    public class GetPrayerTimesQueryHandler : IRequestHandler<GetPrayerTimesQuery, PrayerTimesResult>
+    public class GetPrayerTimesQueryHandler : IRequestHandler<GetPrayerTimesQuery, object>
     {
-        public Task<PrayerTimesResult> Handle(GetPrayerTimesQuery request, CancellationToken cancellationToken)
+        public async Task<object> Handle(GetPrayerTimesQuery request, CancellationToken cancellationToken)
         {
             var prayerTimes = new PrayerTimesCalculator(request.Latitude, request.Longitude);
             prayerTimes.CalculationMethod = CalculationMethods.Egypt;
@@ -26,29 +27,29 @@ namespace Hedaya.Application.PrayerTimes.Queries
             var timeZoneOffset = TimeSpan.FromHours(3);
             var times = prayerTimes.GetPrayerTimes(new DateTimeOffset(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 0, 0, 0, timeZoneOffset));
 
-            string GetNextPrayer()
+            PrayerTimeType GetNextPrayer()
             {              
                 // Determine the name of the next prayer
                 switch (DateTime.Now.TimeOfDay)
                 {
                     case var t when t < times.Fajr:
-                        return "Fajr";
+                        return PrayerTimeType.Fajr;
                     case var t when t < times.Sunrise:
-                        return "Sunrise";
+                        return PrayerTimeType.Sunrise;
                     case var t when t < times.Dhuhr:
-                        return "Dhuhr";
+                        return PrayerTimeType.Dhuhr;
                     case var t when t < times.Asr:
-                        return "Asr";
+                        return PrayerTimeType.Asr;
                     case var t when t < times.Maghrib:
-                        return "Maghrib";
+                        return PrayerTimeType.Maghrib;
                     case var t when t < times.Isha:
-                        return "Isha";
+                        return PrayerTimeType.Isha;
                     default:
-                        return string.Empty;
+                        return PrayerTimeType.None;
                 }
             }
 
-            string nextPrayer = GetNextPrayer();
+            var nextPrayer = GetNextPrayer();
 
 
             var result = new PrayerTimesResult
@@ -66,7 +67,7 @@ namespace Hedaya.Application.PrayerTimes.Queries
 
            
 
-            return Task.FromResult(result);
+            return new {Result = result};
         }
 
     

@@ -6,10 +6,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Hedaya.Application.Users.Queries
 {
-    public class ManageRolesQuery : IRequest<UserRolesDto>
+    public class ManageRolesQuery : IRequest<object>
     {
         public string userId { get; set; }
-        public class Handler : IRequestHandler<ManageRolesQuery, UserRolesDto>
+        public class Handler : IRequestHandler<ManageRolesQuery, object>
         {
 
             private readonly UserManager<AppUser> _userManager;
@@ -21,7 +21,7 @@ namespace Hedaya.Application.Users.Queries
                 _roleManager = roleManager;
             }
 
-            public async Task<UserRolesDto> Handle(ManageRolesQuery request, CancellationToken cancellationToken)
+            public async Task<object> Handle(ManageRolesQuery request, CancellationToken cancellationToken)
             {
                 try
                 {
@@ -43,7 +43,7 @@ namespace Hedaya.Application.Users.Queries
                         }).ToList()
                     };
 
-                    return data;
+                    return new { Result = data } ;
 
                 }
                 catch (Exception ex)

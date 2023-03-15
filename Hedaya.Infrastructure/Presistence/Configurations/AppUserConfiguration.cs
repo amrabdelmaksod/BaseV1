@@ -20,6 +20,11 @@ namespace Hedaya.Infrastructure.Presistence.Configurations
             .IsRequired()
             .HasDefaultValue(Gender.Unknown);
 
+            builder.HasMany(u => u.Notifications)
+          .WithOne(n => n.AppUser)
+          .HasForeignKey(n => n.AppUserId)
+          .OnDelete(DeleteBehavior.Cascade);
+
         }
     }
 }

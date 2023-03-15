@@ -16,19 +16,6 @@ namespace Hedaya.WebApi.Controllers.v1
             _loggerManager = loggerManager;
         }
 
-        [HttpPost]
-        public async Task<IActionResult> SetLanguage(string culture, string returnUrl)
-        {
-            Response.Cookies.Append(
-
-                CookieRequestCultureProvider.DefaultCookieName,
-                CookieRequestCultureProvider.MakeCookieValue(new RequestCulture(culture)),
-                new CookieOptions { Expires = DateTimeOffset.UtcNow.AddYears(1) }
-                );
-            var x = CultureInfo.CurrentCulture.TwoLetterISOLanguageName;
-
-            return LocalRedirect(returnUrl);
-           
-        }
+      
     }
 }

@@ -9,12 +9,12 @@ using Microsoft.Extensions.Configuration;
 
 namespace Hedaya.Application.Friends.Queries
 {
-    public class GetFriendListQuery : IRequest<apiResponse>
+    public class GetFriendListQuery : IRequest<object>
     {
         public string token { get; set; }
     }
 
-    public class GetFriendListQueryHandler : IRequestHandler<GetFriendListQuery, apiResponse>
+    public class GetFriendListQueryHandler : IRequestHandler<GetFriendListQuery, object>
     {
         private readonly IApplicationDbContext _context;
 
@@ -25,7 +25,7 @@ namespace Hedaya.Application.Friends.Queries
        
         }
 
-        public async Task<apiResponse> Handle(GetFriendListQuery request, CancellationToken cancellationToken)
+        public async Task<object> Handle(GetFriendListQuery request, CancellationToken cancellationToken)
         {
 
             string userIdFromToken = JWTHelper.GetUserIdFromToken(request.token);
@@ -33,13 +33,13 @@ namespace Hedaya.Application.Friends.Queries
             if (user == null)
             {
                
-                return new apiResponse { Message = $"Not Found User With Id {userIdFromToken}", Result = new {}};
+                return new  { Message = $"Not Found User With Id {userIdFromToken}", Result = new {}};
             }
 
             var trainee = await _context.Trainees.FirstOrDefaultAsync(a=>a.AppUserId==userIdFromToken);
             if (trainee == null)
             {
-                return new apiResponse { Message = $"Not Found Trainee With Id {userIdFromToken}", Result = new { } };
+                return new  { Message = $"Not Found Trainee With Id {userIdFromToken}"};
             }
 
             var friendIds = await _context.Friendships.Include(a=>a.Trainee).ThenInclude(a=>a.AppUser)
@@ -57,7 +57,7 @@ namespace Hedaya.Application.Friends.Queries
                 })
                 .ToListAsync(cancellationToken);
 
-            return new apiResponse { Message = "Friends List : ",Result =  friends };
+            return new  {Result =  friends };
         }
     }
 

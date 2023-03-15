@@ -16,9 +16,9 @@ namespace Hedaya.WebApi.Controllers.v1.Settings
         }
 
         [HttpGet("getAllBlogs")]
-        public async Task<IActionResult> GetAllBlogs()
+        public async Task<IActionResult> GetAllBlogs([FromQuery]GetAllBlogsQuery request)
         {
-            return Ok(await Mediator.Send(new GetAllBlogsQuery()));
+            return Ok(await Mediator.Send(request));
         }
 
 

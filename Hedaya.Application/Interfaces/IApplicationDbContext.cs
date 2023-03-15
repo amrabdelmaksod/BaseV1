@@ -33,6 +33,14 @@ namespace Hedaya.Application.Interfaces
         DbSet<Friendship> Friendships { get; set; }
         DbSet<CommonQuestion> CommonQuestions { get; set; }
         DbSet<SuggestionAndComplaint> SuggestionAndComplaints { get; set; }
+        DbSet<Podcast> Podcasts { get; set; }
+        DbSet<Notification> Notifications { get; set; }
+        DbSet<Domain.Entities.TeachingStaff> TeachingStaff { get; set; }
+        DbSet<Tutorial> Tutorials { get; set; }
+        DbSet<MainCategory> MainCategories { get; set; }
+        DbSet<SubCategory> SubCategories { get; set; }
+        DbSet<MassCulture> MassCultures { get; set; }
+       
         
 
 

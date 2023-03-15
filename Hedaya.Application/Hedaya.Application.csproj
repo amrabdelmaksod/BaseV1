@@ -38,8 +38,11 @@
     <Folder Include="CommonQuestions\Commands\" />
     <Folder Include="Complexes\Commands\" />
     <Folder Include="GentlemenScholars\Commands\" />
+    <Folder Include="MassCultures\Commands\" />
+    <Folder Include="Notifications\Commands\" />
     <Folder Include="SuggestionsAndComplaints\Models\" />
     <Folder Include="SuggestionsAndComplaints\Queries\" />
+    <Folder Include="TeachingStaff\Commands\" />
     <Folder Include="Tests\DTOs\" />
     <Folder Include="Tests\Queries\" />
   </ItemGroup>

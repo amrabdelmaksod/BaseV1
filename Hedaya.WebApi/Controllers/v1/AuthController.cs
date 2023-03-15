@@ -1,25 +1,50 @@
-﻿  using API.Errors;
-using FluentValidation;
+﻿using API.Errors;
 using Hedaya.Application.Auth.Abstractions;
 using Hedaya.Application.Auth.Models;
 using Hedaya.Application.Auth.Validators;
 using Hedaya.Application.Complexes.Queries;
+using Hedaya.Domain.Entities.Authintication;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
+using System.Globalization;
 
 namespace Hedaya.WebApi.Controllers.v1
 {
-  
+
     [ApiController]
     [Route("api/v{version:apiVersion}/[controller]")]
     
     public class AuthController :BaseController<AuthController>
     {
         private readonly IAuthService _authService;
-
-        public AuthController(IAuthService authService)
+        private readonly UserManager<AppUser> _userManager;
+        public AuthController(IAuthService authService, UserManager<AppUser> userManager)
         {
             _authService = authService;
+            _userManager = userManager;
+        }
+
+
+        [HttpPost("SetLanguage")]
+        public async Task<IActionResult> SetLanguage(string? culture)
+        {
+
+         if(string.IsNullOrEmpty(culture) || (culture!="en-US" && culture!="ar-EG")) 
+            {
+            
+            return BadRequest(new { Message = CultureInfo.CurrentCulture.TwoLetterISOLanguageName == "ar" ? $"عفوا لقد حدث خطأ" : "Something Went wrong" });
+            }
+
+            Response.Cookies.Append(
+
+                CookieRequestCultureProvider.DefaultCookieName,
+                CookieRequestCultureProvider.MakeCookieValue(new RequestCulture(culture)),
+                new CookieOptions { Expires = DateTimeOffset.UtcNow.AddYears(1) }
+                );
+            var currentCulture = new { Message = CultureInfo.CurrentCulture.TwoLetterISOLanguageName == "ar" ? $"لغة التطبيق الحالية هي اللغة العربية" : "The current application language is English." };
+
+            return Ok(currentCulture);
         }
 
 
@@ -27,22 +52,23 @@ namespace Hedaya.WebApi.Controllers.v1
         public async Task<IActionResult> RegisterAsync([FromBody] RegisterModel model)
         {
 
-            var validator = new RegisterModelValidator();
+            var validator = new RegisterModelValidator(_userManager);
             var validationResult = await validator.ValidateAsync(model);
 
             if (!validationResult.IsValid)
             {
-                return BadRequest(validationResult.Errors);
+                var errors = validationResult.Errors
+                    .Select(error => new { error = error.ErrorMessage })
+                    .ToList();
+
+                return BadRequest(new { errors });
             }
 
 
 
 
             var result =await _authService.RegisterAsync(ModelState, model);
-            if(!result.IsAuthinticated)
-            {
-                return CustomBadRequest.CustomModelStateErrorResponse(ModelState);
-            }
+           
            
             return Ok(result);
         }
@@ -53,23 +79,24 @@ namespace Hedaya.WebApi.Controllers.v1
         [HttpPost("login")]
         public async Task<IActionResult> LoginAsync([FromBody]  TokenRequestModel model)
         {
-            var validator = new TokenRequestModelValidator();
+            var validator = new TokenRequestModelValidator(_userManager);
             var validationResult = await validator.ValidateAsync(model);
 
             if (!validationResult.IsValid)
             {
-                return BadRequest(validationResult.Errors);
-            }
+                var errors = validationResult.Errors
+                    .Select(error => new { error = error.ErrorMessage })
+                    .ToList();
 
+                return BadRequest(new { errors });
+            }
 
 
 
 
             var result = await _authService.LoginAsync(ModelState, model);
-            if (!result.IsAuthinticated)
-            {
-                return CustomBadRequest.CustomModelStateErrorResponse(ModelState);
-            }
+        
+         
 
             return Ok(result);
         }
@@ -78,11 +105,24 @@ namespace Hedaya.WebApi.Controllers.v1
         [HttpPost("forgotPassword")]
         public async Task<IActionResult> ForgotPasswordAsync([FromBody] ForgotPasswordVM userModel)
         {
-            var result = await _authService.ForgetPasswordAsync(ModelState, userModel);
-            if (!ModelState.IsValid)
+           
+          
+
+            var validationResult = await new ForgotPasswordVMValidator(_userManager).ValidateAsync(userModel);
+
+            if (!validationResult.IsValid)
             {
-                return CustomBadRequest.CustomModelStateErrorResponse(ModelState);
+
+                var errors = validationResult.Errors
+                     .Select(error => new { error = error.ErrorMessage })
+                     .ToList();
+
+                return BadRequest(new { errors });
             }
+
+
+            var result = await _authService.ForgetPasswordAsync(ModelState, userModel);
+
             return Ok(result);
 
          
@@ -90,15 +130,22 @@ namespace Hedaya.WebApi.Controllers.v1
         }
 
         [HttpPost("ResetPassowrd")]
-        public async Task<IActionResult> RestPassword([FromBody] ResetPasswordModel userModel)
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordModel userModel)
         {
             try
             {
-                var result = await _authService.RestPasswordAsync(ModelState, userModel);
-                if (!ModelState.IsValid)
+                var validationResult = await new ResetPasswordModelValidator(_userManager).ValidateAsync(userModel);
+                if (!validationResult.IsValid)
                 {
-                    return CustomBadRequest.CustomModelStateErrorResponse(ModelState);
+
+                    var errors = validationResult.Errors
+                         .Select(error => new { error = error.ErrorMessage })
+                         .ToList();
+
+                    return BadRequest(new { errors });
                 }
+
+                var result = await _authService.RestPasswordAsync(ModelState, userModel);
                 return Ok(result);
             }
             catch (Exception ex)

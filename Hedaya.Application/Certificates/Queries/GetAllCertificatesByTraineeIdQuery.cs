@@ -5,10 +5,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Hedaya.Application.Certificates.Queries
 {
-    public class GetAllCertificatesByTraineeIdQuery : IRequest<IEnumerable<CertificateDto>>
+    public class GetAllCertificatesByTraineeIdQuery : IRequest<object>
     {
         public string TraineeId { get; set; }
-        public class Handler : IRequestHandler<GetAllCertificatesByTraineeIdQuery, IEnumerable<CertificateDto>>
+        public class Handler : IRequestHandler<GetAllCertificatesByTraineeIdQuery,object>
         {
 
 
@@ -19,7 +19,7 @@ namespace Hedaya.Application.Certificates.Queries
                 _context = context;
             }
 
-            public async Task<IEnumerable<CertificateDto>> Handle(GetAllCertificatesByTraineeIdQuery request, CancellationToken cancellationToken)
+            public async Task<object> Handle(GetAllCertificatesByTraineeIdQuery request, CancellationToken cancellationToken)
             {
                 try
                 {
@@ -39,7 +39,7 @@ namespace Hedaya.Application.Certificates.Queries
                        .ToListAsync();
 
 
-                    return Certificates;
+                    return new { Result = Certificates }  ;
 
                 }
                 catch (Exception ex)

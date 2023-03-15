@@ -6,7 +6,7 @@ namespace Hedaya.Application.Auth.Abstractions
     public interface IAuthService
     {
         Task<dynamic> RegisterAsync(ModelStateDictionary modelState, RegisterModel model);
-        Task<AuthModel> LoginAsync(ModelStateDictionary modelState, TokenRequestModel model);
+        Task<dynamic> LoginAsync(ModelStateDictionary modelState, TokenRequestModel model);
         Task<dynamic> ForgetPasswordAsync(ModelStateDictionary modelState, ForgotPasswordVM userModel);
         Task<dynamic> RestPasswordAsync(ModelStateDictionary modelState, ResetPasswordModel userModel);
         Task<bool> ChangePasswordAsync(string userId, string currentPassword, string newPassword, ModelStateDictionary modelState);

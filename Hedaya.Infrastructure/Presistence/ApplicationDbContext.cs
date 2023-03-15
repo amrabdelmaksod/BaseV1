@@ -47,16 +47,23 @@ namespace Hedaya.Infrastructure.Presistence
         public DbSet<Friendship> Friendships { get; set; }
         public DbSet<CommonQuestion> CommonQuestions { get; set; }
         public DbSet<SuggestionAndComplaint> SuggestionAndComplaints { get; set; }
+        public DbSet<Podcast> Podcasts { get; set; }
+        public DbSet<Notification> Notifications { get; set; }
+        public DbSet<Domain.Entities.TeachingStaff> TeachingStaff { get; set; }
+        public DbSet<Tutorial> Tutorials { get; set; }
+        public DbSet<MainCategory> MainCategories { get; set ; }
+        public DbSet<SubCategory> SubCategories { get ; set; }
+        public DbSet<MassCulture> MassCultures { get; set; }
 
         #endregion
 
 
-     
+
 
         public override DatabaseFacade Database => base.Database;
         public override ChangeTracker ChangeTracker => base.ChangeTracker;
 
-       
+      
 
         public DbSet<TEntity> Set<TEntity>() where TEntity : class
         {

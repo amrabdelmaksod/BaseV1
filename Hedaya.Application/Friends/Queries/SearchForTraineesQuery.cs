@@ -8,13 +8,13 @@ using SendGrid.Helpers.Errors.Model;
 
 namespace Hedaya.Application.Friends.Queries
 {
-    public class SearchForTraineesQuery : IRequest<List<FriendDto>>
+    public class SearchForTraineesQuery : IRequest<object>
     {
         public string TraineeId { get; set; }
         public string SearchTerm { get; set; }
     }
 
-    public class SearchForTraineesQueryHandler : IRequestHandler<SearchForTraineesQuery, List<FriendDto>>
+    public class SearchForTraineesQueryHandler : IRequestHandler<SearchForTraineesQuery,object>
     {
         private readonly IApplicationDbContext _context;
 
@@ -23,14 +23,14 @@ namespace Hedaya.Application.Friends.Queries
             _context = context;
         }
 
-        public async Task<List<FriendDto>> Handle(SearchForTraineesQuery request, CancellationToken cancellationToken)
+        public async Task<object> Handle(SearchForTraineesQuery request, CancellationToken cancellationToken)
         {
             try
             {
                 var trainee = await _context.Trainees.FirstOrDefaultAsync(a => a.AppUserId == request.TraineeId);
                 if (trainee == null)
                 {
-                    throw new NotFoundException(nameof(Trainee));
+                  return  new { Message = $"There is no trainee with this id {request.TraineeId}" };
                 }
 
                 var friendIds = await _context.Friendships
@@ -48,7 +48,7 @@ namespace Hedaya.Application.Friends.Queries
                     })
                     .ToListAsync(cancellationToken);
 
-                return trainees;
+                return new { Result = trainees }  ;
             }
             catch (Exception ex)
             {

@@ -1,5 +1,4 @@
-﻿using Hedaya.Application.CommonQuestions.Models;
-using Hedaya.Application.CommonQuestions.Queries;
+﻿using Hedaya.Application.CommonQuestions.Queries;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hedaya.WebApi.Controllers.v1.Settings
@@ -10,7 +9,7 @@ namespace Hedaya.WebApi.Controllers.v1.Settings
     {
 
         [HttpGet]
-        public async Task<ActionResult<List<CommonQuestionDto>>> GetCommonQuestions()
+        public async Task<ActionResult<object>> GetCommonQuestions()
         {
 
 
