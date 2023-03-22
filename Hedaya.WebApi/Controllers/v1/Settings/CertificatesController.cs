@@ -9,9 +9,10 @@ namespace Hedaya.WebApi.Controllers.v1.Settings
     public class CertificatesController : BaseController<CertificatesController>
     {
         [HttpGet("GetAllCertificatesByTraineeId")]
-        public async Task<IActionResult> GetAllCertificatesByTraineeId(string id)
+        public async Task<IActionResult> GetAllCertificatesByTraineeId()
         {
-            var result = await Mediator.Send(new GetAllCertificatesByTraineeIdQuery { TraineeId = id });
+            var userId = User.Claims.FirstOrDefault(c => c.Type == "uid")?.Value;
+            var result = await Mediator.Send(new GetAllCertificatesByTraineeIdQuery { UserId = userId });
 
             return Ok(result);
         }

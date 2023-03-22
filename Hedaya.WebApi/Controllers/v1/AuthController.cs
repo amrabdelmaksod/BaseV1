@@ -1,8 +1,10 @@
 ﻿using API.Errors;
+using FluentValidation;
 using Hedaya.Application.Auth.Abstractions;
 using Hedaya.Application.Auth.Models;
 using Hedaya.Application.Auth.Validators;
 using Hedaya.Application.Complexes.Queries;
+using Hedaya.Domain.Entities;
 using Hedaya.Domain.Entities.Authintication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
@@ -14,8 +16,8 @@ namespace Hedaya.WebApi.Controllers.v1
 
     [ApiController]
     [Route("api/v{version:apiVersion}/[controller]")]
-    
-    public class AuthController :BaseController<AuthController>
+
+    public class AuthController : BaseController<AuthController>
     {
         private readonly IAuthService _authService;
         private readonly UserManager<AppUser> _userManager;
@@ -30,10 +32,10 @@ namespace Hedaya.WebApi.Controllers.v1
         public async Task<IActionResult> SetLanguage(string? culture)
         {
 
-         if(string.IsNullOrEmpty(culture) || (culture!="en-US" && culture!="ar-EG")) 
+            if (string.IsNullOrEmpty(culture) || (culture != "en-US" && culture != "ar-EG"))
             {
-            
-            return BadRequest(new { Message = CultureInfo.CurrentCulture.TwoLetterISOLanguageName == "ar" ? $"عفوا لقد حدث خطأ" : "Something Went wrong" });
+
+                return BadRequest(new { Message = CultureInfo.CurrentCulture.TwoLetterISOLanguageName == "ar" ? $"عفوا لقد حدث خطأ" : "Something Went wrong" });
             }
 
             Response.Cookies.Append(
@@ -67,17 +69,17 @@ namespace Hedaya.WebApi.Controllers.v1
 
 
 
-            var result =await _authService.RegisterAsync(ModelState, model);
-           
-           
+            var result = await _authService.RegisterAsync(ModelState, model);
+
+
             return Ok(result);
         }
 
 
-        
-        
+
+
         [HttpPost("login")]
-        public async Task<IActionResult> LoginAsync([FromBody]  TokenRequestModel model)
+        public async Task<IActionResult> LoginAsync([FromBody] TokenRequestModel model)
         {
             var validator = new TokenRequestModelValidator(_userManager);
             var validationResult = await validator.ValidateAsync(model);
@@ -95,8 +97,8 @@ namespace Hedaya.WebApi.Controllers.v1
 
 
             var result = await _authService.LoginAsync(ModelState, model);
-        
-         
+
+
 
             return Ok(result);
         }
@@ -105,8 +107,8 @@ namespace Hedaya.WebApi.Controllers.v1
         [HttpPost("forgotPassword")]
         public async Task<IActionResult> ForgotPasswordAsync([FromBody] ForgotPasswordVM userModel)
         {
-           
-          
+
+
 
             var validationResult = await new ForgotPasswordVMValidator(_userManager).ValidateAsync(userModel);
 
@@ -125,7 +127,7 @@ namespace Hedaya.WebApi.Controllers.v1
 
             return Ok(result);
 
-         
+
 
         }
 
@@ -183,24 +185,53 @@ namespace Hedaya.WebApi.Controllers.v1
 
 
         [HttpPut("UpdateProfile")]
-        public async Task<ActionResult> UpdateProfile([FromForm] UpdateProfileModel userModel)
+        public async Task<ActionResult> UpdateProfile([FromBody] UpdateProfileModel userModel)
         {
-            try
+
+            var validationResult = await new UpdateProfileModelValidator(_userManager).ValidateAsync(userModel);
+            if (!validationResult.IsValid)
             {
 
-                var userId = User.Claims.FirstOrDefault(c => c.Type == "uid")?.Value;
+                var errors = validationResult.Errors
+                     .Select(error => new { error = error.ErrorMessage })
+                     .ToList();
 
-                var result = await _authService.UpdateUserAsync(ModelState, userModel, userId);
-                if (!ModelState.IsValid)
-                {
-                    return CustomBadRequest.CustomModelStateErrorResponse(ModelState);
-                }
-                return Ok(result);
+                return BadRequest(new { errors });
             }
-            catch (Exception ex)
+
+
+            var userId = User.Claims.FirstOrDefault(c => c.Type == "uid")?.Value;
+
+                var result = await _authService.UpdateUserAsync(userModel, userId);
+            if(result == null)
+                return BadRequest(new { error = CultureInfo.CurrentCulture.TwoLetterISOLanguageName == "ar" ? "عفوا لقد حدث خطأ" : "Something Went Wrong!" });
+
+            return Ok(result);
+           
+        }
+
+        [HttpPut("UpdateProfilePicture")]
+        public async Task<ActionResult> UpdateProfilePicture([FromForm] UpdateProfilePictureModel UpdateProfilePictureModel)
+        {
+            var validationResult = await new UpdateProfilePictureModelValidator(_userManager).ValidateAsync(UpdateProfilePictureModel);
+            if (!validationResult.IsValid)
             {
-                return CustomBadRequest.CustomExErrorResponse(ex);
+
+                var errors = validationResult.Errors
+                     .Select(error => new { error = error.ErrorMessage })
+                     .ToList();
+
+                return BadRequest(new { errors });
             }
+
+            var userId = User.Claims.FirstOrDefault(c => c.Type == "uid")?.Value;
+
+            var result = await _authService.UpdateProfilePicture(UpdateProfilePictureModel, userId);
+            if (result == null)
+                return BadRequest(new { error = CultureInfo.CurrentCulture.TwoLetterISOLanguageName == "ar" ? "عفوا لقد حدث خطأ" : "Something Went Wrong!" });
+            return Ok(result);
+
+
         }
 
 
@@ -214,12 +245,12 @@ namespace Hedaya.WebApi.Controllers.v1
 
             var userId = User.Claims.FirstOrDefault(c => c.Type == "uid")?.Value;
             var result = await _authService.ChangePasswordAsync(userId, model.CurrentPassword, model.NewPassword, ModelState);
-            if (!result)
+            if (result is null)
             {
-                return BadRequest(ModelState);
+                return BadRequest(new { error = CultureInfo.CurrentCulture.TwoLetterISOLanguageName == "ar" ? "عفوا لقد حدث خطأ" : "Something Went Wrong!" });
             }
 
-            return Ok();
+            return Ok(result);
         }
 
         //[HttpPost("addToRole")]
@@ -232,35 +263,23 @@ namespace Hedaya.WebApi.Controllers.v1
 
         //    if (!string.IsNullOrEmpty(result))
         //        return CustomBadRequest.CustomModelStateErrorResponse(ModelState);
-        
+
 
         //    return Ok(model);
         //}
 
         [HttpDelete("DeleteAccount")]
-        public async Task<ActionResult> DeleteAccount()
+        public async Task<ActionResult> DeleteAccount(string reason)
         {
-            try
+
+            var userId = User.Claims.FirstOrDefault(c => c.Type == "uid")?.Value;
+            var result =await _authService.DeleteAccount(reason, userId);
+            if (result is null)
             {
-
-
-                var userId = User.Claims.FirstOrDefault(c => c.Type == "uid")?.Value;
-                var result = _authService.DeleteAccount(ModelState, userId);
-
-                if (!ModelState.IsValid)
-                {
-                    return CustomBadRequest.CustomModelStateErrorResponse(ModelState);
-                }
-                return Ok(result);
+                return BadRequest(new { error = CultureInfo.CurrentCulture.TwoLetterISOLanguageName == "ar" ? $"عفوا لايوجد مستخدم بهذا المعرف {userId}" : $"The User  With This Id {userId} Is Not Found" });
             }
-            catch (Exception ex)
-            {
-                return CustomBadRequest.CustomExErrorResponse(ex);
-            }
+            return Ok(result);
         }
-
-
-
         [HttpGet("TermsAndConditions")]
         public async Task<IActionResult> TermsAndConditions()
         {

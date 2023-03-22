@@ -4,7 +4,6 @@ using Hedaya.Application.Interfaces;
 using Hedaya.Common;
 using Hedaya.Domain.Entities;
 using Hedaya.Domain.Entities.Authintication;
-using Hedaya.Domain.Enums;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
@@ -12,11 +11,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
-using System.Reflection;
 using System.Security.Claims;
 using System.Text;
-using Twilio.Jwt.AccessToken;
 
 namespace Hedaya.Application.Auth.Services
 {
@@ -26,21 +24,20 @@ namespace Hedaya.Application.Auth.Services
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly JWTSettings _jwt;
         private readonly IEmailSender _sender;
-        private IConfiguration _configuration;
+     
         private readonly ISMSService _smsService;
 
 
         private IApplicationDbContext _context;
         private readonly SignInManager<AppUser> _signInManager;
 
-        public AuthService(UserManager<AppUser> userManager, IApplicationDbContext context, IOptions<JWTSettings> jwt, RoleManager<IdentityRole> roleManager, IEmailSender sender, IConfiguration configuration, ISMSService smsService, SignInManager<AppUser> signInManager)
+        public AuthService(UserManager<AppUser> userManager, IApplicationDbContext context, IOptions<JWTSettings> jwt, RoleManager<IdentityRole> roleManager, IEmailSender sender, ISMSService smsService, SignInManager<AppUser> signInManager)
         {
             _userManager = userManager;
             _jwt = jwt.Value;
             _roleManager = roleManager;
             _sender = sender;
             _context = context;
-            _configuration = configuration;
             _smsService = smsService;
             _signInManager = signInManager;
         }
@@ -333,29 +330,19 @@ namespace Hedaya.Application.Auth.Services
 
 
 
-        public async Task<dynamic> UpdateUserAsync(ModelStateDictionary modelState, UpdateProfileModel userModel, string userId)
+        public async Task<dynamic> UpdateUserAsync( UpdateProfileModel userModel, string userId)
         {
             try
             {
 
+                if(userId == null) { return null; }
+
                 var user = await _userManager.FindByIdAsync(userId);
                 var Trainee = await _context.Trainees.FirstAsync(a => a.AppUserId == userId);
-                if (user == null)
-                {
-                    modelState.AddModelError("Access Token", $"There is no user with this Id : {userId}");
-                    return new { Message = $"There is no user with this Id : {userId}" };
+                if (user is null || Trainee is null)
+                {                  
+                    return null;
                 }
-
-
-                var phoneisexist = _context.AppUsers.FirstOrDefault(s => s.PhoneNumber == userModel.Phone && s.Id != user.Id);
-                if (phoneisexist != null)
-                {
-                    modelState.AddModelError("user_Phone", "Phone Number Is Already Exist");
-                    return new { Message = $"Phone Number Is Already Exist : {userModel.Phone}" };
-                }
-
-
-
 
                 if (!string.IsNullOrEmpty(userModel.Email))
                 {
@@ -371,6 +358,7 @@ namespace Hedaya.Application.Auth.Services
                 {
                     Trainee.FullName = userModel.FullName;
                 }
+
 
                 if (!string.IsNullOrEmpty(userModel.Twitter))
                 {
@@ -398,15 +386,19 @@ namespace Hedaya.Application.Auth.Services
                     Trainee.EducationalDegree = userModel.EducationalDegree;
                 }
 
-                if (!string.IsNullOrEmpty(userModel.ProfilePicture.ToString()))
+                if (!string.IsNullOrEmpty(userModel.Country.ToString()))
                 {
-                    // Save the new profile picture to the database
-                    using (var ms = new MemoryStream())
-                    {
-                        userModel.ProfilePicture.CopyTo(ms);
-                        Trainee.ProfilePicture = ms.ToArray();
-                    }
+                    user.Nationality = userModel.Country;
+                }
 
+                if (!string.IsNullOrEmpty(userModel.Gender.ToString()))
+                {
+                    user.Gender = userModel.Gender;
+                }
+
+                if (userModel.DateOfBirth != null)
+                {
+                    user.DateOfBirth = userModel.DateOfBirth;
                 }
 
                 _context.Trainees.Update(Trainee);
@@ -415,14 +407,13 @@ namespace Hedaya.Application.Auth.Services
 
 
                 var result = await _userManager.UpdateAsync(user);
-                if (!result.Succeeded)
-                {
-                    foreach (var error in result.Errors)
+              
+                    if (!result.Succeeded)
                     {
-                        modelState.AddModelError(error.Code, error.Description);
-                        return new { Message = $"Something Went Wrong!" };
+                        var errors = result.Errors.Select(e => new { error = e.Description }).ToList();
+                        return new { errors };
                     }
-                }
+                
 
 
 
@@ -444,65 +435,64 @@ namespace Hedaya.Application.Auth.Services
             }
             catch (Exception ex)
             {
-                modelState.AddModelError(string.Join(",", ex.Data), string.Join(",", ex.InnerException));
+             
                 return new { Message = $"{ex.Message}" };
             }
 
         }
 
 
-        public async Task<bool> ChangePasswordAsync(string userId, string currentPassword, string newPassword, ModelStateDictionary modelState)
+        public async Task<object> ChangePasswordAsync(string userId, string currentPassword, string newPassword, ModelStateDictionary modelState)
         {
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null)
             {
-                modelState.AddModelError("UserId", "User not found");
-                return false;
+               return null;
             }
 
             var result = await _userManager.ChangePasswordAsync(user, currentPassword, newPassword);
             if (!result.Succeeded)
             {
-                foreach (var error in result.Errors)
-                {
-                    modelState.AddModelError(error.Code, error.Description);
-                }
-                return false;
+                var errors = result.Errors.Select(e => new { error = e.Description }).ToList();
+                return new { errors };
             }
 
             await _signInManager.RefreshSignInAsync(user);
 
-            return true;
+            return new {Message =CultureInfo.CurrentCulture.TwoLetterISOLanguageName =="ar" ? "تم تغيير كلمة السر بنجاح"  : "Password Changed Successfully"};
         }
 
 
-        public async Task<dynamic> DeleteAccount(ModelStateDictionary modelState, string userId)
+        public async Task<dynamic> DeleteAccount(string Reason, string userId)
         {
             try
             {
-                var user = await _userManager.FindByIdAsync(userId);
-                if (user == null)
+              
+                    var user = await _context.AppUsers.FirstOrDefaultAsync(a=>a.Id == userId);
+                var trainee = await _context.Trainees.FirstOrDefaultAsync(a=>a.AppUserId == userId);
+                if (user == null )
+                {                  
+                    return null;
+                }
+
+                if(trainee is not null)
                 {
-                    modelState.AddModelError("Access Token", $"There is no user with this Id : {userId}");
-                    return new { Message = $"There is no user with this Id : {userId}" };
+                    trainee.Deleted = true;
                 }
 
                 user.Deleted = true;
-
+                user.DeletedReason = Reason;
                 await _context.SaveChangesAsync();
 
                 return new
                 {
-                    result = new
-                    {
 
-                    },
-                    msg = "DeletedSuccessfully"
+                    Message = CultureInfo.CurrentCulture.TwoLetterISOLanguageName == "ar" ? "تم ازالة الحساب بنجاح" : "Account Deleted Successfully"
                 };
             }
             catch (Exception ex)
             {
-                modelState.AddModelError(string.Join(",", ex.Data), string.Join(",", ex.InnerException));
+             
                 return new { Message = $"{ex.Message}" };
             }
         }
@@ -576,6 +566,27 @@ namespace Hedaya.Application.Auth.Services
             return username;
         }
 
+        public async Task<object> UpdateProfilePicture(UpdateProfilePictureModel userModel, string userId)
+        {
+            
+            var Trainee = await _context.Trainees.FirstOrDefaultAsync(a => a.AppUserId == userId);
 
+            
+            if (!string.IsNullOrEmpty(userModel.ProfilePicture.ToString()) && Trainee is not null)
+            {
+                // Save the new profile picture to the database
+                using (var ms = new MemoryStream())
+                {
+                    userModel.ProfilePicture.CopyTo(ms);
+                    Trainee.ProfilePicture = ms.ToArray();
+                   await _context.SaveChangesAsync();
+                }
+               var Message = CultureInfo.CurrentCulture.TwoLetterISOLanguageName == "ar" ? "تم تحديث صورة الملف الشخصي بنجاح" : "Profile Picture Updated Successfully";
+                return new { result = Message} ;
+
+            }
+
+            return null;
+        }
     }
 }

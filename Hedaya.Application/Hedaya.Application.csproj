@@ -35,10 +35,13 @@
   <ItemGroup>
     <Folder Include="AboutPlatform\Commands\" />
     <Folder Include="Blogs\Commands\" />
+    <Folder Include="Chats\Commands\" />
+    <Folder Include="Chats\Models\" />
     <Folder Include="CommonQuestions\Commands\" />
     <Folder Include="Complexes\Commands\" />
     <Folder Include="GentlemenScholars\Commands\" />
     <Folder Include="MassCultures\Commands\" />
+    <Folder Include="MethodologicalExplanations\Commands\" />
     <Folder Include="Notifications\Commands\" />
     <Folder Include="SuggestionsAndComplaints\Models\" />
     <Folder Include="SuggestionsAndComplaints\Queries\" />

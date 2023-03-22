@@ -35,7 +35,7 @@ namespace Hedaya.Application.Certificates.Queries
                     Result = new CertificateApiDto
                     {
                         Id = certificate.Id,
-                        CertificateContent = certificate.CertificateContent
+                        CertificateContent = certificate.ImageUrl
                     }
                 };
             }

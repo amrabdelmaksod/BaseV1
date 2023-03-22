@@ -48,6 +48,8 @@ namespace Hedaya.Application.MassCultures.Queries
                     IsFav = false,
                     Duration = CultureInfo.CurrentCulture.TwoLetterISOLanguageName == "ar" ? $"{x.Duration} ساعات" : $"{x.Duration} hours",
                     SubCategoryId = x.SubCategoryId,
+                    ImageUrl = x.ImageUrl,
+                  
                 })
                 .ToListAsync(cancellationToken);
 
@@ -57,7 +59,7 @@ namespace Hedaya.Application.MassCultures.Queries
                 AllCultures = massCultures
             };
 
-            return new {Response = response } ;
+            return new { Result = response } ;
         }
     }
 

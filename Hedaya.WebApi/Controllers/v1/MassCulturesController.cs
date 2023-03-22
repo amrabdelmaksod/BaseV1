@@ -1,5 +1,6 @@
 ﻿using Hedaya.Application.MassCultures.Models;
 using Hedaya.Application.MassCultures.Queries;
+using Hedaya.Application.MethodologicalExplanations.Queries;
 using Microsoft.AspNetCore.Mvc;
 using System.Globalization;
 
@@ -25,6 +26,25 @@ namespace Hedaya.WebApi.Controllers.v1
             var query = new GetMassCulturesBySubcategoryIdQuery { SubcategoryId = subcategoryId, PageNumber = pageNumber };
             var result = await Mediator.Send(query);
 
+            return Ok(result);
+        }
+
+
+
+        [HttpGet("FilterMassCultures")]
+        public async Task<IActionResult> FilterMassCultures([FromQuery] string? SearchKeyword,
+    [FromQuery] int pageNumber = 1,
+    [FromQuery] int? subCategoryId = null,
+    [FromQuery] bool sortByDurationAscending = true)
+        {
+            var query = new FilterMassCulturesQuery
+            {
+                searchKeyword = SearchKeyword,
+                PageNumber = pageNumber,
+                SubcategoryId = subCategoryId,
+                SortByDurationAscending = sortByDurationAscending
+            };
+            var result = await Mediator.Send(query);
             return Ok(result);
         }
 

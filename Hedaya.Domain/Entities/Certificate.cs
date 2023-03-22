@@ -8,7 +8,7 @@
         public int CourseId { get; set; }
 
         public required string TraineeId { get; set; }
-        public byte[] CertificateContent { get; set; }
+        public string? ImageUrl { get; set; }
         public string CertificateType { get; set; }
 
         public virtual Course Course { get; set; }

@@ -12,6 +12,7 @@ namespace Hedaya.Infrastructure.Presistence.Configurations
             builder.HasKey(x => x.Id);
             builder.Property(a => a.Title).HasMaxLength(256).IsRequired();
             builder.Property(a => a.Description).HasMaxLength(2000).IsRequired();
+            builder.Property(a => a.IconUrl).HasMaxLength(200);
             builder.Property(a => a.Deleted).HasDefaultValue(false);
             builder.Property(a => a.CreatedById).HasMaxLength(50).IsRequired();
             builder.Property(b => b.CreationDate).HasColumnType("DATETIME").HasDefaultValueSql("GETDATE()").IsRequired();

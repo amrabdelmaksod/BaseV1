@@ -14,7 +14,7 @@ namespace Hedaya.Domain.Entities
         public string Id { get; set; }
         public string FullName { get; set; }
         public byte[]? ProfilePicture { get; set; }
-        public EducationalDegree  EducationalDegree { get; set; }
+        public EducationalDegree?  EducationalDegree { get; set; }
         public string? JobTitle { get; set; }
         public string? Facebook { get; set; }
         public string? Twitter { get; set; }

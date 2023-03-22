@@ -22,6 +22,7 @@ namespace Hedaya.Infrastructure.Presistence.Configurations
             builder.Property(c => c.Cookies).HasMaxLength(5000);
             builder.Property(c => c.Vision).HasMaxLength(5000);
             builder.Property(c => c.Mission).HasMaxLength(5000);
+            builder.Property(c => c.AboutPlatformVideoUrl).HasMaxLength(200);
         }
     }
 }

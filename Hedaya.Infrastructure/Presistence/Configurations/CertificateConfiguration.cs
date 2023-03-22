@@ -14,7 +14,7 @@ namespace Hedaya.Infrastructure.Presistence.Configurations
             builder.Property(a=>a.TraineeId).HasMaxLength(50).IsRequired();
             builder.Property(a=>a.CourseId).HasMaxLength(50).IsRequired();
             
-            builder.Property(c => c.CertificateContent)
+            builder.Property(c => c.ImageUrl).HasMaxLength(200)
                 .IsRequired();
 
        

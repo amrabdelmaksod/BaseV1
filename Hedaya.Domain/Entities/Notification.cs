@@ -1,4 +1,5 @@
 ﻿using Hedaya.Domain.Entities.Authintication;
+using Hedaya.Domain.Enums;
 
 namespace Hedaya.Domain.Entities
 {
@@ -7,7 +8,7 @@ namespace Hedaya.Domain.Entities
         public int Id { get; set; }
         public string Title { get; set; }
         public string Content { get; set; }
-        public string UrlLink { get; set; }
+        public NotificationType Type { get; set; }
         public DateTime Date { get; set; }
         public string AppUserId { get; set; }
         public AppUser AppUser { get; set; }

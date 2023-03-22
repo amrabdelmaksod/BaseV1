@@ -15,6 +15,7 @@ namespace Hedaya.Domain.Entities.Authintication
         public Gender Gender { get; set; }
         public string? SecurityCode { get; set; }
         public bool Deleted { get; set; }
+        public string? DeletedReason { get; set; }
 
         public virtual ICollection<Notification> Notifications { get; set; }
 

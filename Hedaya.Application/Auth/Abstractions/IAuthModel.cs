@@ -9,12 +9,13 @@ namespace Hedaya.Application.Auth.Abstractions
         Task<dynamic> LoginAsync(ModelStateDictionary modelState, TokenRequestModel model);
         Task<dynamic> ForgetPasswordAsync(ModelStateDictionary modelState, ForgotPasswordVM userModel);
         Task<dynamic> RestPasswordAsync(ModelStateDictionary modelState, ResetPasswordModel userModel);
-        Task<bool> ChangePasswordAsync(string userId, string currentPassword, string newPassword, ModelStateDictionary modelState);
+        Task<object> ChangePasswordAsync(string userId, string currentPassword, string newPassword, ModelStateDictionary modelState);
         Task<dynamic> GetUserAsync(ModelStateDictionary modelState, string userId);
-        Task<dynamic> UpdateUserAsync(ModelStateDictionary modelState, UpdateProfileModel userModel, string userId);
+        Task<dynamic> UpdateUserAsync(UpdateProfileModel userModel, string userId);
+        Task<dynamic> UpdateProfilePicture(UpdateProfilePictureModel userModel, string userId);
      
         //Task<string> AddToRoleAsync(ModelStateDictionary modelState, AddRoleModel model);
-        Task<dynamic> DeleteAccount(ModelStateDictionary modelState, string token);
+        Task<dynamic> DeleteAccount(string Reason, string UserId);
 
 
         //object LogOut(ModelStateDictionary modelState, string authorization, string MobilID);

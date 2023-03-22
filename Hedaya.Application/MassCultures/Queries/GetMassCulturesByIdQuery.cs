@@ -1,9 +1,7 @@
 ﻿using Hedaya.Application.Interfaces;
 using Hedaya.Application.MassCultures.Models;
-using Hedaya.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using SendGrid.Helpers.Errors.Model;
 using System.Globalization;
 
 namespace Hedaya.Application.MassCultures.Queries
@@ -34,7 +32,7 @@ namespace Hedaya.Application.MassCultures.Queries
                     Description = x.Description,
                     IsFav = false,
                     Duration = CultureInfo.CurrentCulture.TwoLetterISOLanguageName == "ar" ? $"{x.Duration} ساعات" : $"{x.Duration} hours",
-                    
+                    ImageUrl = x.ImageUrl                  
                 })
                 .FirstOrDefaultAsync(cancellationToken);
 
@@ -45,24 +43,29 @@ namespace Hedaya.Application.MassCultures.Queries
 
             var relatedCultures = await _context.MassCultures
                 .Where(x => x.SubCategoryId == culture.SubCategoryId && x.Id != culture.Id)
-                .Select(x => new MassCultureDto
+                .Select(x => new MassCultureDetailsDto
                 {
                     Id = x.Id,
                     SubCategoryId = x.SubCategoryId,
                     Title = CultureInfo.CurrentCulture.TwoLetterISOLanguageName == "ar" ? x.TitleAr : x.TitleEn,
                     Description = x.Description,
                     IsFav = false,
-                    Duration = CultureInfo.CurrentCulture.TwoLetterISOLanguageName == "ar" ? $"{x.Duration} ساعات" : $"{x.Duration} hours"
+                    Duration = CultureInfo.CurrentCulture.TwoLetterISOLanguageName == "ar" ? $"{x.Duration} ساعات" : $"{x.Duration} hours",                   
+                    ImageUrl = x.ImageUrl,
+                    Facebook = x.Facebook,
+                    Telegram = x.Telegram,
+                    Twitter = x.Twitter,
+                    Youtube = x.Youtube
                 })
                 .ToListAsync(cancellationToken);
 
-            var response = new MassCultureResponse
+            var response = new MassCultureDetailsResponse
             {
                 MassCulture = culture,
                 RelatedMassCultures = relatedCultures
             };
 
-            return new { Response = response };
+            return new { Result = response };
         }
     }
 

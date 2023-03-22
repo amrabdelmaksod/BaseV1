@@ -12,7 +12,7 @@ namespace Hedaya.Infrastructure.Presistence.Configurations
             builder.HasKey(n => n.Id);
             builder.Property(n => n.Title).HasMaxLength(50);
             builder.Property(n => n.Content).HasMaxLength(255);
-            builder.Property(n => n.UrlLink).HasMaxLength(255);
+     
             builder.Property(n => n.Date).IsRequired();
             builder.Property(n => n.AppUserId).IsRequired();
 

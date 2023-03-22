@@ -23,14 +23,18 @@ namespace Hedaya.Application.PrayerTimes.Queries
         {
             var prayerTimes = new PrayerTimesCalculator(request.Latitude, request.Longitude);
             prayerTimes.CalculationMethod = CalculationMethods.Egypt;
+
+
      
             var timeZoneOffset = TimeSpan.FromHours(3);
             var times = prayerTimes.GetPrayerTimes(new DateTimeOffset(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 0, 0, 0, timeZoneOffset));
 
             PrayerTimeType GetNextPrayer()
-            {              
+            {
+
+                var egyptTime = DateTime.Now.AddHours(-1);
                 // Determine the name of the next prayer
-                switch (DateTime.Now.TimeOfDay)
+                switch (egyptTime.TimeOfDay)
                 {
                     case var t when t < times.Fajr:
                         return PrayerTimeType.Fajr;
@@ -52,7 +56,7 @@ namespace Hedaya.Application.PrayerTimes.Queries
             var nextPrayer = GetNextPrayer();
 
 
-            var result = new PrayerTimesResult
+            var prayerTimesResult = new PrayerTimesResult
             {
                 
                 Fajr = times.Fajr,
@@ -67,7 +71,7 @@ namespace Hedaya.Application.PrayerTimes.Queries
 
            
 
-            return new {Result = result};
+            return new {result = prayerTimesResult};
         }
 
     

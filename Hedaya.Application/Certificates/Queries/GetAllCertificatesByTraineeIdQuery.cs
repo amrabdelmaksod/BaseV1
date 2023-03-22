@@ -7,7 +7,7 @@ namespace Hedaya.Application.Certificates.Queries
 {
     public class GetAllCertificatesByTraineeIdQuery : IRequest<object>
     {
-        public string TraineeId { get; set; }
+        public string UserId { get; set; }
         public class Handler : IRequestHandler<GetAllCertificatesByTraineeIdQuery,object>
         {
 
@@ -26,7 +26,7 @@ namespace Hedaya.Application.Certificates.Queries
                                    
 
 
-                    var Certificates = await _context.Certificates.Include(a => a.Trainee).Include(a => a.Course).ThenInclude(a => a.Instructor).Where(a => !a.Deleted && a.TraineeId == request.TraineeId)
+                    var Certificates = await _context.Certificates.Include(a => a.Trainee).Include(a => a.Course).ThenInclude(a => a.Instructor).Where(a => !a.Deleted && a.Trainee.AppUserId == request.UserId)
 
                         .Select(a => new CertificateDto
                         {
@@ -34,7 +34,8 @@ namespace Hedaya.Application.Certificates.Queries
                             CourseTitle = a.Course.Title,
                             InstructorName = a.Course.Instructor.GetFullName(),
                             TraineeName = a.Trainee.FullName,
-                            TraineeCode = a.TraineeId
+                            TraineeCode = a.TraineeId,
+                            ImageUrl = a.ImageUrl,
                         })
                        .ToListAsync();
 

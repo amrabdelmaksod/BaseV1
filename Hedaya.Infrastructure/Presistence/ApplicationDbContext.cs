@@ -54,6 +54,9 @@ namespace Hedaya.Infrastructure.Presistence
         public DbSet<MainCategory> MainCategories { get; set ; }
         public DbSet<SubCategory> SubCategories { get ; set; }
         public DbSet<MassCulture> MassCultures { get; set; }
+        public DbSet<ChatQuestions> ChatQuestions { get; set; }
+        public DbSet<MethodologicalExplanation> MethodologicalExplanations { get; set; }
+        public DbSet<ExplanationVideo> ExplanationVideos { get; set; }
 
         #endregion
 

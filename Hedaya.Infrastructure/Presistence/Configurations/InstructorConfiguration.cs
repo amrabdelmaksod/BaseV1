@@ -13,6 +13,8 @@ namespace Hedaya.Infrastructure.Presistence.Configurations
             builder.Property(t => t.Id).HasMaxLength(50);
             builder.Property(a=>a.FirstName).HasMaxLength(128).IsRequired();
             builder.Property(a=>a.LastName) .HasMaxLength(128).IsRequired();
+            builder.Property(a=>a.Description) .HasMaxLength(1000);
+            builder.Property(a=>a.ImageUrl) .HasMaxLength(200);
             builder.Property(a=>a.AppUserId).HasMaxLength(450).IsRequired();
             builder.Property(a => a.Deleted).HasDefaultValue(false);
             builder.Property(a => a.CreatedById).HasMaxLength(50).IsRequired();

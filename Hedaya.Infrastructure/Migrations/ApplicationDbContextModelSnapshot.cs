@@ -42,6 +42,9 @@ namespace Hedaya.Infrastructure.Migrations
                     b.Property<bool>("Deleted")
                         .HasColumnType("bit");
 
+                    b.Property<string>("DeletedReason")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Email")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
@@ -212,10 +215,6 @@ namespace Hedaya.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<byte[]>("CertificateContent")
-                        .IsRequired()
-                        .HasColumnType("varbinary(max)");
-
                     b.Property<string>("CertificateType")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -240,6 +239,11 @@ namespace Hedaya.Infrastructure.Migrations
                         .HasColumnType("bit")
                         .HasDefaultValue(false);
 
+                    b.Property<string>("ImageUrl")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
                     b.Property<DateTime?>("ModificationDate")
                         .HasColumnType("DATETIME");
 
@@ -259,6 +263,24 @@ namespace Hedaya.Infrastructure.Migrations
                     b.HasIndex("TraineeId");
 
                     b.ToTable("Certificates", (string)null);
+                });
+
+            modelBuilder.Entity("Hedaya.Domain.Entities.ChatQuestions", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Question")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ChatQuestions", (string)null);
                 });
 
             modelBuilder.Entity("Hedaya.Domain.Entities.Comment", b =>
@@ -317,6 +339,11 @@ namespace Hedaya.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("AboutPlatformVideoUrl")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<string>("AddressDescription")
                         .IsRequired()
@@ -426,6 +453,82 @@ namespace Hedaya.Infrastructure.Migrations
                     b.ToTable("CourseTopics");
                 });
 
+            modelBuilder.Entity("Hedaya.Domain.Entities.ExplanationNote", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<string>("IconUrl")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<int>("MethodologicalExplanationId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("TitleAr")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("TitleEn")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MethodologicalExplanationId");
+
+                    b.ToTable("ExplanationNotes", (string)null);
+                });
+
+            modelBuilder.Entity("Hedaya.Domain.Entities.ExplanationVideo", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<int>("MethodologicalExplanationId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("TitleAr")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("TitleEn")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("VideoUrl")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MethodologicalExplanationId");
+
+                    b.ToTable("ExplanationVideos", (string)null);
+                });
+
             modelBuilder.Entity("Hedaya.Domain.Entities.Forum", b =>
                 {
                     b.Property<int>("Id")
@@ -533,10 +636,20 @@ namespace Hedaya.Infrastructure.Migrations
                         .HasColumnType("bit")
                         .HasDefaultValue(false);
 
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
                     b.Property<string>("FirstName")
                         .IsRequired()
                         .HasMaxLength(128)
                         .HasColumnType("nvarchar(128)");
+
+                    b.Property<string>("ImageUrl")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<string>("LastName")
                         .IsRequired()
@@ -633,8 +746,23 @@ namespace Hedaya.Infrastructure.Migrations
                         .HasColumnType("time")
                         .HasDefaultValue(new TimeSpan(0, 0, 0, 0, 0));
 
+                    b.Property<string>("Facebook")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("ImageUrl")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
                     b.Property<int>("SubCategoryId")
                         .HasColumnType("int");
+
+                    b.Property<string>("Telegram")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<string>("TitleAr")
                         .IsRequired()
@@ -646,11 +774,98 @@ namespace Hedaya.Infrastructure.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
+                    b.Property<string>("Twitter")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Whatsapp")
+                        .IsRequired()
+                        .HasMaxLength(15)
+                        .HasColumnType("nvarchar(15)");
+
+                    b.Property<string>("Youtube")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("SubCategoryId");
 
                     b.ToTable("MassCultures", (string)null);
+                });
+
+            modelBuilder.Entity("Hedaya.Domain.Entities.MethodologicalExplanation", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<TimeSpan>("Duration")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("time")
+                        .HasDefaultValue(new TimeSpan(0, 0, 0, 0, 0));
+
+                    b.Property<string>("Facebook")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("ImageUrl")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("InstructorId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<int>("SubCategoryId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Telegram")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("TitleAr")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("TitleEn")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Twitter")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Whatsapp")
+                        .IsRequired()
+                        .HasMaxLength(15)
+                        .HasColumnType("nvarchar(15)");
+
+                    b.Property<string>("Youtube")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("InstructorId");
+
+                    b.HasIndex("SubCategoryId");
+
+                    b.ToTable("MethodologicalExplanations", (string)null);
                 });
 
             modelBuilder.Entity("Hedaya.Domain.Entities.Notification", b =>
@@ -678,10 +893,8 @@ namespace Hedaya.Infrastructure.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<string>("UrlLink")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -762,6 +975,10 @@ namespace Hedaya.Infrastructure.Migrations
                         .IsRequired()
                         .HasMaxLength(2000)
                         .HasColumnType("nvarchar(2000)");
+
+                    b.Property<string>("IconUrl")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<DateTime?>("ModificationDate")
                         .HasColumnType("DATETIME");
@@ -1081,7 +1298,7 @@ namespace Hedaya.Infrastructure.Migrations
                         .HasColumnType("bit")
                         .HasDefaultValue(false);
 
-                    b.Property<int>("EducationalDegree")
+                    b.Property<int?>("EducationalDegree")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasDefaultValue(0);
@@ -1365,6 +1582,28 @@ namespace Hedaya.Infrastructure.Migrations
                     b.Navigation("Course");
                 });
 
+            modelBuilder.Entity("Hedaya.Domain.Entities.ExplanationNote", b =>
+                {
+                    b.HasOne("Hedaya.Domain.Entities.MethodologicalExplanation", "MethodologicalExplanation")
+                        .WithMany("ExplanationNotes")
+                        .HasForeignKey("MethodologicalExplanationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("MethodologicalExplanation");
+                });
+
+            modelBuilder.Entity("Hedaya.Domain.Entities.ExplanationVideo", b =>
+                {
+                    b.HasOne("Hedaya.Domain.Entities.MethodologicalExplanation", "MethodologicalExplanation")
+                        .WithMany("ExplanationVideos")
+                        .HasForeignKey("MethodologicalExplanationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("MethodologicalExplanation");
+                });
+
             modelBuilder.Entity("Hedaya.Domain.Entities.Forum", b =>
                 {
                     b.HasOne("Hedaya.Domain.Entities.Course", "Course")
@@ -1424,6 +1663,25 @@ namespace Hedaya.Infrastructure.Migrations
                         .HasForeignKey("SubCategoryId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("SubCategory");
+                });
+
+            modelBuilder.Entity("Hedaya.Domain.Entities.MethodologicalExplanation", b =>
+                {
+                    b.HasOne("Hedaya.Domain.Entities.Instructor", "Instructor")
+                        .WithMany("MethodologicalExplanations")
+                        .HasForeignKey("InstructorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Hedaya.Domain.Entities.SubCategory", "SubCategory")
+                        .WithMany("MethodologicalExplanations")
+                        .HasForeignKey("SubCategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Instructor");
 
                     b.Navigation("SubCategory");
                 });
@@ -1584,11 +1842,20 @@ namespace Hedaya.Infrastructure.Migrations
             modelBuilder.Entity("Hedaya.Domain.Entities.Instructor", b =>
                 {
                     b.Navigation("Courses");
+
+                    b.Navigation("MethodologicalExplanations");
                 });
 
             modelBuilder.Entity("Hedaya.Domain.Entities.MainCategory", b =>
                 {
                     b.Navigation("SubCategories");
+                });
+
+            modelBuilder.Entity("Hedaya.Domain.Entities.MethodologicalExplanation", b =>
+                {
+                    b.Navigation("ExplanationNotes");
+
+                    b.Navigation("ExplanationVideos");
                 });
 
             modelBuilder.Entity("Hedaya.Domain.Entities.Post", b =>
@@ -1599,6 +1866,8 @@ namespace Hedaya.Infrastructure.Migrations
             modelBuilder.Entity("Hedaya.Domain.Entities.SubCategory", b =>
                 {
                     b.Navigation("MassCultures");
+
+                    b.Navigation("MethodologicalExplanations");
                 });
 
             modelBuilder.Entity("Hedaya.Domain.Entities.TeachingStaff", b =>

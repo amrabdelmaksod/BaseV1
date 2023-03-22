@@ -14,5 +14,6 @@
         public string Cookies { get; set; }
         public string Vision { get; set; }
         public string Mission { get; set; }
+        public string AboutPlatformVideoUrl { get; set; }
     }
 }

@@ -3,7 +3,7 @@
     public class CertificateApiDto
     {
         public int Id { get; set; }
-        public byte[] CertificateContent { get; set; }
+        public string CertificateContent { get; set; }
     }
 
 }

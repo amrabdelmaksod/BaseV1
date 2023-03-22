@@ -28,6 +28,7 @@ namespace Hedaya.Infrastructure.Presistence.Configurations
 
             builder.Property(u => u.Whatsapp)
                 .HasMaxLength(20);
+            builder.HasQueryFilter(a => !a.Deleted);
 
             builder.Property(u => u.Telegram)
                 .HasMaxLength(100);

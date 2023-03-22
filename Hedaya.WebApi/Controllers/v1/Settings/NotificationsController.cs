@@ -1,5 +1,4 @@
 ﻿using Hedaya.Application.Notifications.Queries;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hedaya.WebApi.Controllers.v1.Settings
@@ -9,10 +8,10 @@ namespace Hedaya.WebApi.Controllers.v1.Settings
     public class NotificationsController : BaseController<NotificationsController>
     {
         [HttpGet]
-        public async Task<IActionResult> GetNotifications()
+        public async Task<IActionResult> GetNotifications(int pageNumber)
         {
             var userId = User.Claims.FirstOrDefault(c => c.Type == "uid")?.Value;
-            var query = new GetNotificationsByUserIdQuery(userId);
+            var query = new GetNotificationsByUserIdQuery(userId,pageNumber);
             var notifications = await Mediator.Send(query);
             return Ok(notifications);
         }

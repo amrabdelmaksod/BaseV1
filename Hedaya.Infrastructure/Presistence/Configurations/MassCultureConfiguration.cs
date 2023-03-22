@@ -19,6 +19,22 @@ namespace Hedaya.Infrastructure.Presistence.Configurations
              builder.Property(mc => mc.Duration)
             .HasDefaultValue(TimeSpan.FromSeconds(0));
 
+            builder.Property(me => me.Facebook)
+             .HasMaxLength(200)
+            ;
+            builder.Property(me => me.Youtube)
+         .HasMaxLength(200)
+        ;
+            builder.Property(me => me.Telegram)
+        .HasMaxLength(200)
+       ;
+
+            builder.Property(me => me.Whatsapp)
+    .HasMaxLength(15)
+   ;
+
+            builder.Property(me => me.ImageUrl).HasMaxLength(200);
+
             builder.HasOne(mc => mc.SubCategory)
                 .WithMany(mc => mc.MassCultures)
                 .HasForeignKey(mc => mc.SubCategoryId)

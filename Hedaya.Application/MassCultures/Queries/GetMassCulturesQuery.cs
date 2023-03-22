@@ -1,6 +1,5 @@
 ﻿using Hedaya.Application.Interfaces;
 using Hedaya.Application.MassCultures.Models;
-using Hedaya.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System.Globalization;
@@ -25,12 +24,6 @@ namespace Hedaya.Application.MassCultures.Queries
 
         public async Task<object> Handle(GetMassCulturesQuery request, CancellationToken cancellationToken)
         {
-
-
-
-
-
-
             var categories = await _context.SubCategories
                 .Select(x => new CategoryDto
                 {
@@ -39,6 +32,8 @@ namespace Hedaya.Application.MassCultures.Queries
                     IconUrl = x.ImgIconUrl
                 })
                 .ToListAsync(cancellationToken);
+
+            var totalCount = await _context.MassCultures.CountAsync(cancellationToken);
 
             int skip = (request.PageNumber - 1) * 10;
 
@@ -52,16 +47,19 @@ namespace Hedaya.Application.MassCultures.Queries
                     IsFav =false,
                     Duration = CultureInfo.CurrentCulture.TwoLetterISOLanguageName == "ar" ? $"{x.Duration} ساعات" : $"{x.Duration} hours",
                     SubCategoryId = x.SubCategoryId,
+                    ImageUrl = x.ImageUrl,
+         
                 })
                 .ToListAsync(cancellationToken);
 
             var response = new MassCulturesResponse
             {
+                TotalCount = totalCount,
                 Categories = categories,
                 AllCultures = massCultures
             };
 
-            return new {Response = response } ;
+            return new {Result = response } ;
         }
     }
 

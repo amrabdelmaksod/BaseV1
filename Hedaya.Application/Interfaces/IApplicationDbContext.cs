@@ -40,6 +40,9 @@ namespace Hedaya.Application.Interfaces
         DbSet<MainCategory> MainCategories { get; set; }
         DbSet<SubCategory> SubCategories { get; set; }
         DbSet<MassCulture> MassCultures { get; set; }
+        DbSet<ChatQuestions> ChatQuestions { get; set; }
+        DbSet<MethodologicalExplanation> MethodologicalExplanations { get; set; }
+        DbSet<ExplanationVideo> ExplanationVideos { get; set; }
        
         
 

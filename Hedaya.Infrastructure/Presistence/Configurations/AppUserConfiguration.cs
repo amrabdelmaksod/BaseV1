@@ -19,6 +19,7 @@ namespace Hedaya.Infrastructure.Presistence.Configurations
             builder.Property(u => u.Gender)
             .IsRequired()
             .HasDefaultValue(Gender.Unknown);
+            builder.HasQueryFilter(a => !a.Deleted);
 
             builder.HasMany(u => u.Notifications)
           .WithOne(n => n.AppUser)
