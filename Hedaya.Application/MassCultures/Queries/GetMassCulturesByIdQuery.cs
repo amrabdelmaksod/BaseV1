@@ -32,14 +32,14 @@ namespace Hedaya.Application.MassCultures.Queries
                     Description = x.Description,
                     IsFav = false,
                     Duration = CultureInfo.CurrentCulture.TwoLetterISOLanguageName == "ar" ? $"{x.Duration} ساعات" : $"{x.Duration} hours",
-                    ImageUrl = x.ImageUrl                  
+                    ImageUrl = x.ImageUrl
                 })
                 .FirstOrDefaultAsync(cancellationToken);
 
-             if (culture == null)
-    {
+            if (culture == null)
+            {
                 return null;
-    }
+            }
 
             var relatedCultures = await _context.MassCultures
                 .Where(x => x.SubCategoryId == culture.SubCategoryId && x.Id != culture.Id)
@@ -50,7 +50,7 @@ namespace Hedaya.Application.MassCultures.Queries
                     Title = CultureInfo.CurrentCulture.TwoLetterISOLanguageName == "ar" ? x.TitleAr : x.TitleEn,
                     Description = x.Description,
                     IsFav = false,
-                    Duration = CultureInfo.CurrentCulture.TwoLetterISOLanguageName == "ar" ? $"{x.Duration} ساعات" : $"{x.Duration} hours",                   
+                    Duration = CultureInfo.CurrentCulture.TwoLetterISOLanguageName == "ar" ? $"{x.Duration} ساعات" : $"{x.Duration} hours",
                     ImageUrl = x.ImageUrl,
                     Facebook = x.Facebook,
                     Telegram = x.Telegram,

@@ -2,6 +2,7 @@
 using Hedaya.Application.Interfaces;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using System.Globalization;
 
 namespace Hedaya.Application.Certificates.Queries
 {
@@ -31,7 +32,7 @@ namespace Hedaya.Application.Certificates.Queries
                         .Select(a => new CertificateDto
                         {
                             Id = a.Id,
-                            CourseTitle = a.Course.Title,
+                            CourseTitle =CultureInfo.CurrentCulture.TwoLetterISOLanguageName =="ar" ?  a.Course.TitleAr : a.Course.TitleEn,
                             InstructorName = a.Course.Instructor.GetFullName(),
                             TraineeName = a.Trainee.FullName,
                             TraineeCode = a.TraineeId,

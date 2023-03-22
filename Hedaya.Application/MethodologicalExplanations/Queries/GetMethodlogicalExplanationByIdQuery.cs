@@ -1,6 +1,5 @@
 ﻿using Hedaya.Application.Interfaces;
 using Hedaya.Application.MethodologicalExplanations.Models;
-using Hedaya.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System.Globalization;
@@ -58,6 +57,7 @@ namespace Hedaya.Application.MethodologicalExplanations.Queries
                     VideoUrl = v.VideoUrl,
                     Title = CultureInfo.CurrentCulture.TwoLetterISOLanguageName == "ar" ? v.TitleAr : v.TitleEn,
                     Description = v.Description,
+                    Duration = v.Duration,
                 }).ToList(),
 
                 ExplanationNoteDtos = explanation.ExplanationNotes.Select(v=>new ExplanationNoteDto {
@@ -65,7 +65,6 @@ namespace Hedaya.Application.MethodologicalExplanations.Queries
                 Description = v.Description,
                 IconUrl = v.IconUrl,
                 Title = CultureInfo.CurrentCulture.TwoLetterISOLanguageName == "ar" ? v.TitleAr : v.TitleEn,
-
                 }).ToList(),
             };
 

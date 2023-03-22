@@ -23,6 +23,11 @@ namespace Hedaya.Infrastructure.Presistence.Configurations
                    .IsRequired()
                    .HasMaxLength(100); // set the TitleAr property constraints
 
+            builder.Property(ev => ev.Duration)
+                   .IsRequired(); // set the Duration property constraints
+
+
+
             builder.Property(ev => ev.TitleEn)
                    .IsRequired()
                    .HasMaxLength(100); // set the TitleEn property constraints

@@ -409,26 +409,50 @@ namespace Hedaya.Infrastructure.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasMaxLength(50)
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.Property<TimeSpan>("Duration")
+                        .HasColumnType("time");
+
+                    b.Property<string>("ImageUrl")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
                     b.Property<string>("InstructorId")
                         .IsRequired()
-                        .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<string>("Title")
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("SubCategoryId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("TitleAr")
                         .IsRequired()
-                        .HasMaxLength(265)
-                        .HasColumnType("nvarchar(265)");
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("TitleEn")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("InstructorId");
 
-                    b.ToTable("Courses", (string)null);
+                    b.HasIndex("SubCategoryId");
+
+                    b.ToTable("Courses");
                 });
 
             modelBuilder.Entity("Hedaya.Domain.Entities.CourseTopic", b =>
@@ -503,6 +527,9 @@ namespace Hedaya.Infrastructure.Migrations
                         .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
+
+                    b.Property<TimeSpan>("Duration")
+                        .HasColumnType("time");
 
                     b.Property<int>("MethodologicalExplanationId")
                         .HasColumnType("int");
@@ -1565,10 +1592,18 @@ namespace Hedaya.Infrastructure.Migrations
                     b.HasOne("Hedaya.Domain.Entities.Instructor", "Instructor")
                         .WithMany("Courses")
                         .HasForeignKey("InstructorId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Hedaya.Domain.Entities.SubCategory", "SubCategory")
+                        .WithMany("Courses")
+                        .HasForeignKey("SubCategoryId")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Instructor");
+
+                    b.Navigation("SubCategory");
                 });
 
             modelBuilder.Entity("Hedaya.Domain.Entities.CourseTopic", b =>
@@ -1865,6 +1900,8 @@ namespace Hedaya.Infrastructure.Migrations
 
             modelBuilder.Entity("Hedaya.Domain.Entities.SubCategory", b =>
                 {
+                    b.Navigation("Courses");
+
                     b.Navigation("MassCultures");
 
                     b.Navigation("MethodologicalExplanations");

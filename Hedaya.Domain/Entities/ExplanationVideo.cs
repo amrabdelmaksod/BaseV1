@@ -7,6 +7,7 @@
         public string TitleAr { get; set; }
         public string TitleEn { get; set; }
         public string Description { get; set; }
+        public TimeSpan Duration { get; set; }
         public int MethodologicalExplanationId { get; set; }
         public virtual MethodologicalExplanation MethodologicalExplanation { get; set; }
 

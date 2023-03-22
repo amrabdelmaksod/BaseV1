@@ -6,6 +6,7 @@
         {
             MassCultures = new HashSet<MassCulture>();
             MethodologicalExplanations = new HashSet<MethodologicalExplanation>();
+            Courses = new HashSet<Course>();
         }
         public int Id { get; set; }
         public string NameAr { get; set; }
@@ -15,5 +16,6 @@
         public virtual MainCategory MainCategory { get; set; }
         public virtual ICollection<MassCulture> MassCultures { get; set; }
         public virtual ICollection<MethodologicalExplanation> MethodologicalExplanations { get; set; }
+        public virtual ICollection<Course> Courses { get; set; }
     }
 }
