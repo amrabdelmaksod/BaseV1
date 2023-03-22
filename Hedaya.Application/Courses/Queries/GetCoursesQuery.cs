@@ -8,49 +8,54 @@ namespace Hedaya.Application.Courses.Queries
 {
     public class GetCoursesQuery : IRequest<object>
     {
-        public int PageSize { get; set; }
+    
         public int PageNumber { get; set; }
 
         public class GetCoursesQueryHandler : IRequestHandler<GetCoursesQuery, object>
         {
-            private readonly IApplicationDbContext _dbContext;
+            private readonly IApplicationDbContext _context;
 
-            public GetCoursesQueryHandler(IApplicationDbContext dbContext)
+            public GetCoursesQueryHandler(IApplicationDbContext context)
             {
-                _dbContext = dbContext;
+                _context = context;
             }
 
             public async Task<object> Handle(GetCoursesQuery request, CancellationToken cancellationToken)
             {
-                var popularCourses = await _dbContext.Courses
+
+
+              
+                var PageSize = 10;
+
+                var popularCourses = await _context.Courses
                     .OrderByDescending(c => c.StartDate)
                     .Take(5)
                     .Select(c => new CourseDto
                     {
                         Id = c.Id,
                         Title = c.TitleAr,
-                        StartDate = c.StartDate.ToShortDateString(),
-                        Duration = c.Duration.ToString(),
+                        StartDate = c.StartDate,
+                        Duration = c.Duration,
                         ImageUrl = c.ImageUrl,
-                        IsFav = false, // Set this based on user preferences
-                        InstructorName =  c.Instructor.GetFullName(),
+                        IsFav = false, // ToDo User Favourites
+                        InstructorName = c.Instructor.GetFullName(),
                         InstructorImageUrl = c.Instructor.ImageUrl,
-                        Category =CultureInfo.CurrentCulture.TwoLetterISOLanguageName =="ar" ?  c.SubCategory.NameAr : c.SubCategory.NameEn,
+                        Category = CultureInfo.CurrentCulture.TwoLetterISOLanguageName == "ar" ? c.SubCategory.NameAr : c.SubCategory.NameEn,
                     })
                     .ToListAsync(cancellationToken);
 
-                var allCourses = await _dbContext.Courses
+                var allCourses = await _context.Courses
                     .OrderByDescending(c => c.StartDate)
-                    .Skip(request.PageSize * (request.PageNumber - 1))
-                    .Take(request.PageSize)
+                    .Skip(PageSize * (request.PageNumber - 1))
+                    .Take(PageSize)
                     .Select(c => new CourseDto
                     {
                         Id = c.Id,
                         Title = c.TitleAr,
-                        StartDate = c.StartDate.ToShortDateString(),
-                        Duration = c.Duration.ToString(),
+                        StartDate = c.StartDate,
+                        Duration = c.Duration,
                         ImageUrl = c.ImageUrl,
-                        IsFav = false, // Set this based on user preferences
+                        IsFav = false, // ToDo User Favourites
                         InstructorName = c.Instructor.GetFullName(),
                         InstructorImageUrl = c.Instructor.ImageUrl,
                         Category = CultureInfo.CurrentCulture.TwoLetterISOLanguageName == "ar" ? c.SubCategory.NameAr : c.SubCategory.NameEn,
@@ -63,7 +68,7 @@ namespace Hedaya.Application.Courses.Queries
                     AllCourses = allCourses
                 };
 
-                return new { result = CoursesResult } ;
+                return new { result = CoursesResult };
             }
         }
 
