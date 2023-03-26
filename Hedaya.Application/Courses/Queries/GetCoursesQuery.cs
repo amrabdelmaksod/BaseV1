@@ -34,7 +34,7 @@ namespace Hedaya.Application.Courses.Queries
                     {
                         Id = c.Id,
                         Title = c.TitleAr,
-                        StartDate = c.StartDate,
+                        StartDate = c.StartDate.ToString("d"),
                         Duration = c.Duration,
                         ImageUrl = c.ImageUrl,
                         IsFav = false, // ToDo User Favourites
@@ -52,7 +52,7 @@ namespace Hedaya.Application.Courses.Queries
                     {
                         Id = c.Id,
                         Title = c.TitleAr,
-                        StartDate = c.StartDate,
+                        StartDate = c.StartDate.ToString("d"),
                         Duration = c.Duration,
                         ImageUrl = c.ImageUrl,
                         IsFav = false, // ToDo User Favourites

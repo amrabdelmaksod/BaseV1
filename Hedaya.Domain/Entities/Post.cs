@@ -13,8 +13,11 @@ namespace Hedaya.Domain.Entities
         public string Text { get; set; }
         public string ImagePath { get; set; }      
         public int ForumId { get; set; }
+        public string TraineeId { get; set; }
         public virtual Forum Forum { get; set; }
+        public virtual Trainee Trainee { get; set; }
         public ICollection<Comment> Comments { get; set; }
+
 
     }
 }

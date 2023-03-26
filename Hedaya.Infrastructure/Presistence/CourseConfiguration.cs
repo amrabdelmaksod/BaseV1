@@ -15,6 +15,9 @@ namespace Hedaya.Infrastructure.Presistence
             builder.Property(c => c.TitleEn).HasMaxLength(256).IsRequired();
             builder.Property(c => c.Description).HasMaxLength(2000).IsRequired();
             builder.Property(c => c.ImageUrl).HasMaxLength(200).IsRequired();
+            builder.Property(c => c.CourseSyllabus).HasMaxLength(500).IsRequired();
+            builder.Property(c => c.CourseFeatures).HasMaxLength(500).IsRequired();
+            builder.Property(c => c.AboutCourse).HasMaxLength(500).IsRequired();
             builder.Property(c => c.StartDate).IsRequired();
             builder.Property(c => c.Duration).IsRequired();
             builder.Property(c => c.InstructorId).IsRequired();

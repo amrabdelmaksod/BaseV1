@@ -59,7 +59,7 @@ namespace Hedaya.WebApi.Controllers.v1
             var query = new GetMethodlogicalExplanationByIdQuery { Id = id };
             var result = await Mediator.Send(query);
             if (result == null)
-                return BadRequest(CultureInfo.CurrentCulture.TwoLetterISOLanguageName == "ar" ? $"{id}عفوا لا يوجد شروحات منهجية بهذا المعرف" : $"Sorry The Explanation With this id : {id} is not found");
+                return BadRequest(new { error = CultureInfo.CurrentCulture.TwoLetterISOLanguageName == "ar" ? $"{id}عفوا لا يوجد شروحات منهجية بهذا المعرف" : $"Sorry The Explanation With this id : {id} is not found" });
             return Ok(result);
         }
 

@@ -10,7 +10,11 @@
         public required string TitleAr { get; set; }
         public  string TitleEn { get; set; }
         public  string Description { get; set; }
+        public  string AboutCourse { get; set; }
+        public  string CourseSyllabus { get; set; }
+        public  string CourseFeatures { get; set; }
         public  string ImageUrl { get; set; }
+        public  string VideoUrl { get; set; }
         public  DateTime StartDate { get; set; }
         public  TimeSpan Duration { get; set; }
         public string InstructorId { get; set; }
