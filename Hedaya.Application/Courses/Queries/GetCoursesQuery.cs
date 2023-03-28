@@ -10,6 +10,7 @@ namespace Hedaya.Application.Courses.Queries
     {
     
         public int PageNumber { get; set; }
+        public string UserId { get; set; }
 
         public class GetCoursesQueryHandler : IRequestHandler<GetCoursesQuery, object>
         {
@@ -22,9 +23,12 @@ namespace Hedaya.Application.Courses.Queries
 
             public async Task<object> Handle(GetCoursesQuery request, CancellationToken cancellationToken)
             {
+                var traineeId = await _context.Trainees
+                     .Where(a => a.AppUserId == request.UserId && !a.Deleted)
+                     .Select(a => a.Id)
+                     .FirstOrDefaultAsync(cancellationToken);
 
 
-              
                 var PageSize = 10;
 
                 var popularCourses = await _context.Courses
@@ -37,7 +41,7 @@ namespace Hedaya.Application.Courses.Queries
                         StartDate = c.StartDate.ToString("d"),
                         Duration = c.Duration,
                         ImageUrl = c.ImageUrl,
-                        IsFav = false, // ToDo User Favourites
+                        IsFav = _context.TraineeCourseFavorites.Any(f => f.CourseId == c.Id && f.TraineeId == traineeId),
                         InstructorName = c.Instructor.GetFullName(),
                         InstructorImageUrl = c.Instructor.ImageUrl,
                         Category = CultureInfo.CurrentCulture.TwoLetterISOLanguageName == "ar" ? c.SubCategory.NameAr : c.SubCategory.NameEn,
@@ -55,7 +59,7 @@ namespace Hedaya.Application.Courses.Queries
                         StartDate = c.StartDate.ToString("d"),
                         Duration = c.Duration,
                         ImageUrl = c.ImageUrl,
-                        IsFav = false, // ToDo User Favourites
+                        IsFav = _context.TraineeCourseFavorites.Any(f => f.CourseId == c.Id && f.TraineeId == traineeId),
                         InstructorName = c.Instructor.GetFullName(),
                         InstructorImageUrl = c.Instructor.ImageUrl,
                         Category = CultureInfo.CurrentCulture.TwoLetterISOLanguageName == "ar" ? c.SubCategory.NameAr : c.SubCategory.NameEn,

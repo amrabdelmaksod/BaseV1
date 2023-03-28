@@ -3,6 +3,7 @@ using Hedaya.Application.Interfaces;
 using Hedaya.Domain;
 using Hedaya.Domain.Entities;
 using Hedaya.Domain.Entities.Authintication;
+using Hedaya.Infrastructure.Migrations;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
@@ -54,9 +55,12 @@ namespace Hedaya.Infrastructure.Presistence
         public DbSet<MainCategory> MainCategories { get; set ; }
         public DbSet<SubCategory> SubCategories { get ; set; }
         public DbSet<MassCulture> MassCultures { get; set; }
-        public DbSet<ChatQuestions> ChatQuestions { get; set; }
+        public DbSet<Domain.Entities.ChatQuestions> ChatQuestions { get; set; }
         public DbSet<MethodologicalExplanation> MethodologicalExplanations { get; set; }
         public DbSet<ExplanationVideo> ExplanationVideos { get; set; }
+        public DbSet<TraineeCourseFavorite> TraineeCourseFavorites { get; set; }
+        public DbSet<TraineeLesson> TraineeLessons { get; set; }
+
 
         #endregion
 
@@ -66,7 +70,6 @@ namespace Hedaya.Infrastructure.Presistence
         public override DatabaseFacade Database => base.Database;
         public override ChangeTracker ChangeTracker => base.ChangeTracker;
 
-      
 
         public DbSet<TEntity> Set<TEntity>() where TEntity : class
         {

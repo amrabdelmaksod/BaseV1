@@ -10,6 +10,8 @@ namespace Hedaya.Domain.Entities
             Certificates = new HashSet<Certificate>();
             Friends = new HashSet<Friendship>();
             Posts = new HashSet<Post>();
+            Favorites = new HashSet<TraineeCourseFavorite>();
+            TraineeLessons = new HashSet<TraineeLesson>();
         }
 
         public string Id { get; set; }
@@ -27,5 +29,9 @@ namespace Hedaya.Domain.Entities
         public virtual ICollection<Certificate> Certificates { get; set; }
         public virtual ICollection<Friendship> Friends { get; set; }
         public virtual ICollection<Post> Posts { get; set; }
+        public virtual ICollection<Comment> Comments { get; set; }
+        public virtual ICollection<TraineeCourseFavorite> Favorites { get; set; }
+        public virtual ICollection<TraineeLesson> TraineeLessons { get; set; }
+
     }
 }

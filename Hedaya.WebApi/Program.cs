@@ -64,7 +64,15 @@ builder.Services.AddIdentityCore<AppUser>(options => options.SignIn.RequireConfi
 
 
 
-
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", builder =>
+    {
+        builder.AllowAnyOrigin()
+               .AllowAnyMethod()
+               .AllowAnyHeader();
+    });
+});
 
 
 
@@ -254,7 +262,7 @@ var apiVersionDescriptionProvider = app.Services.GetRequiredService<IApiVersionD
 
 
 
-
+app.UseCors("AllowAll");
 
 app.UseHttpsRedirection();
 

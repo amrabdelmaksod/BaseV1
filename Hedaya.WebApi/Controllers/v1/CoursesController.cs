@@ -1,4 +1,7 @@
-﻿using Hedaya.Application.Courses.Queries;
+﻿using Hedaya.Application.Courses.Commands;
+using Hedaya.Application.Courses.Commands.Hedaya.Application.TraineeCourseFavorites.Commands;
+using Hedaya.Application.Courses.Models;
+using Hedaya.Application.Courses.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using System.Globalization;
@@ -14,9 +17,12 @@ namespace Hedaya.WebApi.Controllers.v1
         [HttpGet("GetAllCourses")]
         public async Task<ActionResult<object>> GetAllCourses([FromQuery] int pageNumber)
         {
+            var userId = User.Claims.FirstOrDefault(c => c.Type == "uid")?.Value;
+
             var query = new GetCoursesQuery
             {
-                PageNumber = pageNumber
+                PageNumber = pageNumber,
+                UserId = userId
             };
 
             var result = await Mediator.Send(query);
@@ -24,13 +30,7 @@ namespace Hedaya.WebApi.Controllers.v1
             return Ok(result);
         }
 
-        [HttpGet("SearchCourses")]
-        public async Task<IActionResult> SearchCourses(int pageNumber = 1, string searchQuery = null)
-        {
-            var result = await Mediator.Send(new SearchCoursesQuery { PageNumber = pageNumber, SearchQuery = searchQuery });
-            return Ok(result);
-        }
-
+    
         [HttpGet("courses/filter-options")]
         public async Task<ActionResult<object>> GetFilterOptions()
         {
@@ -40,8 +40,16 @@ namespace Hedaya.WebApi.Controllers.v1
         }
 
         [HttpGet("FilterCourses")]
-        public async Task<IActionResult> FilterCourses([FromQuery] FilterCoursesQuery query)
+        public async Task<IActionResult> FilterCourses([FromQuery] FilterCourseDto model)
         {
+            var query = new FilterCoursesQuery 
+            { 
+                CategoryIds = model.CategoryIds ,
+                PageNumber = model.PageNumber,
+                searchKeyword = model.searchKeyword,
+                SortByDurationAscending = model.SortByDurationAscending,
+                UserId = User.Claims.FirstOrDefault(c => c.Type == "uid")?.Value,
+        };
             var result = await Mediator.Send(query);
             return Ok(result);
         }
@@ -50,13 +58,35 @@ namespace Hedaya.WebApi.Controllers.v1
         [HttpGet("Details")]
         public async Task<ActionResult<object>> GetCourseDetails(int courseId)
         {
-            var query = new GetCourseDetailsQuery {CourseId = courseId };
+            var userId = User.Claims.FirstOrDefault(c => c.Type == "uid")?.Value;
+            var query = new GetCourseDetailsQuery {CourseId = courseId ,UserId = userId};
             var result = await Mediator.Send(query);
             if(result is null)
                 if (result == null)
                     return BadRequest(new { error = CultureInfo.CurrentCulture.TwoLetterISOLanguageName == "ar" ? $"{courseId}عفوا لا يوجد دورة بهذا المعرف" : $"Sorry The Course With this id : {courseId} is not found" });
             return Ok(result);
         }
+
+
+        [HttpPost("AddCourseToFavourite")]
+        public async Task<IActionResult> AddCourseToFavourite(int courseId)
+        {
+
+            var userId = User.Claims.FirstOrDefault(c => c.Type == "uid")?.Value;
+            await Mediator.Send(new AddToTraineeCourseFavoritesCommand { CourseId = courseId, userId = userId });
+
+            return Ok();
+        }
+
+        [HttpPost("MarkLessonCompleted")]
+        public async Task<IActionResult> MarkLessonCompleted(int lessonId)
+        {
+            var userId = User.Claims.FirstOrDefault(c => c.Type == "uid")?.Value;
+            var command = new MarkLessonCompletedCommand { UserId = userId, LessonId = lessonId };
+            await Mediator.Send(command);
+            return Ok();
+        }
+
 
 
 

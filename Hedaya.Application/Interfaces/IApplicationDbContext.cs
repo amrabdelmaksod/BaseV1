@@ -43,6 +43,8 @@ namespace Hedaya.Application.Interfaces
         DbSet<ChatQuestions> ChatQuestions { get; set; }
         DbSet<MethodologicalExplanation> MethodologicalExplanations { get; set; }
         DbSet<ExplanationVideo> ExplanationVideos { get; set; }
+        DbSet<TraineeCourseFavorite> TraineeCourseFavorites { get; set; }
+        DbSet<TraineeLesson> TraineeLessons { get; set; }
        
         
 

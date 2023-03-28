@@ -11,7 +11,7 @@ namespace Hedaya.Domain.Entities
         public int Id { get; set; }
 
         public string Text { get; set; }
-        public string ImagePath { get; set; }      
+        public string? ImagePath { get; set; }      
         public int ForumId { get; set; }
         public string TraineeId { get; set; }
         public virtual Forum Forum { get; set; }

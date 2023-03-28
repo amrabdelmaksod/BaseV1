@@ -5,6 +5,7 @@
         public Course()
         {
             CourseTopics = new HashSet<CourseTopic>();
+            Favorites = new HashSet<TraineeCourseFavorite>();
         }
         public int Id { get; set; }
         public required string TitleAr { get; set; }
@@ -19,13 +20,16 @@
         public  TimeSpan Duration { get; set; }
         public string InstructorId { get; set; }
         public int SubCategoryId { get; set; }
+        public int ForumId { get; set; }
 
 
         public virtual Instructor Instructor { get; set; }
+        public virtual Forum Forum { get; set; }
         public virtual SubCategory SubCategory { get; set; }
         public virtual ICollection<CourseTopic> CourseTopics { get; set; }
+        public virtual ICollection<TraineeCourseFavorite> Favorites { get; set; }
 
+      
 
-        
     }
 }
