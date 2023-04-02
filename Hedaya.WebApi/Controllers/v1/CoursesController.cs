@@ -2,6 +2,7 @@
 using Hedaya.Application.Courses.Commands.Hedaya.Application.TraineeCourseFavorites.Commands;
 using Hedaya.Application.Courses.Models;
 using Hedaya.Application.Courses.Queries;
+using Hedaya.Application.CourseTests.Commands;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using System.Globalization;
@@ -87,6 +88,20 @@ namespace Hedaya.WebApi.Controllers.v1
             return Ok();
         }
 
+        [HttpPost("submit-test")]
+        public async Task<IActionResult> SubmitTest([FromBody] SubmitTestCommand command)
+        {
+            var result = await Mediator.Send(command);
+
+            if (result)
+            {
+                return Ok();
+            }
+            else
+            {
+                return BadRequest();
+            }
+        }
 
 
 

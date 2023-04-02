@@ -8,6 +8,7 @@
         public TimeSpan Duration { get; set; }
         public string ImageUrl { get; set; }
         public bool IsFav { get; set; }
+        public string InstructorId { get; set; }
         public string InstructorName { get; set; }
         public string InstructorImageUrl { get; set; }
         public string InstructorDescription { get; set; }
@@ -18,5 +19,7 @@
         public double CourseCompletionRate { get; set; }
         public List<CourseTopicDto> Topics { get; set; }
         public ForumDto Forum { get; set; }
+        public List<CourseTestDto> Tests { get; set; }
+
     }
 }

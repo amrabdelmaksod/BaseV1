@@ -6,6 +6,7 @@
         {
             CourseTopics = new HashSet<CourseTopic>();
             Favorites = new HashSet<TraineeCourseFavorite>();
+            CourseTests = new HashSet<CourseTest>();
         }
         public int Id { get; set; }
         public required string TitleAr { get; set; }
@@ -28,6 +29,7 @@
         public virtual SubCategory SubCategory { get; set; }
         public virtual ICollection<CourseTopic> CourseTopics { get; set; }
         public virtual ICollection<TraineeCourseFavorite> Favorites { get; set; }
+        public virtual ICollection<CourseTest> CourseTests { get; set; }
 
       
 

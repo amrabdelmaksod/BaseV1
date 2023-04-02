@@ -12,6 +12,7 @@ namespace Hedaya.Domain.Entities
             Posts = new HashSet<Post>();
             Favorites = new HashSet<TraineeCourseFavorite>();
             TraineeLessons = new HashSet<TraineeLesson>();
+            TraineeAnswers = new HashSet<TraineeAnswer>();
         }
 
         public string Id { get; set; }
@@ -32,6 +33,7 @@ namespace Hedaya.Domain.Entities
         public virtual ICollection<Comment> Comments { get; set; }
         public virtual ICollection<TraineeCourseFavorite> Favorites { get; set; }
         public virtual ICollection<TraineeLesson> TraineeLessons { get; set; }
+        public virtual ICollection<TraineeAnswer> TraineeAnswers { get; set; }
 
     }
 }

@@ -17,6 +17,11 @@ namespace Hedaya.Infrastructure.Presistence.Configurations
             builder.HasMany(ct => ct.Questions)
                 .WithOne(q => q.CourseTest)
                 .HasForeignKey(q => q.CourseTestId);
+
+            builder.HasOne(c => c.Course)
+                 .WithMany(c => c.CourseTests)
+                 .HasForeignKey(c => c.CourseId)
+                 .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

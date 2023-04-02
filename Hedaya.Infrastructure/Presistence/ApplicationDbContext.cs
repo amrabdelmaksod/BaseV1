@@ -60,6 +60,10 @@ namespace Hedaya.Infrastructure.Presistence
         public DbSet<ExplanationVideo> ExplanationVideos { get; set; }
         public DbSet<TraineeCourseFavorite> TraineeCourseFavorites { get; set; }
         public DbSet<TraineeLesson> TraineeLessons { get; set; }
+        public DbSet<Question> Questions { get; set; }
+        public DbSet<Answer> Answers { get; set; }
+        public DbSet<TraineeAnswer> TraineeAnswers { get; set; }
+        public DbSet<CourseTest> CourseTests { get; set; }
 
 
         #endregion

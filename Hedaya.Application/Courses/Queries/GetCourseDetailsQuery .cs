@@ -1,5 +1,7 @@
 ﻿using Hedaya.Application.Courses.Models;
 using Hedaya.Application.Interfaces;
+using Hedaya.Domain.Entities;
+using Hedaya.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System.Globalization;
@@ -11,9 +13,6 @@ namespace Hedaya.Application.Courses.Queries
     {
         public int CourseId { get; set; }
         public string UserId { get; set; }
-
-
-
 
         // Query Handler
         public class GetCourseDetailsQueryHandler : IRequestHandler<GetCourseDetailsQuery, object>
@@ -31,6 +30,7 @@ namespace Hedaya.Application.Courses.Queries
             {
                 try
                 {
+
                     var traineeId = await _context.Trainees
                     .Where(a => a.AppUserId == request.UserId && !a.Deleted)
                     .Select(a => a.Id)
@@ -54,6 +54,7 @@ namespace Hedaya.Application.Courses.Queries
                             Duration = c.Duration,
                             ImageUrl = c.ImageUrl ?? "",
                             IsFav = _context.TraineeCourseFavorites.Any(f => f.CourseId == c.Id && f.TraineeId == traineeId),
+                            InstructorId = c.Instructor.Id,
                             InstructorName = c.Instructor.GetFullName(),
                             InstructorImageUrl = c.Instructor.ImageUrl ?? "",
                             InstructorDescription = c.Instructor.Description,
@@ -95,7 +96,27 @@ namespace Hedaya.Application.Courses.Queries
                                         ImgUrl = c.ImagePath ?? ""
                                     }).ToList()
                                 }).ToList()
-                            }
+                            },
+                            Tests = c.CourseTests.Select(t => new CourseTestDto
+                            {
+                                Id = t.Id,
+                                Title = t.Title,
+                                QuestionsCount = t.Questions.Count,
+                                Questions = t.Questions.Select(q => new QuestionDto
+                                {
+                                    Id = q.Id,
+                                    Text = q.Text,
+                                    Type = q.Type,
+                                    Answers = q.Answers.Select(a => new AnswerDto
+                                    {
+                                        Id = a.Id,
+                                        Text = a.Text,
+                                        IsCorrect = a.IsCorrect
+                                    }).ToList()
+                                }).ToList()
+                            }).ToList()
+
+
                         })
                         .FirstOrDefaultAsync(cancellationToken);
 

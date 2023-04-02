@@ -20,8 +20,8 @@
     <PackageReference Include="MessageBird" Version="4.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="7.0.2" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="7.0.2" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.2" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="7.0.2">
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.3" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="7.0.3">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
@@ -39,6 +39,8 @@
     <Folder Include="Chats\Models\" />
     <Folder Include="CommonQuestions\Commands\" />
     <Folder Include="Complexes\Commands\" />
+    <Folder Include="CourseTests\Models\" />
+    <Folder Include="CourseTests\Queries\" />
     <Folder Include="GentlemenScholars\Commands\" />
     <Folder Include="MassCultures\Commands\" />
     <Folder Include="MethodologicalExplanations\Commands\" />
@@ -51,8 +53,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\BaseV1.Common\Hedaya.Common.csproj" />
-    <ProjectReference Include="..\BaseV1.Domain\Hedaya.Domain.csproj" />
+   
     <ProjectReference Include="..\Hedaya.Common\Hedaya.Common.csproj" />
     <ProjectReference Include="..\Hedaya.Domain\Hedaya.Domain.csproj" />
   </ItemGroup>

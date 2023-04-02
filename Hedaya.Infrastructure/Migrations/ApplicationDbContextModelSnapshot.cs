@@ -17,7 +17,7 @@ namespace Hedaya.Infrastructure.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "7.0.2")
+                .HasAnnotation("ProductVersion", "7.0.3")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -518,12 +518,20 @@ namespace Hedaya.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int>("CourseId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CourseId");
 
                     b.ToTable("CourseTests", (string)null);
                 });
@@ -1495,6 +1503,42 @@ namespace Hedaya.Infrastructure.Migrations
                     b.ToTable("Trainees", (string)null);
                 });
 
+            modelBuilder.Entity("Hedaya.Domain.Entities.TraineeAnswer", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CourseTestId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("QuestionId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Score")
+                        .HasColumnType("int");
+
+                    b.Property<string>("SelectedAnswers")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TraineeId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CourseTestId");
+
+                    b.HasIndex("QuestionId");
+
+                    b.HasIndex("TraineeId");
+
+                    b.ToTable("TraineeAnswers");
+                });
+
             modelBuilder.Entity("Hedaya.Domain.Entities.TraineeCourseFavorite", b =>
                 {
                     b.Property<string>("TraineeId")
@@ -1790,6 +1834,17 @@ namespace Hedaya.Infrastructure.Migrations
                     b.Navigation("SubCategory");
                 });
 
+            modelBuilder.Entity("Hedaya.Domain.Entities.CourseTest", b =>
+                {
+                    b.HasOne("Hedaya.Domain.Entities.Course", "Course")
+                        .WithMany("CourseTests")
+                        .HasForeignKey("CourseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Course");
+                });
+
             modelBuilder.Entity("Hedaya.Domain.Entities.CourseTopic", b =>
                 {
                     b.HasOne("Hedaya.Domain.Entities.Course", "Course")
@@ -1990,6 +2045,33 @@ namespace Hedaya.Infrastructure.Migrations
                     b.Navigation("AppUser");
                 });
 
+            modelBuilder.Entity("Hedaya.Domain.Entities.TraineeAnswer", b =>
+                {
+                    b.HasOne("Hedaya.Domain.Entities.CourseTest", "CourseTest")
+                        .WithMany("TraineeAnswers")
+                        .HasForeignKey("CourseTestId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Hedaya.Domain.Entities.Question", "Question")
+                        .WithMany("TraineeAnswers")
+                        .HasForeignKey("QuestionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Hedaya.Domain.Entities.Trainee", "Trainee")
+                        .WithMany("TraineeAnswers")
+                        .HasForeignKey("TraineeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CourseTest");
+
+                    b.Navigation("Question");
+
+                    b.Navigation("Trainee");
+                });
+
             modelBuilder.Entity("Hedaya.Domain.Entities.TraineeCourseFavorite", b =>
                 {
                     b.HasOne("Hedaya.Domain.Entities.Course", "Course")
@@ -2102,6 +2184,8 @@ namespace Hedaya.Infrastructure.Migrations
 
             modelBuilder.Entity("Hedaya.Domain.Entities.Course", b =>
                 {
+                    b.Navigation("CourseTests");
+
                     b.Navigation("CourseTopics");
 
                     b.Navigation("Favorites");
@@ -2113,6 +2197,8 @@ namespace Hedaya.Infrastructure.Migrations
             modelBuilder.Entity("Hedaya.Domain.Entities.CourseTest", b =>
                 {
                     b.Navigation("Questions");
+
+                    b.Navigation("TraineeAnswers");
                 });
 
             modelBuilder.Entity("Hedaya.Domain.Entities.CourseTopic", b =>
@@ -2152,6 +2238,8 @@ namespace Hedaya.Infrastructure.Migrations
             modelBuilder.Entity("Hedaya.Domain.Entities.Question", b =>
                 {
                     b.Navigation("Answers");
+
+                    b.Navigation("TraineeAnswers");
                 });
 
             modelBuilder.Entity("Hedaya.Domain.Entities.SubCategory", b =>
@@ -2179,6 +2267,8 @@ namespace Hedaya.Infrastructure.Migrations
                     b.Navigation("Friends");
 
                     b.Navigation("Posts");
+
+                    b.Navigation("TraineeAnswers");
 
                     b.Navigation("TraineeLessons");
                 });

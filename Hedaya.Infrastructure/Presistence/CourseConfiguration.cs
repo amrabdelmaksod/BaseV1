@@ -39,6 +39,14 @@ namespace Hedaya.Infrastructure.Presistence
                    .HasForeignKey(ct => ct.CourseId)
                    .OnDelete(DeleteBehavior.Cascade);
 
+
+
+
+            builder.HasMany(c => c.CourseTests)
+                  .WithOne(ct => ct.Course)
+                  .HasForeignKey(ct => ct.CourseId)
+                  .OnDelete(DeleteBehavior.Cascade);
+
             builder.HasOne(c => c.Forum)
              .WithOne(f => f.Course)
              .HasForeignKey<Forum>(f => f.CourseId)

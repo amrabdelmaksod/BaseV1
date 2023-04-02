@@ -7,6 +7,8 @@ namespace Hedaya.Domain.Entities
         public Question()
         {
             Answers = new List<Answer>();
+            TraineeAnswers = new HashSet<TraineeAnswer>();
+
         }
 
         public int Id { get; set; }
@@ -15,5 +17,7 @@ namespace Hedaya.Domain.Entities
         public virtual ICollection<Answer> Answers { get; set; }
         public int CourseTestId { get; set; }
         public virtual CourseTest CourseTest { get; set; }
+        public virtual ICollection<TraineeAnswer> TraineeAnswers { get; set; }
+
     }
 }

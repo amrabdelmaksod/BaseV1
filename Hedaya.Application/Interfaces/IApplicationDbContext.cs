@@ -45,6 +45,11 @@ namespace Hedaya.Application.Interfaces
         DbSet<ExplanationVideo> ExplanationVideos { get; set; }
         DbSet<TraineeCourseFavorite> TraineeCourseFavorites { get; set; }
         DbSet<TraineeLesson> TraineeLessons { get; set; }
+        DbSet<CourseTest> CourseTests { get; set; }
+        DbSet<Question> Questions { get; set; }
+        DbSet<Answer> Answers { get; set; }
+        DbSet<TraineeAnswer> TraineeAnswers { get; set; }
+
        
         
 
