@@ -50,6 +50,7 @@
     <Folder Include="TeachingStaff\Commands\" />
     <Folder Include="Tests\DTOs\" />
     <Folder Include="Tests\Queries\" />
+    <Folder Include="TrainingPrograms\Commands\" />
   </ItemGroup>
 
   <ItemGroup>

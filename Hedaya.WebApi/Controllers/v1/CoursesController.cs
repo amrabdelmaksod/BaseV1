@@ -154,7 +154,7 @@ namespace Hedaya.WebApi.Controllers.v1
             return Ok(degree);
         }
 
-        [HttpGet("{instructorId}")]
+        [HttpGet("GetCoursesByInstructorId")]
         public async Task<IActionResult> GetCoursesByInstructorId(string instructorId)
         {
             var userId = User.Claims.FirstOrDefault(c => c.Type == "uid")?.Value;

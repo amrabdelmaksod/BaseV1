@@ -64,7 +64,8 @@ namespace Hedaya.Infrastructure.Presistence
         public DbSet<Answer> Answers { get; set; }
         public DbSet<TraineeAnswer> TraineeAnswers { get; set; }
         public DbSet<CourseTest> CourseTests { get; set; }
-
+        public DbSet<Domain.Entities.TrainingProgram> TrainingPrograms { get; set ; }
+        public DbSet<TraineeFavouriteProgram> TraineeFavouritePrograms { get ; set; }
 
         #endregion
 
@@ -74,6 +75,7 @@ namespace Hedaya.Infrastructure.Presistence
         public override DatabaseFacade Database => base.Database;
         public override ChangeTracker ChangeTracker => base.ChangeTracker;
 
+      
 
         public DbSet<TEntity> Set<TEntity>() where TEntity : class
         {

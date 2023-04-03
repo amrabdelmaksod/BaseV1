@@ -34,6 +34,8 @@ namespace Hedaya.Domain.Entities
         public virtual ICollection<TraineeCourseFavorite> Favorites { get; set; }
         public virtual ICollection<TraineeLesson> TraineeLessons { get; set; }
         public virtual ICollection<TraineeAnswer> TraineeAnswers { get; set; }
+        public virtual ICollection<TraineeFavouriteProgram> FavouritePrograms { get; set; }
+
 
     }
 }

@@ -21,6 +21,12 @@ namespace Hedaya.Infrastructure.Presistence.Configurations
                 .WithMany(x => x.SubCategories)
                 .HasForeignKey(x => x.MainCategoryId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+
+            builder.HasMany(sc => sc.TrainingPrograms)
+         .WithOne(tp => tp.SubCategory)
+         .HasForeignKey(tp => tp.SubCategoryId)
+         .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

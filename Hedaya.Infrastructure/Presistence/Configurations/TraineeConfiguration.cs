@@ -36,7 +36,10 @@ namespace Hedaya.Infrastructure.Presistence.Configurations
              .HasConversion<int>()
              .HasDefaultValue(EducationalDegree.None);
 
-
+            builder.HasMany(e => e.FavouritePrograms)
+       .WithOne()
+       .HasForeignKey(e => e.TraineeId)
+       .OnDelete(DeleteBehavior.Cascade);
 
 
             builder.Property(a=>a.AppUserId).HasMaxLength(450).IsRequired();

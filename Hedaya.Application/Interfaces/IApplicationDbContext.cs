@@ -49,6 +49,8 @@ namespace Hedaya.Application.Interfaces
         DbSet<Question> Questions { get; set; }
         DbSet<Answer> Answers { get; set; }
         DbSet<TraineeAnswer> TraineeAnswers { get; set; }
+        DbSet<TrainingProgram> TrainingPrograms { get; set; }
+        DbSet<TraineeFavouriteProgram> TraineeFavouritePrograms { get; set; }
 
        
         

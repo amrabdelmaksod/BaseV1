@@ -22,16 +22,15 @@
         public string InstructorId { get; set; }
         public int SubCategoryId { get; set; }
         public int ForumId { get; set; }
+        public int TrainingProgramId { get; set; }
 
 
+        public virtual TrainingProgram TrainingProgram { get; set; }
         public virtual Instructor Instructor { get; set; }
         public virtual Forum Forum { get; set; }
         public virtual SubCategory SubCategory { get; set; }
         public virtual ICollection<CourseTopic> CourseTopics { get; set; }
         public virtual ICollection<TraineeCourseFavorite> Favorites { get; set; }
         public virtual ICollection<CourseTest> CourseTests { get; set; }
-
-      
-
     }
 }

@@ -6,12 +6,12 @@ using System.Globalization;
 
 namespace Hedaya.Application.Courses.Queries
 {
-    public class GetCoursesByInstructorIdQuery : IRequest<List<InstructorCoursesDto>>
+    public class GetCoursesByInstructorIdQuery : IRequest<object>
     {
         public string InstructorId { get; set; }
         public string UserId { get; set; }
 
-        public class GetInstructorCoursesQueryHandler : IRequestHandler<GetCoursesByInstructorIdQuery, List<InstructorCoursesDto>>
+        public class GetInstructorCoursesQueryHandler : IRequestHandler<GetCoursesByInstructorIdQuery,object>
         {
             private readonly IApplicationDbContext _context;
 
@@ -20,12 +20,18 @@ namespace Hedaya.Application.Courses.Queries
                 _context = dbContext;
             }
 
-            public async Task<List<InstructorCoursesDto>> Handle(GetCoursesByInstructorIdQuery request, CancellationToken cancellationToken)
+            public async Task<object> Handle(GetCoursesByInstructorIdQuery request, CancellationToken cancellationToken)
             {
                 var traineeId = await _context.Trainees
                    .Where(a => a.AppUserId == request.UserId && !a.Deleted)
                    .Select(a => a.Id)
                    .FirstOrDefaultAsync(cancellationToken);
+
+                var instructor = await _context.Instructors
+                    .Where(a=>a.Id == request.InstructorId && !a.Deleted)
+                    .Select(a=>new InstructorDto { Id = a.Id, Description = a.Description , Name = a.GetFullName()})
+                    .FirstOrDefaultAsync();
+
 
                 var instructorCourses = await _context.Courses
                     .Where(c => c.InstructorId == request.InstructorId)
@@ -41,7 +47,9 @@ namespace Hedaya.Application.Courses.Queries
                     })
                     .ToListAsync(cancellationToken);
 
-                return instructorCourses;
+                var response = new InstructoCoursesLiDto { Instructor = instructor, Courses = instructorCourses };
+
+                return new { result = response } ;
             }
         }
 

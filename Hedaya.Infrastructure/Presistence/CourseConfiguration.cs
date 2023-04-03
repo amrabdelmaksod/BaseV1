@@ -51,6 +51,10 @@ namespace Hedaya.Infrastructure.Presistence
              .WithOne(f => f.Course)
              .HasForeignKey<Forum>(f => f.CourseId)
              .IsRequired();
+
+            builder.HasOne(c => c.TrainingProgram)
+           .WithMany(tp => tp.Courses)
+           .HasForeignKey(c => c.TrainingProgramId);
         }
     }
 
