@@ -24,40 +24,8 @@ namespace Hedaya.Application.CourseTests.Commands
 
             public async Task<bool> Handle(SubmitTestCommand request, CancellationToken cancellationToken)
             {
-                var courseTest = new CourseTest
-                {
-                    Title = "Dummy Course Test",
-                    Status = CourseTestStatus.Open,
-                    CourseId = 1,
-                    Questions = new List<Question>
-    {
-        new Question
-        {
-            Text = "What is the capital of France?",
-            Answers = new List<Answer>
-            {
-                new Answer { Text = "Paris", IsCorrect = true },
-                new Answer { Text = "London", IsCorrect = false },
-                new Answer { Text = "Madrid", IsCorrect = false },
-                new Answer { Text = "Berlin", IsCorrect = false }
-            }
-        },
-        new Question
-        {
-            Text = "What is the largest planet in our solar system?",
-            Answers = new List<Answer>
-            {
-                new Answer { Text = "Jupiter", IsCorrect = true },
-                new Answer { Text = "Mars", IsCorrect = false },
-                new Answer { Text = "Earth", IsCorrect = false },
-                new Answer { Text = "Saturn", IsCorrect = false }
-            }
-        }
-    }
-                };
-
-                _context.CourseTests.Add(courseTest);
-                await _context.SaveChangesAsync();
+               
+              
 
 
                 var traineeId = await _context.Trainees

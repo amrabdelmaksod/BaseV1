@@ -3,6 +3,7 @@ using Hedaya.Application.Courses.Commands.Hedaya.Application.TraineeCourseFavori
 using Hedaya.Application.Courses.Models;
 using Hedaya.Application.Courses.Queries;
 using Hedaya.Application.CourseTests.Commands;
+using Hedaya.Application.CourseTests.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using System.Globalization;
@@ -19,6 +20,10 @@ namespace Hedaya.WebApi.Controllers.v1
         public async Task<ActionResult<object>> GetAllCourses([FromQuery] int pageNumber)
         {
             var userId = User.Claims.FirstOrDefault(c => c.Type == "uid")?.Value;
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
 
             var query = new GetCoursesQuery
             {
@@ -43,13 +48,18 @@ namespace Hedaya.WebApi.Controllers.v1
         [HttpGet("FilterCourses")]
         public async Task<IActionResult> FilterCourses([FromQuery] FilterCourseDto model)
         {
+            var userId = User.Claims.FirstOrDefault(c => c.Type == "uid")?.Value;
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
             var query = new FilterCoursesQuery 
             { 
                 CategoryIds = model.CategoryIds ,
                 PageNumber = model.PageNumber,
                 searchKeyword = model.searchKeyword,
                 SortByDurationAscending = model.SortByDurationAscending,
-                UserId = User.Claims.FirstOrDefault(c => c.Type == "uid")?.Value,
+                UserId = userId,
         };
             var result = await Mediator.Send(query);
             return Ok(result);
@@ -60,6 +70,10 @@ namespace Hedaya.WebApi.Controllers.v1
         public async Task<ActionResult<object>> GetCourseDetails(int courseId)
         {
             var userId = User.Claims.FirstOrDefault(c => c.Type == "uid")?.Value;
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
             var query = new GetCourseDetailsQuery {CourseId = courseId ,UserId = userId};
             var result = await Mediator.Send(query);
             if(result is null)
@@ -74,6 +88,10 @@ namespace Hedaya.WebApi.Controllers.v1
         {
 
             var userId = User.Claims.FirstOrDefault(c => c.Type == "uid")?.Value;
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
             await Mediator.Send(new AddToTraineeCourseFavoritesCommand { CourseId = courseId, userId = userId });
 
             return Ok();
@@ -83,14 +101,26 @@ namespace Hedaya.WebApi.Controllers.v1
         public async Task<IActionResult> MarkLessonCompleted(int lessonId)
         {
             var userId = User.Claims.FirstOrDefault(c => c.Type == "uid")?.Value;
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
             var command = new MarkLessonCompletedCommand { UserId = userId, LessonId = lessonId };
             await Mediator.Send(command);
             return Ok();
         }
 
         [HttpPost("submit-test")]
-        public async Task<IActionResult> SubmitTest([FromBody] SubmitTestCommand command)
+        public async Task<IActionResult> SubmitTest(int CourseTestId, Dictionary<int, string[]> Answers)
         {
+            var userId = User.Claims.FirstOrDefault(c => c.Type == "uid")?.Value;
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
+
+
+            var command = new SubmitTestCommand { CourseTestId = CourseTestId,  Answers = Answers , UserId =userId };
             var result = await Mediator.Send(command);
 
             if (result)
@@ -101,6 +131,41 @@ namespace Hedaya.WebApi.Controllers.v1
             {
                 return BadRequest();
             }
+        }
+
+
+        [HttpGet("GetCourseTestDegree")]
+        public async Task<IActionResult> GetCourseTestDegree(int courseTestId)
+        {
+            var userId = User.Claims.FirstOrDefault(c => c.Type == "uid")?.Value;
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
+
+            var query = new GetCourseTestDegreeQuery
+            {
+                UserId = userId,
+                CourseTestId = courseTestId
+            };
+
+            var degree = await Mediator.Send(query);
+
+            return Ok(degree);
+        }
+
+        [HttpGet("{instructorId}")]
+        public async Task<IActionResult> GetCoursesByInstructorId(string instructorId)
+        {
+            var userId = User.Claims.FirstOrDefault(c => c.Type == "uid")?.Value;
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
+            var query = new GetCoursesByInstructorIdQuery { InstructorId = instructorId, UserId = userId };
+            var courses = await Mediator.Send(query);
+
+            return Ok(courses);
         }
 
 

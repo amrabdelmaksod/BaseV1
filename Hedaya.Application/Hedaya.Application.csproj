@@ -40,7 +40,7 @@
     <Folder Include="CommonQuestions\Commands\" />
     <Folder Include="Complexes\Commands\" />
     <Folder Include="CourseTests\Models\" />
-    <Folder Include="CourseTests\Queries\" />
+    <Folder Include="CourseTests\Models\" />
     <Folder Include="GentlemenScholars\Commands\" />
     <Folder Include="MassCultures\Commands\" />
     <Folder Include="MethodologicalExplanations\Commands\" />
