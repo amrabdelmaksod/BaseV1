@@ -22,28 +22,38 @@ namespace Hedaya.Application.TrainingPrograms.Queries
 
             public async Task<object> Handle(GetAllTrainingProgramsQuery request, CancellationToken cancellationToken)
             {
-                var PageSize = 10;
-                var traineeId = await _context.Trainees
-                 .Where(a => a.AppUserId == request.UserId && !a.Deleted)
-                 .Select(a => a.Id)
-                 .FirstOrDefaultAsync(cancellationToken);
+                try
+                {
+                    var PageSize = 10;
+                    var traineeId = await _context.Trainees
+                     .Where(a => a.AppUserId == request.UserId && !a.Deleted)
+                     .Select(a => a.Id)
+                     .FirstOrDefaultAsync(cancellationToken);
 
-                var trainingPrograms = await _context.TrainingPrograms
-                    .Include(tp => tp.SubCategory)
-                    .Include(tp => tp.TraineeFavouritePrograms)
-                    .Select(tp => new TrainingProgramDto
-                    {
-                        SubCategoryName = tp.SubCategory.NameEn,
-                        IsFav = _context.TraineeFavouritePrograms.Any(f => f.TrainingProgramId == tp.Id && f.TraineeId == traineeId),
-                        ImgUrl = tp.ImgUrl,
-                        Title = tp.TitleEn,
-                        StartDate = tp.StartDate
-                    })
-                    .Skip((request.PageNumber - 1) * PageSize)
-                    .Take(PageSize)
-                    .ToListAsync(cancellationToken);
+                    var trainingPrograms = await _context.TrainingPrograms
+                        .Include(tp => tp.SubCategory)
+                        .Include(tp => tp.TraineeFavouritePrograms)
+                         .Skip((request.PageNumber - 1) * PageSize)
+                        .Take(PageSize)
+                        .Select(tp => new TrainingProgramDto
+                        {
+                            SubCategoryName = tp.SubCategory.NameEn,
+                            IsFav = _context.TraineeFavouritePrograms.Any(f => f.TrainingProgramId == tp.Id && f.TraineeId == traineeId),
+                            ImgUrl = tp.ImgUrl,
+                            Title = tp.TitleEn,
+                            StartDate = tp.StartDate
+                        })
+                       
+                        .ToListAsync(cancellationToken);
 
-                return new { result = trainingPrograms} ;
+                    return new { result = trainingPrograms };
+                }
+                catch (Exception ex) 
+                {
+
+                    throw new Exception(ex.Message);
+                }
+               
             }
         }
     }

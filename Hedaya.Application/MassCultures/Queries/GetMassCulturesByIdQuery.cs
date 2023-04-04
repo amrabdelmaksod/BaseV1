@@ -24,7 +24,7 @@ namespace Hedaya.Application.MassCultures.Queries
         {
             var culture = await _context.MassCultures
                 .Where(x => x.Id == request.MassCultureId)
-                .Select(x => new MassCultureDto
+                .Select(x => new MassCultureDetailsDto
                 {
                     Id = x.Id,
                     SubCategoryId = x.SubCategoryId,
@@ -32,7 +32,11 @@ namespace Hedaya.Application.MassCultures.Queries
                     Description = x.Description,
                     IsFav = false,
                     Duration = CultureInfo.CurrentCulture.TwoLetterISOLanguageName == "ar" ? $"{x.Duration} ساعات" : $"{x.Duration} hours",
-                    ImageUrl = x.ImageUrl
+                    ImageUrl = x.ImageUrl,
+                    Facebook = x.Facebook,
+                    Telegram = x.Telegram,
+                    Twitter = x.Twitter,
+                    Youtube = x.Youtube
                 })
                 .FirstOrDefaultAsync(cancellationToken);
 

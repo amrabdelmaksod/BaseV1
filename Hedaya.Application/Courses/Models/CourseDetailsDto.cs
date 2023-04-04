@@ -18,7 +18,7 @@
         public string CourseFeatures { get; set; }
         public double CourseCompletionRate { get; set; }
         public List<CourseTopicDto> Topics { get; set; }
-        public ForumDto Forum { get; set; }
+        public Object Forum { get; set; }
         public List<CourseTestDto> Tests { get; set; }
 
     }

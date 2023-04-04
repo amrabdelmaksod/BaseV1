@@ -4,8 +4,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Hedaya.WebApi.Controllers.v1
 {
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("api/v{version:apiVersion}/[controller]")]
     public class TrainingProgramsController : BaseController<TrainingProgramsController>
     {
         public TrainingProgramsController()
@@ -23,6 +23,14 @@ namespace Hedaya.WebApi.Controllers.v1
                 return Unauthorized();
             }
             var query = new GetAllTrainingProgramsQuery{ UserId = userId};
+            var result = await Mediator.Send(query);
+            return Ok(result);
+        }
+
+
+        [HttpGet]
+        public async Task<IActionResult> GetTrainingPrograms([FromQuery] FilterTrainingProgramsQuery query)
+        {
             var result = await Mediator.Send(query);
             return Ok(result);
         }

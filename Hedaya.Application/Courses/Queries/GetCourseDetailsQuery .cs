@@ -78,8 +78,8 @@ namespace Hedaya.Application.Courses.Queries
                             }).ToList(),
 
 
-                          //Forum Of This Course
-                            Forum = new ForumDto
+                            //Forum Of This Course
+                            Forum = c.Forum != null ? new ForumDto
                             {
                                 Id = c.Forum.Id,
                                 Posts = c.Forum.Posts.Select(p => new PostDto
@@ -96,8 +96,10 @@ namespace Hedaya.Application.Courses.Queries
                                         ImgUrl = c.ImagePath ?? ""
                                     }).ToList()
                                 }).ToList()
-                            },
-                            Tests = c.CourseTests.Select(t => new CourseTestDto
+                            } : "",
+                        
+                         
+                    Tests = c.CourseTests.Select(t => new CourseTestDto
                             {
                                 Id = t.Id,
                                 Title = t.Title,

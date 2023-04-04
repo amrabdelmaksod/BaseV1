@@ -2,7 +2,7 @@
 {
     public class MassCultureDetailsResponse
     {
-        public MassCultureDto MassCulture { get; set; }
+        public MassCultureDetailsDto MassCulture { get; set; }
         public List<MassCultureDetailsDto> RelatedMassCultures { get; set; }
     }
 
