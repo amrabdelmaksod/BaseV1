@@ -33,8 +33,6 @@ namespace Hedaya.Application.TrainingPrograms.Queries
                     var trainingPrograms = await _context.TrainingPrograms
                         .Include(tp => tp.SubCategory)
                         .Include(tp => tp.TraineeFavouritePrograms)
-                         .Skip((request.PageNumber - 1) * PageSize)
-                        .Take(PageSize)
                         .Select(tp => new TrainingProgramDto
                         {
                             SubCategoryName = tp.SubCategory.NameEn,
@@ -43,7 +41,8 @@ namespace Hedaya.Application.TrainingPrograms.Queries
                             Title = tp.TitleEn,
                             StartDate = tp.StartDate
                         })
-                       
+                        .Skip((request.PageNumber - 1) * PageSize)
+                        .Take(PageSize)
                         .ToListAsync(cancellationToken);
 
                     return new { result = trainingPrograms };
