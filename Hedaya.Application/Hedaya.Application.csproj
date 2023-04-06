@@ -38,7 +38,6 @@
     <Folder Include="Chats\Commands\" />
     <Folder Include="Chats\Models\" />
     <Folder Include="CommonQuestions\Commands\" />
-    <Folder Include="Complexes\Commands\" />
     <Folder Include="CourseTests\Models\" />
     <Folder Include="CourseTests\Models\" />
     <Folder Include="GentlemenScholars\Commands\" />

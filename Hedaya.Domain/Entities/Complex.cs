@@ -1,6 +1,6 @@
 ﻿namespace Hedaya.Domain.Entities
 {
-    public class Complex
+    public class Complex : BaseEntity
     {
         public int Id { get; set; }
         public string Title { get; set; }

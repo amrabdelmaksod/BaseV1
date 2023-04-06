@@ -8,7 +8,6 @@ public class FilterTrainingProgramsQuery : IRequest<object>
 {
     public string UserId { get; set; }
     public int PageNumber { get; set; } = 1;
-    public int PageSize { get; set; } = 10;
     public int? SubCategoryId { get; set; }
     public bool SortByDurationAscending { get; set; }
     public string? SearchKeyword { get; set; }
@@ -25,49 +24,9 @@ public class FilterTrainingProgramsQuery : IRequest<object>
         public async Task<object> Handle(FilterTrainingProgramsQuery request, CancellationToken cancellationToken)
         {
 
-            try
-            {
-                var subCategories = _context.SubCategories.ToList(); // assuming you have subcategories in your database
+         
 
-                var trainingProgramsdummy = Enumerable.Range(1, 10)
-                    .Select(i => new TrainingProgram
-                    {
-                        TitleEn = $"Training Program {i} (EN)",
-                        TitleAr = $"Training Program {i} (AR)",
-                        Description = $"This is the description of training program {i} in English.",
-
-                        ImgUrl = $"https://example.com/images/training-program-{i}.jpg",
-                        StartDate = DateTime.Today.AddDays(i * 7),
-                        EndDate = DateTime.Today.AddDays(i * 14),
-                        SubCategoryId = subCategories[i % subCategories.Count].Id,
-                        Courses = Enumerable.Range(1, 3)
-                            .Select(j => new Course
-                            {
-                                TitleEn = $"Course {j} in Training Program {i} (EN)",
-                                TitleAr = $"Course {j} in Training Program {i} (AR)",
-                                Description = $"This is the description of course {j} in training program {i} in English.",
-                                AboutCourse = "About",
-                                CourseFeatures = "Features",
-                                CourseSyllabus = "Syllabus",
-                                VideoUrl = "$https://example.com/images/training-program.mp4",
-                                Duration = TimeSpan.FromDays(j * 10),
-
-                                TrainingProgramId = i
-                            })
-                            .ToList()
-                    })
-                    .ToList();
-
-                _context.TrainingPrograms.AddRange(trainingProgramsdummy);
-                await _context.SaveChangesAsync();
-            }
-            catch (Exception ex)
-            {
-
-                throw new Exception(ex.Message);
-            }
-            
-
+            var PageSize = 10;
 
 
             var traineeId = await _context.Trainees
@@ -102,8 +61,8 @@ public class FilterTrainingProgramsQuery : IRequest<object>
 
             var trainingProgramsCount = await query.CountAsync(cancellationToken);
             var trainingPrograms = await query
-                .Skip((request.PageNumber - 1) * request.PageSize)
-                .Take(request.PageSize)
+                .Skip((request.PageNumber - 1) * PageSize)
+                .Take(PageSize)
                 .Select(tp => new TrainingProgramDto
                 {
                    

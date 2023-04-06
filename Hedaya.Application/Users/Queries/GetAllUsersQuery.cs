@@ -1,45 +1,40 @@
 ﻿using Hedaya.Application.Users.Models;
-using Hedaya.Domain.Common;
 using Hedaya.Domain.Entities.Authintication;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 
 namespace Hedaya.Application.Users.Queries
 {
-    public class GetAllUsersQuery : IRequest<object>
+    public class GetAllUsersQuery : IRequest<List<UsersLiDto>>
     {
-        public UserParams userParams { get; set; } 
-        public class Handler : IRequestHandler<GetAllUsersQuery, object>
+        public int PageNumber { get; set; }
+
+        public class Handler : IRequestHandler<GetAllUsersQuery, List<UsersLiDto>>
         {
-         
             private readonly UserManager<AppUser> _userManager;
-            public Handler( UserManager<AppUser> userManager)
+
+            public Handler(UserManager<AppUser> userManager)
             {
-              
                 _userManager = userManager;
             }
 
-            public async Task<object> Handle(GetAllUsersQuery request, CancellationToken cancellationToken)
+            public async Task<List<UsersLiDto>> Handle(GetAllUsersQuery request, CancellationToken cancellationToken)
             {
-                try
-                {
-                    var users = _userManager.Users
-            
-                        .Select(user => new UsersLiDto { Id = user.Id, userName = user.UserName, Email = user.Email, Roles = _userManager.GetRolesAsync(user).Result })
-            
-                        .ToList();
+                var PageSize = 10;
+                var users = _userManager.Users
+                    .Select(user => new UsersLiDto
+                    {
+                        Id = user.Id,
+                        userName = user.UserName,
+                        Email = user.Email,
+                        Roles = _userManager.GetRolesAsync(user).Result
+                    })
+                    .ToList();
 
-            
-                 
-
-                    return new { Result = users } ;
-
-                }
-                catch (Exception ex)
-                {
-
-                    throw new Exception(ex.Message);
-                }
+                return users
+                    .Skip((request.PageNumber - 1) * PageSize)
+                    .Take(PageSize)
+                    .ToList();
             }
         }
     }

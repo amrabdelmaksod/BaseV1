@@ -1,3 +1,4 @@
+using Hedaya.Application.Certificates.Services;
 using Hedaya.Application.Infrastructure;
 using Hedaya.Application.Interfaces;
 using Hedaya.Dashboard.Models;
@@ -45,6 +46,7 @@ builder.Services.Configure<RequestLocalizationOptions>(options =>
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddScoped<ICertificateRepository, CertificateRepository>();
 
 
 builder.Services.AddDbContext<ApplicationDbContext>(
