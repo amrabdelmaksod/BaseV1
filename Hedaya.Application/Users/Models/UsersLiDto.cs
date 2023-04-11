@@ -1,10 +1,15 @@
-﻿namespace Hedaya.Application.Users.Models
+﻿using Hedaya.Domain.Enums;
+
+namespace Hedaya.Application.Users.Models
 {
     public class UsersLiDto
     {
         public string Id { get; set; }
-        public string userName { get; set; }
+        public string Phone { get; set; }
         public string Email { get; set; }
+        public string FullName { get; set; }
+        public bool IsActive { get; set; }
+        public UserType UserType { get; set; }
         public IEnumerable<string> Roles { get; set; }
     }
     

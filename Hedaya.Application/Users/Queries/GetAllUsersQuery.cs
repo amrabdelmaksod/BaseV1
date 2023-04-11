@@ -1,7 +1,9 @@
-﻿using Hedaya.Application.Users.Models;
+﻿using Hedaya.Application.Interfaces;
+using Hedaya.Application.Users.Models;
 using Hedaya.Domain.Entities.Authintication;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace Hedaya.Application.Users.Queries
 {
@@ -12,10 +14,12 @@ namespace Hedaya.Application.Users.Queries
         public class Handler : IRequestHandler<GetAllUsersQuery, List<UsersLiDto>>
         {
             private readonly UserManager<AppUser> _userManager;
+            private readonly IApplicationDbContext _context;
 
-            public Handler(UserManager<AppUser> userManager)
+            public Handler(UserManager<AppUser> userManager, IApplicationDbContext context)
             {
                 _userManager = userManager;
+                _context = context;
             }
 
             public async Task<List<UsersLiDto>> Handle(GetAllUsersQuery request, CancellationToken cancellationToken)
@@ -25,11 +29,25 @@ namespace Hedaya.Application.Users.Queries
                     .Select(user => new UsersLiDto
                     {
                         Id = user.Id,
-                        userName = user.UserName,
+                        Phone = user.UserName,
                         Email = user.Email,
-                        Roles = _userManager.GetRolesAsync(user).Result
+                        Roles = _userManager.GetRolesAsync(user).Result,
+                        UserType = user.UserType,
+                        IsActive = user.IsActive,
                     })
                     .ToList();
+
+                foreach (var user in users)
+                {
+                    var TraineeName = "";
+                    if (user.UserType == Domain.Enums.UserType.User)
+                    {
+                         TraineeName = (await _context.Trainees.Where(a => a.AppUserId == user.Id).Select(a => a.FullName).FirstOrDefaultAsync(cancellationToken));
+                    }
+                 
+                 
+                    user.FullName = TraineeName??"";
+                }
 
                 return users
                     .Skip((request.PageNumber - 1) * PageSize)

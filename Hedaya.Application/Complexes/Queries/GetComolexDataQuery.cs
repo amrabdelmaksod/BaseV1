@@ -5,6 +5,7 @@ using Hedaya.Common;
 using Hedaya.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using System.Globalization;
 
 namespace Hedaya.Application.Complexes.Queries
 {
@@ -26,7 +27,14 @@ namespace Hedaya.Application.Complexes.Queries
                   
 
 
-                    var Complex = await _context.Complexes.Select(a => new ComplexDto { Title = a.Title, Email = a.Email,AddressDescription = a.AddressDescription,LandlinePhone = a.LandlinePhone, Mobile = a.Mobile }).FirstOrDefaultAsync();
+                    var Complex = await _context.Complexes.Select(a => new ComplexDto 
+                    {  
+                        Title = CultureInfo.CurrentCulture.TwoLetterISOLanguageName == "ar" ? a.TitleAr : a.TitleEn, 
+                        Email = a.Email,
+                        AddressDescription = a.AddressDescription,
+                        LandlinePhone = a.LandlinePhone,
+                        Mobile = a.Mobile
+                    }).FirstOrDefaultAsync();
                     if (Complex == null)
                     {
                         return new  { Message = "Not Found" }; ;

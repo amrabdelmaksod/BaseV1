@@ -5,7 +5,6 @@ using Hedaya.Application.Users.Commands.UpdateUser.Hedaya.Application.Users.Comm
 using Hedaya.Application.Users.Commands.UpdateUser.Hedaya.Application.Users.Commands.UpdateUser;
 using Hedaya.Application.Users.Models;
 using Hedaya.Application.Users.Queries;
-using Hedaya.Domain.Common;
 using Hedaya.Domain.Entities.Authintication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;

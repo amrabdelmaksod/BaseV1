@@ -35,31 +35,28 @@ namespace Hedaya.Dashboard.Controllers.v1
 
 
 
-        [HttpPost("CreateComplex")]
-        public async Task<ActionResult<int>> CreateComplex(CreateComplexCommand command)
-        {
-            var validationResult = await new CreateComplexCommandValidator().ValidateAsync(command);
-            if (!validationResult.IsValid)
-            {
-                return BadRequest(validationResult.Errors);
-            }
+        //[HttpPost("CreateComplex")]
+        //public async Task<ActionResult<int>> CreateComplex(CreateComplexCommand command)
+        //{
+        //    var validationResult = await new CreateComplexCommandValidator().ValidateAsync(command);
+        //    if (!validationResult.IsValid)
+        //    {
+        //        return BadRequest(validationResult.Errors);
+        //    }
 
            
-            var id = await Mediator.Send(command);
-                   return Ok(id);       
-        }
+        //    var id = await Mediator.Send(command);
+        //           return Ok(id);       
+        //}
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, [FromBody] UpdateComplexCommand command)
+        [HttpPut()]
+        public async Task<IActionResult> Update([FromBody] UpdateComplexCommand command)
         {
-            if (id != command.Id)
-            {
-                return BadRequest();
-            }
+         
 
             await Mediator.Send(command);
 
-            return NoContent();
+            return Ok();
         }
 
         [HttpDelete("{id}")]

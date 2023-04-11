@@ -1,8 +1,8 @@
 ﻿using Hedaya.Application.Complexes.DTOs;
-using Hedaya.Application.Infrastructure;
 using Hedaya.Application.Interfaces;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using System.Globalization;
 
 namespace Hedaya.Application.Complexes.Queries
 {
@@ -21,7 +21,12 @@ namespace Hedaya.Application.Complexes.Queries
             {
                 try
                 {
-                    var Complex = await _context.Complexes.Select(a => new VisionAndMissionDto { Vision = a.Vision, Mission = a.Mission }).FirstOrDefaultAsync();
+                    var Complex = await _context.Complexes.Select(a => new VisionAndMissionDto 
+                    { 
+                        Vision = CultureInfo.CurrentCulture.TwoLetterISOLanguageName == "ar" ? a.VisionAr : a.VisionEn,
+                        Mission = CultureInfo.CurrentCulture.TwoLetterISOLanguageName == "ar" ? a.MissionAr : a.MissionEn 
+                    
+                    }).FirstOrDefaultAsync();
                     if (Complex == null)
                     {
                         return new  { Message = "Not Found" }; ;

@@ -2,6 +2,7 @@
 using Hedaya.Application.Interfaces;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using System.Globalization;
 
 namespace Hedaya.Application.Complexes.Queries
 {
@@ -20,7 +21,12 @@ namespace Hedaya.Application.Complexes.Queries
             {
                 try
                 {
-                    var Complex = await _context.Complexes.Select(a=>new TermsAndConditionDto { Conditions = a.Conditions, Terms = a.Terms}).FirstOrDefaultAsync();
+                    var Complex = await _context.Complexes.Select(a=>new TermsAndConditionDto
+                    {
+                        Conditions = CultureInfo.CurrentCulture.TwoLetterISOLanguageName == "ar" ? a.ConditionsAr : a.ConditionsEn, 
+                        Terms = CultureInfo.CurrentCulture.TwoLetterISOLanguageName == "ar" ? a.TermsAr : a.TermsEn,
+                    }
+                    ).FirstOrDefaultAsync();
                     if (Complex == null)
                     {
                         return new  { Message = "Not Found" }; ;

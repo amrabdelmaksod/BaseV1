@@ -8,6 +8,7 @@ using Hedaya.Infrastructure.Presistence;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
+using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Localization;
@@ -50,7 +51,7 @@ builder.Services.AddScoped<ICertificateRepository, CertificateRepository>();
 
 
 builder.Services.AddDbContext<ApplicationDbContext>(
-    dbContextOptions => dbContextOptions.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")), ServiceLifetime.Transient
+    dbContextOptions => dbContextOptions.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")), ServiceLifetime.Scoped
     );
 
 //Add Mediator Services
@@ -71,7 +72,16 @@ builder.Services.AddApiVersioning(opt =>
                                                     new MediaTypeApiVersionReader("x-api-version"));
 });
 
-
+//Cors Policy
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", builder =>
+    {
+        builder.AllowAnyOrigin()
+               .AllowAnyMethod()
+               .AllowAnyHeader();
+    });
+});
 
 // Add ApiExplorer to discover versions
 builder.Services.AddVersionedApiExplorer(setup =>
@@ -120,13 +130,23 @@ catch (Exception)
     logger.LogWarning("Ann error occured while seeding default data!");
 }
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
 
+
+var apiVersionDescriptionProvider = app.Services.GetRequiredService<IApiVersionDescriptionProvider>();
+// Configure the HTTP request pipeline.
+
+
+app.UseSwagger();
+app.UseSwaggerUI(options =>
+{
+    foreach (var description in apiVersionDescriptionProvider.ApiVersionDescriptions)
+    {
+        options.SwaggerEndpoint($"/swagger/{description.GroupName}/swagger.json",
+            description.GroupName.ToUpperInvariant());
+    }
+});
+
+app.UseCors("AllowAll");
 app.UseHttpsRedirection();
 
 app.UseAuthorization();

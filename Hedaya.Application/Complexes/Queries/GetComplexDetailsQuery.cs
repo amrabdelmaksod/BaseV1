@@ -2,6 +2,7 @@
 using Hedaya.Application.Interfaces;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using System.Globalization;
 
 namespace Hedaya.Application.Complexes.Queries.GetComplex
 {
@@ -24,17 +25,17 @@ namespace Hedaya.Application.Complexes.Queries.GetComplex
                 .Select(c => new ComplexDetailsDto
                 {
                     Id = c.Id,
-                    Title = c.Title,
+                    Title =CultureInfo.CurrentCulture.TwoLetterISOLanguageName == "ar" ? c.TitleAr : c.TitleEn,
                     AddressDescription = c.AddressDescription,
                     Email = c.Email,
                     Mobile = c.Mobile,
                     LandlinePhone = c.LandlinePhone,
-                    Terms = c.Terms,
-                    Conditions = c.Conditions,
-                    LogFiles = c.LogFiles,
-                    Cookies = c.Cookies,
-                    Vision = c.Vision,
-                    Mission = c.Mission,
+                    Terms =CultureInfo.CurrentCulture.TwoLetterISOLanguageName == "ar" ? c.TermsAr : c.TermsEn,
+                    Conditions = CultureInfo.CurrentCulture.TwoLetterISOLanguageName == "ar" ? c.ConditionsAr : c.ConditionsEn,
+                    LogFiles = CultureInfo.CurrentCulture.TwoLetterISOLanguageName == "ar" ? c.LogFilesAr : c.LogFilesEn,
+                    Cookies = CultureInfo.CurrentCulture.TwoLetterISOLanguageName == "ar" ? c.CookiesAr : c.ConditionsEn,
+                    Vision = CultureInfo.CurrentCulture.TwoLetterISOLanguageName == "ar" ? c.VisionAr : c.VisionEn,
+                    Mission = CultureInfo.CurrentCulture.TwoLetterISOLanguageName == "ar" ? c.MissionAr : c.MissionEn,
                     AboutPlatformVideoUrl = c.AboutPlatformVideoUrl
                 })
                 .FirstOrDefaultAsync(cancellationToken);

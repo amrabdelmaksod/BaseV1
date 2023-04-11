@@ -1,9 +1,8 @@
 ﻿using Hedaya.Application.Complexes.DTOs;
-using Hedaya.Application.Infrastructure;
 using Hedaya.Application.Interfaces;
-using Hedaya.Common;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using System.Globalization;
 
 namespace Hedaya.Application.Complexes.Queries
 {
@@ -22,7 +21,10 @@ namespace Hedaya.Application.Complexes.Queries
             {
                 try
                 {
-                    var Complex = await _context.Complexes.Select(a => new CookiesAndLogFilesDto { Cookies = a.Cookies, LogFiles = a.LogFiles }).FirstOrDefaultAsync();
+                    var Complex = await _context.Complexes.Select(a => new CookiesAndLogFilesDto 
+                    { Cookies = CultureInfo.CurrentCulture.TwoLetterISOLanguageName == "ar" ? a.CookiesAr : a.CookiesEn,
+                        LogFiles = CultureInfo.CurrentCulture.TwoLetterISOLanguageName == "ar" ? a.LogFilesAr : a.LogFilesEn,
+                    }).FirstOrDefaultAsync();
                     if (Complex == null)
                     {
                         return new  { Message = "Not Found" }; ;
