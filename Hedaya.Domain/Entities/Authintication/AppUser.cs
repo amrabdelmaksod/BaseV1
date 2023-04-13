@@ -9,6 +9,7 @@ namespace Hedaya.Domain.Entities.Authintication
         {
             Notifications = new HashSet<Notification>();
         }
+        public string? FullName { get; set; }
         public UserType UserType { get; set; }
         public Nationality Nationality { get; set; }
         public DateTime DateOfBirth { get; set; }

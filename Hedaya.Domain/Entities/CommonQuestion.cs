@@ -1,6 +1,6 @@
 ﻿namespace Hedaya.Domain.Entities
 {
-    public class CommonQuestion
+    public class CommonQuestion : BaseEntity
     {
         public int Id { get; set; }
         public string Question { get; set; }

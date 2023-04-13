@@ -14,14 +14,14 @@
         public class EditUserCommand : IRequest
         {
             public string Id { get; set; }
-            public string Phone { get; set; }
-            public string Email { get; set; }
-            public UserType UserType { get; set; }
-            public Nationality Nationality { get; set; }
-            public DateTime DateOfBirth { get; set; }
-            public Gender Gender { get; set; }
-            public string? SecurityCode { get; set; }
-            public string RoleId { get; set; }
+            public string? FullName { get; set; }
+            public string? Phone { get; set; }
+            public string? Email { get; set; }
+            public UserType? UserType { get; set; }
+            public Nationality? Nationality { get; set; }
+            public DateTime? DateOfBirth { get; set; }
+            public Gender? Gender { get; set; }
+            public string? RoleId { get; set; }
         }
 
         public class EditUserCommandHandler : IRequestHandler<EditUserCommand>
@@ -43,13 +43,40 @@
                     throw new ApplicationException($"User with ID {request.Id} not found.");
                 }
 
-                user.UserName = request.Phone;
-                user.Email = request.Email;
-                user.UserType = request.UserType;
-                user.Nationality = request.Nationality;
-                user.DateOfBirth = request.DateOfBirth;
-                user.Gender = request.Gender;
-                user.SecurityCode = request.SecurityCode;
+                if (!string.IsNullOrWhiteSpace(request.FullName))
+                {
+                    user.FullName = request.FullName;
+                }
+
+                if (!string.IsNullOrWhiteSpace(request.Phone))
+                {
+                    user.UserName = request.Phone;
+                }
+
+                if (!string.IsNullOrWhiteSpace(request.Email))
+                {
+                    user.Email = request.Email;
+                }
+
+                if (request.UserType.HasValue)
+                {
+                    user.UserType = request.UserType.Value;
+                }
+
+                if (request.Nationality.HasValue)
+                {
+                    user.Nationality = request.Nationality.Value;
+                }
+
+                if (request.DateOfBirth.HasValue)
+                {
+                    user.DateOfBirth = request.DateOfBirth.Value;
+                }
+
+                if (request.Gender.HasValue)
+                {
+                    user.Gender = request.Gender.Value;
+                }
 
                 var result = await _userManager.UpdateAsync(user);
 
@@ -59,20 +86,24 @@
                     throw new ApplicationException($"Unable to update user: {errors}");
                 }
 
-                // Remove the user from all roles and then add them to the specified role
-                var roles = await _userManager.GetRolesAsync(user);
-                foreach (var role in roles)
-                {
-                    await _userManager.RemoveFromRoleAsync(user, role);
-                }
+            
 
-                var newRole = await _roleManager.FindByIdAsync(request.RoleId);
-                if (newRole == null)
+                if (!string.IsNullOrWhiteSpace(request.RoleId))
                 {
-                    throw new ApplicationException($"Role with ID {request.RoleId} not found.");
-                }
+                    // Remove the user from all roles and then add them to the specified role
+                    var roles = await _userManager.GetRolesAsync(user);
+                    foreach (var role in roles)
+                    {
+                        await _userManager.RemoveFromRoleAsync(user, role);
+                    }
+                    var newRole = await _roleManager.FindByIdAsync(request.RoleId);
+                    if (newRole == null)
+                    {
+                        throw new ApplicationException($"Role with ID {request.RoleId} not found.");
+                    }
 
-                await _userManager.AddToRoleAsync(user, newRole.Name);
+                    await _userManager.AddToRoleAsync(user, newRole.Name);
+                }
 
                 return Unit.Value;
             }

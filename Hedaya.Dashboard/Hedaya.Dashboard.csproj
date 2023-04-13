@@ -27,6 +27,7 @@
   <ItemGroup>
     <Folder Include="Controllers\v2\" />
     <Folder Include="Resources\" />
+    <Folder Include="wwwroot\ImagePath\" />
   </ItemGroup>
 
 </Project>

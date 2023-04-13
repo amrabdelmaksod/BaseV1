@@ -12,6 +12,7 @@ namespace Hedaya.Infrastructure.Presistence.Configurations
             builder.ToTable("AppUsers");
     
             builder.Property(a=>a.SecurityCode).HasMaxLength(10);
+            builder.Property(a => a.FullName).HasMaxLength(256);
 
             builder.Property(u => u.DateOfBirth)
                 .IsRequired()

@@ -14,6 +14,7 @@ namespace Hedaya.Infrastructure.Presistence.Configurations
             builder.Property(a => a.Description).HasMaxLength(2000).IsRequired();
             builder.Property(a => a.IconUrl).HasMaxLength(200);
             builder.Property(a => a.Deleted).HasDefaultValue(false);
+            builder.HasQueryFilter(a => !a.Deleted);
             builder.Property(a => a.CreatedById).HasMaxLength(50).IsRequired();
             builder.Property(b => b.CreationDate).HasColumnType("DATETIME").HasDefaultValueSql("GETDATE()").IsRequired();
             builder.Property(b => b.ModificationDate).HasColumnType("DATETIME");

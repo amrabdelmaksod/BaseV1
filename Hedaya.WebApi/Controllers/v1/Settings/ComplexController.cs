@@ -1,4 +1,5 @@
 ﻿using Hedaya.Application.Complexes.Queries;
+using Hedaya.Application.Complexes.Queries.GetComplex;
 using Hedaya.Application.SuggestionsAndComplaints.Commands.Create;
 using Microsoft.AspNetCore.Mvc;
 
@@ -29,7 +30,7 @@ namespace Hedaya.WebApi.Controllers.v1.Settings
         [HttpGet("complex-data")]
         public async Task<IActionResult> GetComplexData()
         {
-            var query = new GetComplexDataQuery();
+            var query = new GetComplexQuery();
             var result = await Mediator.Send(query);
 
             return Ok(result);

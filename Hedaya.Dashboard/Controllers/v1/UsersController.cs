@@ -1,4 +1,5 @@
-﻿using Hedaya.Application.Users.Commands.CreateUser;
+﻿using Hedaya.Application.Users.Commands.ChangeStatus;
+using Hedaya.Application.Users.Commands.CreateUser;
 using Hedaya.Application.Users.Commands.DeleteUser;
 using Hedaya.Application.Users.Commands.UpdateRoles;
 using Hedaya.Application.Users.Commands.UpdateUser.Hedaya.Application.Users.Commands.EditUser;
@@ -50,10 +51,25 @@ namespace Hedaya.Dashboard.Controllers.v1
             return Ok(userId);
         }
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateUser(string id, [FromBody] EditUserCommand command)
+        [HttpPut("UpdateUser")]
+        public async Task<IActionResult> UpdateUser(string id, [FromBody] EditUserDto userDto)
         {
-            command.Id = id;
+
+            var command = new EditUserCommand 
+            {  
+                Id = id,
+                Email = userDto.Email,
+                FullName = userDto.FullName,
+                DateOfBirth = userDto.DateOfBirth,
+                Gender = userDto.Gender,
+                Nationality = userDto.Nationality,
+                Phone = userDto.Phone,
+                RoleId = userDto.RoleId,
+                UserType = userDto.UserType
+            };
+           
+
+
 
             var validationResult = await new EditUserCommandValidator(_userManager, _roleManager).ValidateAsync(command);
             if (!validationResult.IsValid)
@@ -66,8 +82,17 @@ namespace Hedaya.Dashboard.Controllers.v1
             return Ok();
         }
 
+        [HttpPut("ChangeUserStatus")]
+        public async Task<IActionResult> ChangeUserStatus(string id, bool IsActive)
+        {
+        
+            var command = new ChangeUserStatusCommand {UserId = id, IsActive = IsActive };
+            await Mediator.Send(command);
 
-        [HttpDelete("{id}")]
+            return Ok();
+        }
+
+        [HttpDelete("DeleteUser")]
         public async Task<IActionResult> DeleteUser(string id, string deleteReason)
         {
             var command = new DeleteUserCommand { Id = id, DeletedReason = deleteReason };

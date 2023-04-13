@@ -19,6 +19,12 @@ namespace Hedaya.Application.Users.Commands.CreateUser
             _userManager = userManager;
             _roleManager = roleManager;
 
+
+            RuleFor(x => x.FullName)
+               .NotEmpty().WithMessage("Full Name is required.")
+               .MaximumLength(256).WithMessage("Full Name cannot be longer than 256 characters.");
+
+
             RuleFor(x => x.Phone)
                 .NotEmpty().WithMessage("Phone is required.")
                 .MaximumLength(15).WithMessage("Phone cannot be longer than 15 characters.");

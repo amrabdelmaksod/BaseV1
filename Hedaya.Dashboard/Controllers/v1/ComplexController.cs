@@ -3,6 +3,7 @@ using Hedaya.Application.Complexes.Commands.Create;
 using Hedaya.Application.Complexes.Commands.Delete;
 using Hedaya.Application.Complexes.Commands.Update;
 using Hedaya.Application.Complexes.DTOs;
+using Hedaya.Application.Complexes.Queries;
 using Hedaya.Application.Complexes.Queries.GetComplex;
 using Hedaya.Application.Users.Commands.CreateUser;
 using Microsoft.AspNetCore.Identity;
@@ -20,9 +21,9 @@ namespace Hedaya.Dashboard.Controllers.v1
 
 
         [HttpGet("GetComplexData")]
-        public async Task<ActionResult<ComplexDetailsDto>> GetComplexData()
+        public async Task<ActionResult<ComplexDto>> GetComplexData()
         {
-            var query = new GetComplexQuery();
+            var query = new GetComplexDataForDashboardQuery();
             var result = await Mediator.Send(query);
 
             if (result == null)

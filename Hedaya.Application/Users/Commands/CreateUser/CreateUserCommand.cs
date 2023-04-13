@@ -12,6 +12,7 @@ namespace Hedaya.Application.Users.Commands.CreateUser
 {
     public class CreateUserCommand : IRequest<string>
     {
+        public string FullName { get; set; }
         public string Phone { get; set; }
         public string Email { get; set; }
         public string Password { get; set; }
@@ -21,7 +22,6 @@ namespace Hedaya.Application.Users.Commands.CreateUser
         public Nationality Nationality { get; set; }
         public DateTime DateOfBirth { get; set; }
         public Gender Gender { get; set; }
-        public string? SecurityCode { get; set; }
         public string RoleId { get; set; }
 
         public class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, string>
@@ -37,15 +37,18 @@ namespace Hedaya.Application.Users.Commands.CreateUser
 
             public async Task<string> Handle(CreateUserCommand request, CancellationToken cancellationToken)
             {
+               var SecurityCode = new Random().Next(100000, 999999).ToString();
+
                 var user = new AppUser
                 {
+                    FullName = request.FullName,
                     UserName = request.Phone,
                     Email = request.Email,
                     UserType = request.UserType,
                     Nationality = request.Nationality,
                     DateOfBirth = request.DateOfBirth,
                     Gender = request.Gender,
-                    SecurityCode = request.SecurityCode
+                    SecurityCode = SecurityCode
                 };
 
                 var result = await _userManager.CreateAsync(user, request.Password);
