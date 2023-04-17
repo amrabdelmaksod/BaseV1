@@ -1,4 +1,5 @@
-﻿using Hedaya.Application.Interfaces;
+﻿using Hedaya.Application.Helpers;
+using Hedaya.Application.Interfaces;
 using Hedaya.Application.TeachingStaff.Models;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -46,8 +47,10 @@ namespace Hedaya.Application.TeachingStaff.Queries
                         Title = t.Title
                     }).ToList()
                 }).ToList();
-
-                return new { Result = teachingStaffDtoList };
+                var totalCount = await _context.Podcasts.CountAsync(cancellationToken);
+                var totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
+              var PagedResults =  new PaginatedList<TeachingStaffDto>(teachingStaffDtoList, totalCount, request.PageNumber, pageSize, (int)Math.Ceiling((decimal)totalCount / pageSize));
+                return new { Result = PagedResults };
             }
 
         }

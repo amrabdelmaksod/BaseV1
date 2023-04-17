@@ -1,6 +1,6 @@
 ﻿using Hedaya.Application.GentlemenScholars.DTOs;
 using Hedaya.Application.GentlemenScholars.Queries;
-using Hedaya.Application.Infrastructure;
+using Hedaya.Application.Helpers;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hedaya.WebApi.Controllers.v1.Settings
@@ -20,9 +20,9 @@ namespace Hedaya.WebApi.Controllers.v1.Settings
     
 
         [HttpGet("GetAllGentlemenPaginated")]
-        public async Task<ActionResult<PagedResults<GentlemenScholarDto>>> GetAllGentlemenPaginated([FromQuery] GetAllGentlemenSchoolarsPaginatedQuery request)
+        public async Task<ActionResult<PaginatedList<GentlemenScholarDto>>> GetAllGentlemenPaginated(int PageNumber = 1)
         {
-            var result = await Mediator.Send(request);
+            var result = await Mediator.Send(new GetAllGentlemenSchoolarsPaginatedQuery { PageNumber = PageNumber});
 
             return Ok(result);
         }

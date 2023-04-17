@@ -1,7 +1,4 @@
-﻿using Hedaya.Application.CommonQuestions.Models;
-using Hedaya.Application.CommonQuestions.Queries;
-using Hedaya.Application.Interfaces;
-using Hedaya.Domain.Entities;
+﻿using Hedaya.Application.Interfaces;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 

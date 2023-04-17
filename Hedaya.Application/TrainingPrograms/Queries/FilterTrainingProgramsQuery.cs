@@ -1,6 +1,5 @@
 ﻿using Hedaya.Application.Interfaces;
 using Hedaya.Application.TrainingPrograms.Models;
-using Hedaya.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -65,13 +64,12 @@ public class FilterTrainingProgramsQuery : IRequest<object>
                 .Take(PageSize)
                 .Select(tp => new TrainingProgramDto
                 {
-                   
+                    Id = tp.Id,
                     SubCategoryName = tp.SubCategory.NameEn,
                     IsFav = _context.TraineeFavouritePrograms.Any(f => f.TrainingProgramId == tp.Id && f.TraineeId == traineeId),
                     ImgUrl = tp.ImgUrl,
                     Title = tp.TitleEn,
-                    StartDate = tp.StartDate,
-                  
+                    StartDate = tp.StartDate,                 
                 })
                 .ToListAsync(cancellationToken);
 

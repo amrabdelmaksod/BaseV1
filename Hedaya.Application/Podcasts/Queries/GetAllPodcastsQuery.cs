@@ -1,7 +1,6 @@
-﻿using Hedaya.Application.Infrastructure;
+﻿using Hedaya.Application.Helpers;
 using Hedaya.Application.Interfaces;
 using Hedaya.Application.Podcasts.Models;
-using Hedaya.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -26,11 +25,14 @@ namespace Hedaya.Application.Podcasts.Queries
             {
                 try
                 {
-                    
+
+                    var pageSize = 10;
+                    var totalCount = await _context.Podcasts.CountAsync(cancellationToken);
                     var podcasts = await _context.Podcasts
                         .OrderByDescending(p => p.PublishDate)
-                        .Skip((request.PageNumber - 1) * 10)
-                        .Take(10).Select(a => new PodcastDTO
+                        .Skip((request.PageNumber - 1) * pageSize)
+                        .Take(pageSize)
+                        .Select(a => new PodcastDTO
                         {
                             AudioUrl = a.AudioUrl,
                             CreatedDate = a.CreatedDate,
@@ -42,7 +44,9 @@ namespace Hedaya.Application.Podcasts.Queries
                         })
                         .ToListAsync(cancellationToken);
 
-                    return new { Result = podcasts } ;
+                    var PaginatedResult = new PaginatedList<PodcastDTO>(podcasts, totalCount, request.PageNumber, pageSize, (int)Math.Ceiling((decimal)totalCount / pageSize));
+
+                    return new { Result = PaginatedResult } ;
                 }
                 catch (Exception ex)
                 {

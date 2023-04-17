@@ -1,8 +1,6 @@
 ﻿using Hedaya.Application.GentlemenScholars.DTOs;
-using Hedaya.Application.Infrastructure;
+using Hedaya.Application.Helpers;
 using Hedaya.Application.Interfaces;
-using Hedaya.Domain.Entities;
-using iTextSharp.text;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,12 +8,7 @@ namespace Hedaya.Application.GentlemenScholars.Queries
 {
     public class GetAllGentlemenSchoolarsPaginatedQuery : IRequest<object>
     {
-
         public int PageNumber { get; set; }
-     
-
-      
-
         public class GetAllGentlemenSchoolarsQueryHandler : IRequestHandler<GetAllGentlemenSchoolarsPaginatedQuery, object>
         {
             private readonly IApplicationDbContext _context;
@@ -34,10 +27,11 @@ namespace Hedaya.Application.GentlemenScholars.Queries
          
               
 
-                // Get the total count of courses that match the search criteria
+               
                 var totalCount = await Query.CountAsync(cancellationToken);
+                // Calculate the total number of pages
+                var totalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
 
-                // Paginate the courses
                 var GentleMens = await Query
                     .Skip((request.PageNumber - 1) * pageSize)
                     .Take(pageSize)
@@ -55,15 +49,18 @@ namespace Hedaya.Application.GentlemenScholars.Queries
                   )
                     .ToListAsync(cancellationToken);
 
-                // Create a PagedResults object to return the paginated courses and total count
-                //To Do Paged Result with Total Counts
-                var pagedResults = new PagedResults<GentlemenScholarDto>
-                {
-                    TotalCount = totalCount,
-                    Items = GentleMens
-                };
+               
 
-                return new { Result = GentleMens }  ;
+                // Create a PaginatedList object to return the paginated Gentlemen Scholars and total count
+                var pagedResults = new PaginatedList<GentlemenScholarDto>(
+                    items: GentleMens,
+                    totalCount: totalCount,
+                    pageNumber: request.PageNumber,
+                    pageSize: pageSize,
+                    totalPages: totalPages);
+
+
+                return new { Result = pagedResults }  ;
             }
         }
 

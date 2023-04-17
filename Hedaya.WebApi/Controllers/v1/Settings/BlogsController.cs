@@ -15,10 +15,10 @@ namespace Hedaya.WebApi.Controllers.v1.Settings
             _logger = logger;
         }
 
-        [HttpGet("getAllBlogs")]
-        public async Task<IActionResult> GetAllBlogs([FromQuery]GetAllBlogsQuery request)
+        [HttpGet("GetAllBlogs")]
+        public async Task<IActionResult> GetAllBlogs(int PageNumber = 1)
         {
-            return Ok(await Mediator.Send(request));
+            return Ok(await Mediator.Send(new GetAllBlogsQuery { PageNumber = PageNumber}));
         }
 
 

@@ -1,6 +1,5 @@
 ﻿using Hedaya.Application.TeachingStaff.Models;
 using Hedaya.Application.TeachingStaff.Queries;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hedaya.WebApi.Controllers.v1.Settings
@@ -10,9 +9,9 @@ namespace Hedaya.WebApi.Controllers.v1.Settings
     public class TeachingStaffController : BaseController<TeachingStaffController>
     {
         [HttpGet("teachingstaff")]
-        public async Task<ActionResult<List<TeachingStaffDto>>> GetAllTeachingStaff([FromQuery] int pageNumber = 1)
+        public async Task<ActionResult<List<TeachingStaffDto>>> GetAllTeachingStaff(int PageNumber = 1)
         {
-            var query = new GetAllTeachingStaffQuery { PageNumber = pageNumber };
+            var query = new GetAllTeachingStaffQuery { PageNumber = PageNumber };
             var result = await Mediator.Send(query);
             return Ok(result);
         }

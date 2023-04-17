@@ -1,6 +1,7 @@
-﻿using Hedaya.Application.Interfaces;
+﻿using Hedaya.Application.Helpers;
+using Hedaya.Application.Interfaces;
 using Hedaya.Application.TrainingPrograms.Models;
-using Hedaya.Domain.Entities;
+using iTextSharp.text;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -26,48 +27,28 @@ namespace Hedaya.Application.TrainingPrograms.Queries
                 try
                 {
 
-                    var program1 = new TrainingProgram
-                    {
-                        TitleAr = "برنامج تدريبي 1",
-                        TitleEn = "Training Program 1",
-                        Description = "This is a training program description.",
-                        StartDate = DateTime.UtcNow.AddDays(7),
-                        EndDate = DateTime.UtcNow.AddDays(14),
-                        ImgUrl = "https://example.com/image.jpg",
-                        SubCategoryId = 1,
-                        CreationDate = DateTime.UtcNow,
-                        Deleted = false,
-                        CreatedById = "1",
-                    };
-                    var program2 = new TrainingProgram
-                    {
-                        TitleAr = "برنامج تدريبي 2",
-                        TitleEn = "Training Program 2",
-                        Description = "This is another training program description.",
-                        StartDate = DateTime.UtcNow.AddDays(14),
-                        EndDate = DateTime.UtcNow.AddDays(21),
-                        ImgUrl = "https://example.com/image2.jpg",
-                        SubCategoryId = 2,
-                        CreationDate = DateTime.UtcNow,
-                        Deleted = false, CreatedById = "1",
-                    };
-
-                    _context.TrainingPrograms.AddRange(program1, program2);
-                    _context.SaveChanges();
-
+                   
 
 
                     var PageSize = 10;
+                  
+                    
+                    
                     var traineeId = await _context.Trainees
                      .Where(a => a.AppUserId == request.UserId && !a.Deleted)
                      .Select(a => a.Id)
                      .FirstOrDefaultAsync(cancellationToken);
+
+                    var totalCount = await _context.TrainingPrograms.CountAsync(cancellationToken);
+                    var totalPages = (int)Math.Ceiling((double)totalCount / PageSize);
+
 
                     var trainingPrograms = await _context.TrainingPrograms
                         .Include(tp => tp.SubCategory)
                         .Include(tp => tp.TraineeFavouritePrograms)
                         .Select(tp => new TrainingProgramDto
                         {
+                            Id = tp.Id,
                             SubCategoryName = tp.SubCategory.NameEn,
                             IsFav = _context.TraineeFavouritePrograms.Any(f => f.TrainingProgramId == tp.Id && f.TraineeId == traineeId),
                             ImgUrl = tp.ImgUrl,
@@ -79,7 +60,9 @@ namespace Hedaya.Application.TrainingPrograms.Queries
                         .Take(PageSize)
                         .ToListAsync(cancellationToken);
 
-                    return new { result = trainingPrograms };
+                    var AllPrograms = new PaginatedList<TrainingProgramDto>(trainingPrograms, totalCount, request.PageNumber, PageSize, totalPages);
+
+                    return new {result = AllPrograms};
                 }
                 catch (Exception ex) 
                 {

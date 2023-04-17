@@ -2,6 +2,7 @@
 {
     public class TrainingProgramDto
     {
+        public int Id { get; set; }
         public string SubCategoryName { get; set; }
         public bool IsFav { get; set; }
         public string ImgUrl { get; set; }

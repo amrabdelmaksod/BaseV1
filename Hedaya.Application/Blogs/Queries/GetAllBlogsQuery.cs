@@ -1,6 +1,6 @@
 ﻿using Hedaya.Application.Blogs.Models;
+using Hedaya.Application.Helpers;
 using Hedaya.Application.Interfaces;
-using Hedaya.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -8,7 +8,7 @@ namespace Hedaya.Application.Blogs.Queries
 {
     public class GetAllBlogsQuery : IRequest<object>
     {
-        public int PageNumber { get; set; } = 1;
+        public int PageNumber { get; set; }
 
         public class Handler : IRequestHandler<GetAllBlogsQuery,object>
         {
@@ -22,53 +22,38 @@ namespace Hedaya.Application.Blogs.Queries
              {
                 try
                 {
+                    var PageSize = 10;
 
-                    #region Add Dummy Data
-                    //    List<Blog> blogsListDummy = Enumerable.Range(1,100)
-                    //.Select(i => new Blog
-                    //{
+                    int totalCount = await _context.Blogs.CountAsync(cancellationToken);
 
-                    //    Title = $"عنوان المدونة {i}",
-                    //    Description = $"وصف المدونة {i} هو عبارة عن مقال يتحدث عن العديد من المواضيع المختلفة، ويشمل هذا المقال أفكارًا وأفكارًا جديدة ومختلفة في عالم {i} المعرفة.",
-                    //    ImagePath = $"path/to/image{i}.jpg",
-                    //    Facebook = $"https://www.facebook.com/blog{i}",
-                    //    Twitter = $"https://www.twitter.com/blog{i}",
-                    //    Youtube = $"https://www.youtube.com/blog{i}",
-                    //    Instagram = $"https://www.instagram.com/blog{i}",
-                    //    Whatsapp = $"https://www.whatsapp.com/blog{i}",
-                    //    Deleted = false
-                    //})
-                    //.ToList();
-                    //    await _context.Blogs.AddRangeAsync(blogsListDummy);
-                    //    await _context.SaveChangesAsync();
-
-                    // You can also add objects dynamically using a loop or by reading from a data source such as a database
-                    #endregion
+                    int totalPages = (int)Math.Ceiling(totalCount / (double)PageSize);
 
 
-
-
-                    int skip = (request.PageNumber - 1) * 10;
+                    int skip = (request.PageNumber - 1) * PageSize;
 
                     var blogs = await _context.Blogs
+                        .OrderByDescending(b => b.Id)
                         .Skip(skip)
-                        .Take(10)
-                        .Select(a => new BlogDto
+                        .Take(PageSize)
+                        .Select(b => new BlogDto
                         {
-                            Id = a.Id,
-                            Title = a.Title,
-                            Description = a.Description,
-                            ImgUrl = a.ImagePath,
-                            Facebook = a.Facebook,
-                            Instagram = a.Instagram,
-                            Twitter = a.Twitter,
-                            Whatsapp = a.Whatsapp,
-                            Youtube = a.Youtube,
+                            Id = b.Id,
+                            Title = b.Title,
+                            Description = b.Description,
+                            ImgUrl = b.ImagePath,
+                            Facebook = b.Facebook,
+                            Instagram = b.Instagram,
+                            Twitter = b.Twitter,
+                            Whatsapp = b.Whatsapp,
+                            Youtube = b.Youtube
                         })
                         .ToListAsync(cancellationToken);
 
-                  
-                    return new { Result = blogs} ;
+
+                 var AllBlogs = new PaginatedList<BlogDto>(blogs, totalCount, request.PageNumber, PageSize, totalPages);
+
+
+                    return new { Result = AllBlogs } ;
        
                 }
                 catch (Exception ex)

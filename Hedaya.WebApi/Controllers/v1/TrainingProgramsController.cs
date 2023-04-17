@@ -15,7 +15,7 @@ namespace Hedaya.WebApi.Controllers.v1
 
 
         [HttpGet("GetAllTrainingPrograms")]
-        public async Task<ActionResult<List<TrainingProgramDto>>> GetAllTrainingPrograms(int PageNumber)
+        public async Task<ActionResult<List<TrainingProgramDto>>> GetAllTrainingPrograms(int PageNumber = 1)
         {
             var userId = User.Claims.FirstOrDefault(c => c.Type == "uid")?.Value;
             if (userId == null)
