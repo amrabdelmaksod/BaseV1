@@ -25,6 +25,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="NAudio" Version="2.1.0" />
     <PackageReference Include="NLog.Web.AspNetCore" Version="5.2.1" />
     <PackageReference Include="PrayerTimes" Version="1.0.1" />
     <PackageReference Include="SendGrid" Version="9.28.1" />
@@ -38,6 +39,8 @@
     <Folder Include="Chats\Models\" />
     <Folder Include="CourseTests\Models\" />
     <Folder Include="CourseTests\Models\" />
+    <Folder Include="Enrollments\Queries\" />
+    <Folder Include="Favourites\Models\" />
     <Folder Include="GentlemenScholars\Commands\" />
     <Folder Include="MassCultures\Commands\" />
     <Folder Include="MethodologicalExplanations\Commands\" />

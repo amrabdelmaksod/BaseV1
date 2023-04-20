@@ -13,11 +13,13 @@ namespace Hedaya.Domain.Entities
             Favorites = new HashSet<TraineeCourseFavorite>();
             TraineeLessons = new HashSet<TraineeLesson>();
             TraineeAnswers = new HashSet<TraineeAnswer>();
+            Enrollments = new HashSet<Enrollment>();
         }
 
         public string Id { get; set; }
         public string FullName { get; set; }
-        public byte[]? ProfilePicture { get; set; }
+        public string? ProfilePictureImagePath { get; set; }
+
         public EducationalDegree?  EducationalDegree { get; set; }
         public string? JobTitle { get; set; }
         public string? Facebook { get; set; }
@@ -35,6 +37,7 @@ namespace Hedaya.Domain.Entities
         public virtual ICollection<TraineeLesson> TraineeLessons { get; set; }
         public virtual ICollection<TraineeAnswer> TraineeAnswers { get; set; }
         public virtual ICollection<TraineeFavouriteProgram> FavouritePrograms { get; set; }
+        public virtual ICollection<Enrollment> Enrollments { get; set; }
 
 
     }

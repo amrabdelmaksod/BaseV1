@@ -8,8 +8,6 @@ namespace Hedaya.Application.Podcasts.Commands.Create
         {
             RuleFor(c => c.Title).NotEmpty();
             RuleFor(c => c.Description).NotEmpty();
-            RuleFor(c => c.AudioUrl).NotEmpty().Must(BeAValidUrl).WithMessage("Invalid URL format");
-            RuleFor(c => c.PublishDate).NotEmpty();
         }
 
         private bool BeAValidUrl(string url)

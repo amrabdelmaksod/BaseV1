@@ -21,10 +21,13 @@ namespace Hedaya.WebApi.Controllers.v1
     {
         private readonly IAuthService _authService;
         private readonly UserManager<AppUser> _userManager;
-        public AuthController(IAuthService authService, UserManager<AppUser> userManager)
+        private readonly IWebHostEnvironment _environment;
+
+        public AuthController(IAuthService authService, UserManager<AppUser> userManager, IWebHostEnvironment environment)
         {
             _authService = authService;
             _userManager = userManager;
+            _environment = environment;
         }
 
 
@@ -96,7 +99,7 @@ namespace Hedaya.WebApi.Controllers.v1
 
 
 
-            var result = await _authService.LoginAsync(ModelState, model);
+            var result = await _authService.LoginAsync(ModelState, model,_environment.WebRootPath);
 
 
 
@@ -166,7 +169,7 @@ namespace Hedaya.WebApi.Controllers.v1
                 // Get the current user ID from the JWT token
                 var userId = User.Claims.FirstOrDefault(c => c.Type == "uid")?.Value;
 
-                var result = await _authService.GetUserAsync(ModelState, userId);
+                var result = await _authService.GetUserAsync(ModelState, userId,_environment.WebRootPath);
                 if (!ModelState.IsValid)
                 {
                     return CustomBadRequest.CustomModelStateErrorResponse(ModelState);
@@ -213,6 +216,7 @@ namespace Hedaya.WebApi.Controllers.v1
         [HttpPut("UpdateProfilePicture")]
         public async Task<ActionResult> UpdateProfilePicture([FromForm] UpdateProfilePictureModel UpdateProfilePictureModel)
         {
+            var x = _environment.WebRootPath;
             var validationResult = await new UpdateProfilePictureModelValidator(_userManager).ValidateAsync(UpdateProfilePictureModel);
             if (!validationResult.IsValid)
             {
@@ -226,7 +230,7 @@ namespace Hedaya.WebApi.Controllers.v1
 
             var userId = User.Claims.FirstOrDefault(c => c.Type == "uid")?.Value;
 
-            var result = await _authService.UpdateProfilePicture(UpdateProfilePictureModel, userId);
+            var result = await _authService.UpdateProfilePicture(UpdateProfilePictureModel, userId,_environment.WebRootPath);
             if (result == null)
                 return BadRequest(new { error = CultureInfo.CurrentCulture.TwoLetterISOLanguageName == "ar" ? "عفوا لقد حدث خطأ" : "Something Went Wrong!" });
             return Ok(result);

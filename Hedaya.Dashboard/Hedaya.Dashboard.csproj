@@ -28,6 +28,8 @@
     <Folder Include="Controllers\v2\" />
     <Folder Include="Resources\" />
     <Folder Include="wwwroot\ImagePath\" />
+    <Folder Include="wwwroot\uploads\audio\" />
+    <Folder Include="wwwroot\uploads\NewFolder\" />
   </ItemGroup>
 
 </Project>

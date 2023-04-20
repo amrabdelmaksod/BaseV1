@@ -35,7 +35,7 @@ namespace Hedaya.Application.Podcasts.Queries
                         .Select(a => new PodcastDTO
                         {
                             AudioUrl = a.AudioUrl,
-                            CreatedDate = a.CreatedDate,
+                            CreatedDate = a.CreationDate,
                             Description = a.Description,
                             Duration = a.Duration,
                             Id = a.Id,

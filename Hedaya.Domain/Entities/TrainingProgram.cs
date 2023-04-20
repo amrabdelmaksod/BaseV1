@@ -6,6 +6,8 @@
         {
             TraineeFavouritePrograms = new HashSet<TraineeFavouriteProgram>();
             Courses = new HashSet<Course>();
+            TrainingProgramNotes = new HashSet<TrainingProgramNote>();
+            Enrollments = new HashSet<Enrollment>();
         }
         public int Id { get; set; }
         public string TitleAr { get; set; }
@@ -19,6 +21,9 @@
 
         public virtual ICollection<TraineeFavouriteProgram> TraineeFavouritePrograms { get; set; }
         public virtual ICollection<Course> Courses { get; set; }
+        public virtual ICollection<TrainingProgramNote> TrainingProgramNotes { get; set; }
+        public virtual ICollection<Enrollment> Enrollments { get; set; }
+
 
     }
 }

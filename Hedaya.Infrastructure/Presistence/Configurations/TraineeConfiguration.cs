@@ -14,11 +14,12 @@ namespace Hedaya.Infrastructure.Presistence.Configurations
             builder.Property(t => t.Id).HasMaxLength(50);
             builder.Property(a => a.FullName).HasMaxLength(256).IsRequired();
 
-            builder.Property(u => u.ProfilePicture)
-              .HasColumnType("varbinary(max)");
 
             builder.Property(u => u.JobTitle)
         .HasMaxLength(50);
+
+            builder.Property(u => u.ProfilePictureImagePath)
+     .HasMaxLength(200);
 
             builder.Property(u => u.Facebook)
                 .HasMaxLength(100);

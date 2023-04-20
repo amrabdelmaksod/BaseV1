@@ -659,6 +659,71 @@ namespace Hedaya.Infrastructure.Migrations
                     b.ToTable("CourseTopics");
                 });
 
+            modelBuilder.Entity("Hedaya.Domain.Entities.Enrollment", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("CreatedById")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<DateTime>("CreationDate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("DATETIME")
+                        .HasDefaultValueSql("GETDATE()");
+
+                    b.Property<bool>("Deleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime>("EnrollmentDate")
+                        .HasColumnType("datetime");
+
+                    b.Property<string>("FullName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("MobileNumber")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<DateTime?>("ModificationDate")
+                        .HasColumnType("DATETIME");
+
+                    b.Property<string>("ModifiedById")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("TraineeId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<int>("TrainingProgramId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TraineeId");
+
+                    b.HasIndex("TrainingProgramId", "Email")
+                        .IsUnique();
+
+                    b.ToTable("Enrollments");
+                });
+
             modelBuilder.Entity("Hedaya.Domain.Entities.ExplanationNote", b =>
                 {
                     b.Property<int>("Id")
@@ -1275,8 +1340,20 @@ namespace Hedaya.Infrastructure.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2");
+                    b.Property<string>("CreatedById")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<DateTime>("CreationDate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("DATETIME")
+                        .HasDefaultValueSql("GETDATE()");
+
+                    b.Property<bool>("Deleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -1285,6 +1362,13 @@ namespace Hedaya.Infrastructure.Migrations
 
                     b.Property<TimeSpan>("Duration")
                         .HasColumnType("time");
+
+                    b.Property<DateTime?>("ModificationDate")
+                        .HasColumnType("DATETIME");
+
+                    b.Property<string>("ModifiedById")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<DateTime>("PublishDate")
                         .HasColumnType("datetime2");
@@ -1575,8 +1659,9 @@ namespace Hedaya.Infrastructure.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<byte[]>("ProfilePicture")
-                        .HasColumnType("varbinary(max)");
+                    b.Property<string>("ProfilePictureImagePath")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<string>("Telegram")
                         .HasMaxLength(100)
@@ -1753,6 +1838,36 @@ namespace Hedaya.Infrastructure.Migrations
                     b.HasIndex("SubCategoryId");
 
                     b.ToTable("TrainingPrograms", (string)null);
+                });
+
+            modelBuilder.Entity("Hedaya.Domain.Entities.TrainingProgramNote", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<byte>("SortIndex")
+                        .HasColumnType("tinyint");
+
+                    b.Property<string>("TextAr")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("TextEn")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<int>("TrainingProgramId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TrainingProgramId");
+
+                    b.ToTable("TrainingProgramNotes", (string)null);
                 });
 
             modelBuilder.Entity("Hedaya.Domain.Entities.Tutorial", b =>
@@ -2036,6 +2151,25 @@ namespace Hedaya.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("Course");
+                });
+
+            modelBuilder.Entity("Hedaya.Domain.Entities.Enrollment", b =>
+                {
+                    b.HasOne("Hedaya.Domain.Entities.Trainee", "Trainee")
+                        .WithMany("Enrollments")
+                        .HasForeignKey("TraineeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Hedaya.Domain.Entities.TrainingProgram", "TrainingProgram")
+                        .WithMany("Enrollments")
+                        .HasForeignKey("TrainingProgramId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Trainee");
+
+                    b.Navigation("TrainingProgram");
                 });
 
             modelBuilder.Entity("Hedaya.Domain.Entities.ExplanationNote", b =>
@@ -2322,6 +2456,17 @@ namespace Hedaya.Infrastructure.Migrations
                     b.Navigation("SubCategory");
                 });
 
+            modelBuilder.Entity("Hedaya.Domain.Entities.TrainingProgramNote", b =>
+                {
+                    b.HasOne("Hedaya.Domain.Entities.TrainingProgram", "TrainingProgram")
+                        .WithMany("TrainingProgramNotes")
+                        .HasForeignKey("TrainingProgramId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("TrainingProgram");
+                });
+
             modelBuilder.Entity("Hedaya.Domain.Entities.Tutorial", b =>
                 {
                     b.HasOne("Hedaya.Domain.Entities.TeachingStaff", "TeachingStaff")
@@ -2476,6 +2621,8 @@ namespace Hedaya.Infrastructure.Migrations
 
                     b.Navigation("Comments");
 
+                    b.Navigation("Enrollments");
+
                     b.Navigation("Favorites");
 
                     b.Navigation("FavouritePrograms");
@@ -2493,7 +2640,11 @@ namespace Hedaya.Infrastructure.Migrations
                 {
                     b.Navigation("Courses");
 
+                    b.Navigation("Enrollments");
+
                     b.Navigation("TraineeFavouritePrograms");
+
+                    b.Navigation("TrainingProgramNotes");
                 });
 
             modelBuilder.Entity("Hedaya.Domain.TestClass", b =>

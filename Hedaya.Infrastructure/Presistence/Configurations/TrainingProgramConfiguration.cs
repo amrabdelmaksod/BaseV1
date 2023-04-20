@@ -51,6 +51,11 @@ namespace Hedaya.Infrastructure.Presistence.Configurations
           .HasForeignKey(c => c.TrainingProgramId);
 
 
+            builder.HasMany(e => e.TrainingProgramNotes)
+               .WithOne(e => e.TrainingProgram)
+               .HasForeignKey(e => e.TrainingProgramId)
+               .OnDelete(DeleteBehavior.Cascade);
+
             builder.Property(a => a.Deleted).HasDefaultValue(false);
             builder.Property(a => a.CreatedById).HasMaxLength(50).IsRequired();
             builder.Property(b => b.CreationDate).HasColumnType("DATETIME").HasDefaultValueSql("GETDATE()").IsRequired();

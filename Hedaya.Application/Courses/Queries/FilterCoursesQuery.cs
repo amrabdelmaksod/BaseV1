@@ -11,8 +11,8 @@ namespace Hedaya.Application.Courses.Queries
     public class FilterCoursesQuery : IRequest<object>
     {
         public int PageNumber { get; set; }
-        public List<int> CategoryIds { get; set; }
-        public bool SortByDurationAscending { get; set; }
+        public List<int>? CategoryIds { get; set; }
+        public bool? SortByDurationAscending { get; set; }
         public string? searchKeyword { get; set; }
         public string UserId { get; set; }
 
@@ -39,7 +39,7 @@ namespace Hedaya.Application.Courses.Queries
                     query = query.Where(x => request.CategoryIds.Contains(x.SubCategoryId));
                 }
 
-         
+
                 // Apply search filter
                 if (!string.IsNullOrEmpty(request.searchKeyword))
                 {
@@ -47,7 +47,7 @@ namespace Hedaya.Application.Courses.Queries
                 }
 
                 // Sort by duration
-                if (request.SortByDurationAscending)
+                if (request.SortByDurationAscending.HasValue == true)
                 {
                     query = query.OrderBy(x => x.Duration);
                 }
@@ -57,13 +57,13 @@ namespace Hedaya.Application.Courses.Queries
                 }
 
                 // Get total count for pagination
-                int totalCount = await query.CountAsync(cancellationToken);
+                int totalCount = await _context.Courses.CountAsync(cancellationToken);
 
                 // Get paginated results
                 int skip = (request.PageNumber - 1) * 10;
                 var courses = await query.Skip(skip)
                     .Take(10)
-                    .Select(c=> new CourseDto
+                    .Select(c => new CourseDto
                     {
                         Id = c.Id,
                         Title = c.TitleAr,
@@ -87,13 +87,13 @@ namespace Hedaya.Application.Courses.Queries
                     })
                     .ToListAsync(cancellationToken);
 
-             
 
-                var response = new 
+
+                var response = new
                 {
                     TotalCount = totalCount,
                     Categories = categories,
-              
+
                     AllCourses = courses
                 };
 

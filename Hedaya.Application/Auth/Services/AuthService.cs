@@ -1,9 +1,11 @@
 ﻿using Hedaya.Application.Auth.Abstractions;
 using Hedaya.Application.Auth.Models;
+using Hedaya.Application.Helpers;
 using Hedaya.Application.Interfaces;
 using Hedaya.Common;
 using Hedaya.Domain.Entities;
 using Hedaya.Domain.Entities.Authintication;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
@@ -11,6 +13,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Org.BouncyCastle.Crmf;
 using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -26,12 +29,19 @@ namespace Hedaya.Application.Auth.Services
         private readonly IEmailSender _sender;
      
         private readonly ISMSService _smsService;
+        public static IHostingEnvironment _environment;
 
 
         private IApplicationDbContext _context;
         private readonly SignInManager<AppUser> _signInManager;
 
-        public AuthService(UserManager<AppUser> userManager, IApplicationDbContext context, IOptions<JWTSettings> jwt, RoleManager<IdentityRole> roleManager, IEmailSender sender, ISMSService smsService, SignInManager<AppUser> signInManager)
+        public AuthService(UserManager<AppUser> userManager,
+            IApplicationDbContext context, 
+            IOptions<JWTSettings> jwt,
+            RoleManager<IdentityRole> roleManager,
+            IEmailSender sender,
+            ISMSService smsService, 
+            SignInManager<AppUser> signInManager,IHostingEnvironment environment)
         {
             _userManager = userManager;
             _jwt = jwt.Value;
@@ -40,6 +50,7 @@ namespace Hedaya.Application.Auth.Services
             _context = context;
             _smsService = smsService;
             _signInManager = signInManager;
+            _environment = environment; 
         }
 
 
@@ -101,7 +112,7 @@ namespace Hedaya.Application.Auth.Services
         
         }
 
-        public async Task<dynamic> LoginAsync(ModelStateDictionary modelState, TokenRequestModel model)
+        public async Task<dynamic> LoginAsync(ModelStateDictionary modelState, TokenRequestModel model, string WebRootPath)
         {
             var authModel = new AuthModel();
 
@@ -112,16 +123,17 @@ namespace Hedaya.Application.Auth.Services
             var trainee = await _context.Trainees.FirstOrDefaultAsync(a => a.AppUserId == user.Id);
 
 
-            string profilePictureBase64 = null;
-            if (trainee.ProfilePicture != null && trainee.ProfilePicture.Length > 0)
+            string ProfilePicture = null;
+            if (trainee.ProfilePictureImagePath != null)
             {
-                profilePictureBase64 = Convert.ToBase64String(trainee.ProfilePicture);
+                ProfilePicture = Path.Combine(WebRootPath, "ImagePath", trainee.ProfilePictureImagePath ?? "1");
+
             }
 
             var jwtSecurityToken = await CreateJwtToken(user);
             authModel.Message = "Login Successfully";
             authModel.Email = user.Email;
-            authModel.ProfilePicture = profilePictureBase64;
+            authModel.ProfilePicture = ProfilePicture;
             authModel.IsAuthinticated = true;
             authModel.Token = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
             authModel.Mobile = user.UserName; // assuming the mobile number is stored in the UserName property
@@ -278,7 +290,7 @@ namespace Hedaya.Application.Auth.Services
         }
 
 
-        public async Task<dynamic> GetUserAsync(ModelStateDictionary modelState, string userId)
+        public async Task<dynamic> GetUserAsync(ModelStateDictionary modelState, string userId, string WebRootPath)
         {
             try
             {
@@ -291,12 +303,12 @@ namespace Hedaya.Application.Auth.Services
                     return new { Message = $"There is no user with this Id : {userId}" };
                 }
 
-                string profilePictureBase64 = null;
-                if (trainee.ProfilePicture != null && trainee.ProfilePicture.Length > 0)
+                string ProfilePicture = null;
+                if (trainee.ProfilePictureImagePath != null)
                 {
-                    profilePictureBase64 = Convert.ToBase64String(trainee.ProfilePicture);
-                }
+                    ProfilePicture = Path.Combine(WebRootPath, "ImagePath", trainee.ProfilePictureImagePath ?? "1");
 
+                }
                 return new
                 {
                     result = new
@@ -316,7 +328,7 @@ namespace Hedaya.Application.Auth.Services
                             Twitter = trainee.Twitter ?? "",
                             Whatsapp = trainee.Whatsapp ?? "",
                             Telegram = trainee.Telegram ?? "",
-                            profilePictureBase64 = profilePictureBase64,
+                            ProfilePicture = ProfilePicture,
                         }
                     }
                 };
@@ -566,24 +578,17 @@ namespace Hedaya.Application.Auth.Services
             return username;
         }
 
-        public async Task<object> UpdateProfilePicture(UpdateProfilePictureModel userModel, string userId)
+        public async Task<object> UpdateProfilePicture(UpdateProfilePictureModel userModel, string userId, string WebRootPath)
         {
-            
             var Trainee = await _context.Trainees.FirstOrDefaultAsync(a => a.AppUserId == userId);
 
-            
-            if (!string.IsNullOrEmpty(userModel.ProfilePicture.ToString()) && Trainee is not null)
+            if (userModel.ProfilePicture != null && Trainee is not null)
             {
-                // Save the new profile picture to the database
-                using (var ms = new MemoryStream())
-                {
-                    userModel.ProfilePicture.CopyTo(ms);
-                    Trainee.ProfilePicture = ms.ToArray();
-                   await _context.SaveChangesAsync();
-                }
-               var Message = CultureInfo.CurrentCulture.TwoLetterISOLanguageName == "ar" ? "تم تحديث صورة الملف الشخصي بنجاح" : "Profile Picture Updated Successfully";
-                return new { result = Message} ;
-
+                var imagePath = Path.Combine(WebRootPath, "ImagePath");
+                Trainee.ProfilePictureImagePath =await ImageHelper.SaveImage(userModel.ProfilePicture, _environment);
+                await _context.SaveChangesAsync();
+                var Message = CultureInfo.CurrentCulture.TwoLetterISOLanguageName == "ar" ? "تم تحديث صورة الملف الشخصي بنجاح" : "Profile Picture Updated Successfully";
+                return new { result = Message };
             }
 
             return null;

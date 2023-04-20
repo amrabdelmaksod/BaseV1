@@ -66,7 +66,9 @@ namespace Hedaya.Infrastructure.Presistence
         public DbSet<CourseTest> CourseTests { get; set; }
         public DbSet<Domain.Entities.TrainingProgram> TrainingPrograms { get; set ; }
         public DbSet<TraineeFavouriteProgram> TraineeFavouritePrograms { get ; set; }
+        public DbSet<TrainingProgramNote> TrainingProgramNotes { get; set; }
 
+        public DbSet<Enrollment> Enrollments { get; set; }
         #endregion
 
 
