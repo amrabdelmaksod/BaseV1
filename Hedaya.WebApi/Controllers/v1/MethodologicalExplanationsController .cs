@@ -19,7 +19,13 @@ namespace Hedaya.WebApi.Controllers.v1
         [HttpGet("GetAll")]
         public async Task<IActionResult> GetAll([FromQuery] int pageNumber)
         {
-            var query = new GetAllMethodlogicalExplanationQuery { PageNumber = pageNumber };
+
+            var userId = User.Claims.FirstOrDefault(c => c.Type == "uid")?.Value;
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
+            var query = new GetAllMethodlogicalExplanationQuery { PageNumber = pageNumber, UserId = userId };
             var result = await Mediator.Send(query);
             return Ok(result);
         }
@@ -28,7 +34,12 @@ namespace Hedaya.WebApi.Controllers.v1
         [HttpGet("MethodlogicalExplanation/{subcategoryId:int}")]
         public async Task<IActionResult> GetMassCulturesBySubcategoryId(int subcategoryId, int pageNumber = 1)
         {
-            var query = new GetMethodlogicalExplanationsBySubCategoryIdQuery { SubCategoryId = subcategoryId, PageNumber = pageNumber };
+            var userId = User.Claims.FirstOrDefault(c => c.Type == "uid")?.Value;
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
+            var query = new GetMethodlogicalExplanationsBySubCategoryIdQuery { SubCategoryId = subcategoryId, PageNumber = pageNumber , UserId = userId};
             var result = await Mediator.Send(query);
 
             return Ok(result);
@@ -42,21 +53,33 @@ namespace Hedaya.WebApi.Controllers.v1
             [FromQuery] bool sortByDurationAscending = true )
 
         {
+
+            var userId = User.Claims.FirstOrDefault(c => c.Type == "uid")?.Value;
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
             var query = new FilterMethodologicalExplanationsQuery
             {
                 PageNumber = pageNumber,
                 SubCategoryId = subCategoryId,
                 SortByDurationAscending = sortByDurationAscending,
                 searchKeyword = SearchKeyword,
+                UserId = userId,
             };
             var result = await Mediator.Send(query);
             return Ok(result);
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("GetMethodlogicalExplanationById")]
         public async Task<ActionResult<object>> GetMethodlogicalExplanationById(int id)
         {
-            var query = new GetMethodlogicalExplanationByIdQuery { Id = id };
+            var userId = User.Claims.FirstOrDefault(c => c.Type == "uid")?.Value;
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
+            var query = new GetMethodlogicalExplanationByIdQuery { Id = id,UserId = userId };
             var result = await Mediator.Send(query);
             if (result == null)
                 return BadRequest(new { error = CultureInfo.CurrentCulture.TwoLetterISOLanguageName == "ar" ? $"{id}عفوا لا يوجد شروحات منهجية بهذا المعرف" : $"Sorry The Explanation With this id : {id} is not found" });

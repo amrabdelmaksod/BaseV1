@@ -1,4 +1,5 @@
 ﻿using Hedaya.Application.Courses.Models;
+using Hedaya.Application.Helpers;
 using Hedaya.Application.Interfaces;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -8,8 +9,8 @@ namespace Hedaya.Application.Courses.Queries
 {
     public class GetCoursesQuery : IRequest<object>
     {
-    
         public int PageNumber { get; set; }
+       
         public string UserId { get; set; }
 
         public class GetCoursesQueryHandler : IRequestHandler<GetCoursesQuery, object>
@@ -23,13 +24,12 @@ namespace Hedaya.Application.Courses.Queries
 
             public async Task<object> Handle(GetCoursesQuery request, CancellationToken cancellationToken)
             {
+                var PageSize = 10;
+
                 var traineeId = await _context.Trainees
                      .Where(a => a.AppUserId == request.UserId && !a.Deleted)
                      .Select(a => a.Id)
                      .FirstOrDefaultAsync(cancellationToken);
-
-
-                var PageSize = 10;
 
                 var popularCourses = await _context.Courses
                     .OrderByDescending(c => c.StartDate)
@@ -45,13 +45,15 @@ namespace Hedaya.Application.Courses.Queries
                         InstructorName = c.Instructor.GetFullName(),
                         InstructorImageUrl = c.Instructor.ImageUrl,
                         Category = CultureInfo.CurrentCulture.TwoLetterISOLanguageName == "ar" ? c.SubCategory.NameAr : c.SubCategory.NameEn,
+                        TrainingProgramId = c.TrainingProgramId,
+                        CategoryId = c.SubCategoryId,
+                        VideoUrl = c.VideoUrl,
+                        
                     })
                     .ToListAsync(cancellationToken);
 
-                var allCourses = await _context.Courses
+                var allCoursesQuery = _context.Courses
                     .OrderByDescending(c => c.StartDate)
-                    .Skip(PageSize * (request.PageNumber - 1))
-                    .Take(PageSize)
                     .Select(c => new CourseDto
                     {
                         Id = c.Id,
@@ -63,19 +65,41 @@ namespace Hedaya.Application.Courses.Queries
                         InstructorName = c.Instructor.GetFullName(),
                         InstructorImageUrl = c.Instructor.ImageUrl,
                         Category = CultureInfo.CurrentCulture.TwoLetterISOLanguageName == "ar" ? c.SubCategory.NameAr : c.SubCategory.NameEn,
-                    })
+                        TrainingProgramId = c.TrainingProgramId,
+                        CategoryId = c.SubCategoryId,
+                        VideoUrl = c.VideoUrl,
+                    });
+
+
+
+
+                var allCourses = await allCoursesQuery
+                    .Skip((request.PageNumber - 1) * PageSize)
+                    .Take(PageSize)
                     .ToListAsync(cancellationToken);
 
-                var CoursesResult = new CourseLiDto
+
+                var AllItems = new CourseLiDto
                 {
+                    AllCourses = allCourses,
                     PopularCourses = popularCourses,
-                    AllCourses = allCourses
                 };
 
-                return new { result = CoursesResult };
+                var totalCount = await allCoursesQuery.CountAsync(cancellationToken);
+                var totalPages = (int)Math.Ceiling((double)totalCount / PageSize);
+
+
+
+                var paginatedList = new PaginatedList<CourseLiDto>(AllItems, totalCount, request.PageNumber, PageSize, totalPages);
+
+           
+
+          
+
+                return new {Result = paginatedList } ;
             }
         }
 
-    }
 
+    }
 }

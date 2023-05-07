@@ -9,5 +9,6 @@
         public DateTime PublishDate { get; set; }
         public DateTime CreatedDate { get; set; }
         public TimeSpan Duration { get; set; }
+        public bool IsFav { get; set; }
     }
 }

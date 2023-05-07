@@ -34,7 +34,7 @@ namespace Hedaya.Infrastructure.Persistence.Configurations
                 .HasForeignKey(e => e.TrainingProgramId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            builder.HasIndex(e => new {e.TrainingProgramId, e.Email}).IsUnique();
+            //builder.HasIndex(e => new {e.TrainingProgramId, e.Email}).IsUnique();
 
             builder.Property(a => a.Deleted).HasDefaultValue(false);
             builder.Property(a => a.CreatedById).HasMaxLength(50).IsRequired();

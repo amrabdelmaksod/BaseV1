@@ -9,6 +9,8 @@ namespace Hedaya.Application.MethodologicalExplanations.Queries
     public class GetMethodlogicalExplanationByIdQuery : IRequest<object>
     {
         public int Id { get; set; }
+        public string UserId { get; set; }
+
     }
 
     public class GetMethodlogicalExplanationByIdQueryHandler : IRequestHandler<GetMethodlogicalExplanationByIdQuery, object>
@@ -24,6 +26,10 @@ namespace Hedaya.Application.MethodologicalExplanations.Queries
         {
 
 
+            var traineeId = await _context.Trainees
+            .Where(a => a.AppUserId == request.UserId && !a.Deleted)
+            .Select(a => a.Id)
+            .FirstOrDefaultAsync(cancellationToken);
 
             var explanation = await _context.MethodologicalExplanations
                 .Include(e => e.ExplanationVideos).Include(a=>a.Instructor).Include(a=>a.ExplanationNotes)
@@ -41,7 +47,7 @@ namespace Hedaya.Application.MethodologicalExplanations.Queries
                 Title = CultureInfo.CurrentCulture.TwoLetterISOLanguageName == "ar" ? explanation.TitleAr : explanation.TitleEn,
                 ImageUrl = explanation.ImageUrl,
                 Description = explanation.Description,
-                IsFav = false,
+                IsFav = _context.TraineeExplanationFavourite.Any(f => f.MethodologicalExplanationId == explanation.Id && f.TraineeId == traineeId),
                 Duration = CultureInfo.CurrentCulture.TwoLetterISOLanguageName == "ar" ? $"{explanation.Duration} ساعات" : $"{explanation.Duration} hours",
                 SubCategoryId = explanation.SubCategoryId,
                 InstructorName = explanation.Instructor.GetFullName(),

@@ -1,7 +1,5 @@
 ﻿using Hedaya.Application.Courses.Models;
 using Hedaya.Application.Interfaces;
-using Hedaya.Domain.Entities;
-using Hedaya.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System.Globalization;
@@ -38,6 +36,7 @@ namespace Hedaya.Application.Courses.Queries
 
                     var CourseCompletionRate = await GetCourseCompletionRateAsync(request.CourseId, traineeId);
 
+                   var IsEnrolled = await _context.Enrollments.AnyAsync(a=>!a.Deleted && a.CourseId == request.CourseId &&a.TraineeId == traineeId);
 
                     var course = await _context.Courses
                         .Where(c => c.Id == request.CourseId)
@@ -53,17 +52,20 @@ namespace Hedaya.Application.Courses.Queries
                             StartDate = c.StartDate.ToString("d"),
                             Duration = c.Duration,
                             ImageUrl = c.ImageUrl ?? "",
+                            VideoUrl = c.VideoUrl ??"",
                             IsFav = _context.TraineeCourseFavorites.Any(f => f.CourseId == c.Id && f.TraineeId == traineeId),
                             InstructorId = c.Instructor.Id,
                             InstructorName = c.Instructor.GetFullName(),
                             InstructorImageUrl = c.Instructor.ImageUrl ?? "",
                             InstructorDescription = c.Instructor.Description,
                             Category = CultureInfo.CurrentCulture.TwoLetterISOLanguageName == "ar" ? c.SubCategory.NameAr : c.SubCategory.NameEn,
+                            CategoryId = c.SubCategoryId,
+                            TrainingProgramId = c.TrainingProgramId,
                             AboutCourse = c.AboutCourse,
                             CourseCompletionRate = CourseCompletionRate,
                             CourseFeatures = c.CourseFeatures,
                             CourseSyllabus = c.CourseSyllabus,
-
+                            IsEnrolled = IsEnrolled,
 
                             // Topics Of This Course
                             Topics = c.CourseTopics.OrderBy(ct => ct.SortIndex).Select(ct => new CourseTopicDto
@@ -73,7 +75,9 @@ namespace Hedaya.Application.Courses.Queries
                                 {
                                     Id = l.Id,
                                     Title = CultureInfo.CurrentCulture.TwoLetterISOLanguageName == "ar" ? l.NameAr : l.NameEn,
-                                    Duration = l.Duration
+                                    Duration = l.Duration,
+                                    VideoUrl = l.VideoUrl??"",
+                                    IsCompleeted =  _context.TraineeLessons.Any(t => t.TraineeId == traineeId && t.LessonId == l.Id && t.IsCompleted)
                                 }).ToList()
                             }).ToList(),
 

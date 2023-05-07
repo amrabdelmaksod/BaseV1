@@ -2,7 +2,6 @@
 using Hedaya.Application.CommonQuestions.Models;
 using Hedaya.Application.CommonQuestions.Queries;
 using Hedaya.Application.Helpers;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hedaya.Dashboard.Controllers.v1

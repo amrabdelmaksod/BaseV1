@@ -11,7 +11,7 @@ namespace Hedaya.Application.Courses.Queries
     public class FilterCoursesQuery : IRequest<object>
     {
         public int PageNumber { get; set; }
-        public List<int>? CategoryIds { get; set; }
+        public int? CategoryId { get; set; }
         public bool? SortByDurationAscending { get; set; }
         public string? searchKeyword { get; set; }
         public string UserId { get; set; }
@@ -28,17 +28,16 @@ namespace Hedaya.Application.Courses.Queries
             public async Task<object> Handle(FilterCoursesQuery request, CancellationToken cancellationToken)
             {
                 var traineeId = await _context.Trainees
-                     .Where(a => a.AppUserId == request.UserId && !a.Deleted)
-                     .Select(a => a.Id)
-                     .FirstOrDefaultAsync(cancellationToken);
+                    .Where(a => a.AppUserId == request.UserId && !a.Deleted)
+                    .Select(a => a.Id)
+                    .FirstOrDefaultAsync(cancellationToken);
 
-                // Filter by category IDs if provided
+                // Filter by category ID if provided
                 IQueryable<Course> query = _context.Courses;
-                if (request.CategoryIds != null && request.CategoryIds.Count > 0)
+                if (request.CategoryId.HasValue)
                 {
-                    query = query.Where(x => request.CategoryIds.Contains(x.SubCategoryId));
+                    query = query.Where(x => x.SubCategoryId == request.CategoryId);
                 }
-
 
                 // Apply search filter
                 if (!string.IsNullOrEmpty(request.searchKeyword))
@@ -74,6 +73,8 @@ namespace Hedaya.Application.Courses.Queries
                         InstructorName = c.Instructor.GetFullName(),
                         InstructorImageUrl = c.Instructor.ImageUrl,
                         Category = CultureInfo.CurrentCulture.TwoLetterISOLanguageName == "ar" ? c.SubCategory.NameAr : c.SubCategory.NameEn,
+                        TrainingProgramId = c.TrainingProgramId,
+                        CategoryId = c.SubCategoryId,
                     })
                     .ToListAsync(cancellationToken);
 
@@ -87,19 +88,16 @@ namespace Hedaya.Application.Courses.Queries
                     })
                     .ToListAsync(cancellationToken);
 
-
-
                 var response = new
                 {
                     TotalCount = totalCount,
                     Categories = categories,
-
                     AllCourses = courses
                 };
 
                 return new { Result = response };
             }
         }
-
     }
+
 }

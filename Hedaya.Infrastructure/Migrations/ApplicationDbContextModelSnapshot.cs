@@ -667,6 +667,9 @@ namespace Hedaya.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int>("CourseId")
+                        .HasColumnType("int");
+
                     b.Property<string>("CreatedById")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -716,10 +719,11 @@ namespace Hedaya.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CourseId");
+
                     b.HasIndex("TraineeId");
 
-                    b.HasIndex("TrainingProgramId", "Email")
-                        .IsUnique();
+                    b.HasIndex("TrainingProgramId");
 
                     b.ToTable("Enrollments");
                 });
@@ -974,7 +978,7 @@ namespace Hedaya.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("VideoFilePath")
+                    b.Property<string>("VideoUrl")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -1383,6 +1387,21 @@ namespace Hedaya.Infrastructure.Migrations
                     b.ToTable("Podcasts", (string)null);
                 });
 
+            modelBuilder.Entity("Hedaya.Domain.Entities.PodcastFavourite", b =>
+                {
+                    b.Property<string>("TraineeId")
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<int>("PodcastId")
+                        .HasColumnType("int");
+
+                    b.HasKey("TraineeId", "PodcastId");
+
+                    b.HasIndex("PodcastId");
+
+                    b.ToTable("PodcastFavourites", (string)null);
+                });
+
             modelBuilder.Entity("Hedaya.Domain.Entities.Post", b =>
                 {
                     b.Property<int>("Id")
@@ -1731,6 +1750,21 @@ namespace Hedaya.Infrastructure.Migrations
                     b.HasIndex("CourseId");
 
                     b.ToTable("TraineeCourseFavorites", (string)null);
+                });
+
+            modelBuilder.Entity("Hedaya.Domain.Entities.TraineeExplanationFavourite", b =>
+                {
+                    b.Property<string>("TraineeId")
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<int>("MethodologicalExplanationId")
+                        .HasColumnType("int");
+
+                    b.HasKey("TraineeId", "MethodologicalExplanationId");
+
+                    b.HasIndex("MethodologicalExplanationId");
+
+                    b.ToTable("TraineeExplanationFavourites", (string)null);
                 });
 
             modelBuilder.Entity("Hedaya.Domain.Entities.TraineeFavouriteProgram", b =>
@@ -2155,6 +2189,12 @@ namespace Hedaya.Infrastructure.Migrations
 
             modelBuilder.Entity("Hedaya.Domain.Entities.Enrollment", b =>
                 {
+                    b.HasOne("Hedaya.Domain.Entities.Course", "Course")
+                        .WithMany()
+                        .HasForeignKey("CourseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Hedaya.Domain.Entities.Trainee", "Trainee")
                         .WithMany("Enrollments")
                         .HasForeignKey("TraineeId")
@@ -2166,6 +2206,8 @@ namespace Hedaya.Infrastructure.Migrations
                         .HasForeignKey("TrainingProgramId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Course");
 
                     b.Navigation("Trainee");
 
@@ -2287,6 +2329,25 @@ namespace Hedaya.Infrastructure.Migrations
                     b.Navigation("AppUser");
                 });
 
+            modelBuilder.Entity("Hedaya.Domain.Entities.PodcastFavourite", b =>
+                {
+                    b.HasOne("Hedaya.Domain.Entities.Podcast", "Podcast")
+                        .WithMany("PodcastFavourites")
+                        .HasForeignKey("PodcastId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Hedaya.Domain.Entities.Trainee", "Trainee")
+                        .WithMany("PodcastFavourites")
+                        .HasForeignKey("TraineeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Podcast");
+
+                    b.Navigation("Trainee");
+                });
+
             modelBuilder.Entity("Hedaya.Domain.Entities.Post", b =>
                 {
                     b.HasOne("Hedaya.Domain.Entities.Forum", "Forum")
@@ -2403,6 +2464,25 @@ namespace Hedaya.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("Course");
+
+                    b.Navigation("Trainee");
+                });
+
+            modelBuilder.Entity("Hedaya.Domain.Entities.TraineeExplanationFavourite", b =>
+                {
+                    b.HasOne("Hedaya.Domain.Entities.MethodologicalExplanation", "MethodologicalExplanation")
+                        .WithMany("TraineeExplanationFavourites")
+                        .HasForeignKey("MethodologicalExplanationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Hedaya.Domain.Entities.Trainee", "Trainee")
+                        .WithMany("TraineeExplanationFavourites")
+                        .HasForeignKey("TraineeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("MethodologicalExplanation");
 
                     b.Navigation("Trainee");
                 });
@@ -2585,6 +2665,13 @@ namespace Hedaya.Infrastructure.Migrations
                     b.Navigation("ExplanationNotes");
 
                     b.Navigation("ExplanationVideos");
+
+                    b.Navigation("TraineeExplanationFavourites");
+                });
+
+            modelBuilder.Entity("Hedaya.Domain.Entities.Podcast", b =>
+                {
+                    b.Navigation("PodcastFavourites");
                 });
 
             modelBuilder.Entity("Hedaya.Domain.Entities.Post", b =>
@@ -2629,9 +2716,13 @@ namespace Hedaya.Infrastructure.Migrations
 
                     b.Navigation("Friends");
 
+                    b.Navigation("PodcastFavourites");
+
                     b.Navigation("Posts");
 
                     b.Navigation("TraineeAnswers");
+
+                    b.Navigation("TraineeExplanationFavourites");
 
                     b.Navigation("TraineeLessons");
                 });

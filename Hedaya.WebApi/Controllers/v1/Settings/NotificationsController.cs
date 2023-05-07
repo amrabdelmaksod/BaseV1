@@ -11,7 +11,12 @@ namespace Hedaya.WebApi.Controllers.v1.Settings
         public async Task<IActionResult> GetNotifications(int pageNumber)
         {
             var userId = User.Claims.FirstOrDefault(c => c.Type == "uid")?.Value;
-            var query = new GetNotificationsByUserIdQuery(userId,pageNumber);
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
+
+            var query = new GetNotificationsByUserIdQuery { PageNumber = pageNumber, UserId = userId};
             var notifications = await Mediator.Send(query);
             return Ok(notifications);
         }

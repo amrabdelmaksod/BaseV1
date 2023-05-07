@@ -1,9 +1,9 @@
-﻿using System.Security.Claims;
-using Hedaya.Application.Courses.Models;
+﻿using Hedaya.Application.Courses.Models;
 using Hedaya.Application.Favourites.Commands;
 using Hedaya.Application.Favourites.Queries;
+using Hedaya.Application.MethodologicalExplanations.Models;
+using Hedaya.Application.Podcasts.Models;
 using Hedaya.Application.TrainingPrograms.Models;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hedaya.WebApi.Controllers.v1
@@ -13,7 +13,7 @@ namespace Hedaya.WebApi.Controllers.v1
     public class FavouritesController : BaseController<FavouritesController>
     {
         [HttpGet("GetFavouriteCourses")]
-        public async Task<ActionResult<List<CourseDto>>> GetFavouriteCourses(int PageNumber)
+        public async Task<ActionResult<List<CourseDto>>> GetFavouriteCourses(int PageNumber = 1)
         {
             var userId = User.Claims.FirstOrDefault(c => c.Type == "uid")?.Value;
             if (userId == null)
@@ -29,7 +29,7 @@ namespace Hedaya.WebApi.Controllers.v1
 
 
         [HttpGet("GetFavouritePrograms")]
-        public async Task<ActionResult<List<TrainingProgramDto>>> GetFavouritePrograms(int PageNumber)
+        public async Task<ActionResult<List<TrainingProgramDto>>> GetFavouritePrograms(int PageNumber = 1)
         {
             var userId = User.Claims.FirstOrDefault(c => c.Type == "uid")?.Value;
             if (userId == null)
@@ -41,6 +41,38 @@ namespace Hedaya.WebApi.Controllers.v1
 
             return Ok(result);
         }
+
+
+        [HttpGet("GetFavouriteExplanations")]
+        public async Task<ActionResult<List<MethodlogicalExplanationDto>>> GetFavouriteExplanations(int PageNumber = 1)
+        {
+            var userId = User.Claims.FirstOrDefault(c => c.Type == "uid")?.Value;
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
+
+            var query = new GetFavoriteExplanationsQuery { UserId = userId, PageNumber = PageNumber };
+            var explanations = await Mediator.Send(query);
+
+            return Ok(explanations);
+        }
+
+        [HttpGet("GetFavouritePodcastsQuery")]
+        public async Task<ActionResult<List<PodcastDTO>>> GetFavouritePodcastsQuery(int pageNumber = 1)
+        {
+            var userId = User.Claims.FirstOrDefault(c => c.Type == "uid")?.Value;
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
+
+            var query = new GetFavoritePodcastsQuery { UserId = userId, PageNumber = pageNumber };
+            var podcasts = await Mediator.Send(query);
+
+            return Ok(podcasts);
+        }
+
 
 
         [HttpPut("ChangeStatusProgramFavourite")]
@@ -66,7 +98,7 @@ namespace Hedaya.WebApi.Controllers.v1
 
 
         [HttpPut("ChangeStatusCourseFavourite")]
-        public async Task<IActionResult> ToggleCourseFavorite(int id, [FromBody] bool isFavorite)
+        public async Task<IActionResult> ToggleCourseFavorite(int id, bool isFavorite)
         {
             var userId = User.Claims.FirstOrDefault(c => c.Type == "uid")?.Value;
             if (userId == null)
@@ -85,6 +117,49 @@ namespace Hedaya.WebApi.Controllers.v1
 
             return Ok();
         }
+
+
+        [HttpPut("ChangeStatusMethodologicalExplanationFavourite")]
+        public async Task<IActionResult> ToggleMethodologicalExplanationFavorite(int id, bool isFavorite)
+        {
+            var userId = User.Claims.FirstOrDefault(c => c.Type == "uid")?.Value;
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
+
+            var command = new ToggleMethodologicalExplanationFavouriteCommand
+            {
+                Id = id,
+                UserId = userId,
+                IsFavourite = isFavorite
+            };
+
+            await Mediator.Send(command);
+
+            return Ok();
+        }
+        [HttpPut("ChangePodcastFavouriteStatus")]
+        public async Task<IActionResult> TogglePodcastFavourite(int id, bool isFavorite)
+        {
+            var userId = User.Claims.FirstOrDefault(c => c.Type == "uid")?.Value;
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
+
+            var command = new TogglePodcastFavouriteCommand
+            {
+                Id = id,
+                UserId = userId,
+                IsFavourite = isFavorite
+            };
+
+            await Mediator.Send(command);
+
+            return Ok();
+        }
+
 
 
 

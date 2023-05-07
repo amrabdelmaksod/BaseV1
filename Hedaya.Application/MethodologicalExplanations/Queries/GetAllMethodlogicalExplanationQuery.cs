@@ -10,6 +10,7 @@ namespace Hedaya.Application.MethodologicalExplanations.Queries
     public class GetAllMethodlogicalExplanationQuery : IRequest<object>
     {
         public int PageNumber { get; set; }
+        public string UserId { get; set; }
         public class GetAllMethodlogicalExplanationQueryHandler : IRequestHandler<GetAllMethodlogicalExplanationQuery, object>
         {
 
@@ -23,6 +24,12 @@ namespace Hedaya.Application.MethodologicalExplanations.Queries
 
             public async Task<object> Handle(GetAllMethodlogicalExplanationQuery request, CancellationToken cancellationToken)
             {
+
+
+                var traineeId = await _context.Trainees
+                .Where(a => a.AppUserId == request.UserId && !a.Deleted)
+                .Select(a => a.Id)
+                .FirstOrDefaultAsync(cancellationToken);
 
                 IQueryable<MethodologicalExplanation> query = _context.MethodologicalExplanations;
                 int totalCount = await query.CountAsync(cancellationToken);
@@ -45,7 +52,7 @@ namespace Hedaya.Application.MethodologicalExplanations.Queries
                         Id = x.Id,
                         Title = CultureInfo.CurrentCulture.TwoLetterISOLanguageName == "ar" ? x.TitleAr : x.TitleEn,
                         Description = x.Description,
-                        IsFav = false,
+                        IsFav = _context.TraineeExplanationFavourite.Any(f => f.MethodologicalExplanationId == x.Id && f.TraineeId == traineeId),
                         Duration = CultureInfo.CurrentCulture.TwoLetterISOLanguageName == "ar" ? $"{x.Duration} ساعات" : $"{x.Duration} hours",
                         SubCategoryId = x.SubCategoryId,
                         ImageUrl = x.ImageUrl,

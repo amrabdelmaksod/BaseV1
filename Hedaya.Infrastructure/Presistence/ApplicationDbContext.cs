@@ -3,7 +3,6 @@ using Hedaya.Application.Interfaces;
 using Hedaya.Domain;
 using Hedaya.Domain.Entities;
 using Hedaya.Domain.Entities.Authintication;
-using Hedaya.Infrastructure.Migrations;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
@@ -21,6 +20,8 @@ namespace Hedaya.Infrastructure.Presistence
 
         #region Users
         public DbSet<AppUser> AppUsers { get; set; }
+        public DbSet<Trainee> Trainees { get; set; }
+        public DbSet<Instructor> Instructors { get; set; }
         #endregion
 
 
@@ -42,8 +43,7 @@ namespace Hedaya.Infrastructure.Presistence
         public DbSet<PlatformField> PlatformFields { get ; set; }
         public DbSet<PlatformWorkAxes> PlatformWorkAxes { get; set; }
         public DbSet<PlatformFeature> PlatformFeatures { get ; set; }
-        public DbSet<Trainee> Trainees { get; set; }
-        public DbSet<Instructor> Instructors { get; set; }
+   
         public DbSet<Certificate> Certificates { get; set; }
         public DbSet<Friendship> Friendships { get; set; }
         public DbSet<CommonQuestion> CommonQuestions { get; set; }
@@ -69,6 +69,9 @@ namespace Hedaya.Infrastructure.Presistence
         public DbSet<TrainingProgramNote> TrainingProgramNotes { get; set; }
 
         public DbSet<Enrollment> Enrollments { get; set; }
+
+        public DbSet<TraineeExplanationFavourite> TraineeExplanationFavourite { get; set; }
+        public DbSet<PodcastFavourite> PodcastFavourites { get; set; }
         #endregion
 
 

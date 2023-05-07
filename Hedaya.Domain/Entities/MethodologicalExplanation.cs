@@ -6,6 +6,7 @@
         {
             ExplanationVideos = new HashSet<ExplanationVideo>();
             ExplanationNotes = new HashSet<ExplanationNote>();
+            TraineeExplanationFavourites = new HashSet<TraineeExplanationFavourite>();
         }
         public int Id { get; set; }
         public string TitleAr { get; set; }
@@ -25,5 +26,6 @@
         public virtual Instructor Instructor { get; set; }
         public virtual ICollection<ExplanationVideo> ExplanationVideos { get; set; }
         public virtual ICollection<ExplanationNote> ExplanationNotes { get; set; }
+        public virtual ICollection<TraineeExplanationFavourite> TraineeExplanationFavourites { get; set; }
     }
 }

@@ -14,6 +14,8 @@ namespace Hedaya.Domain.Entities
             TraineeLessons = new HashSet<TraineeLesson>();
             TraineeAnswers = new HashSet<TraineeAnswer>();
             Enrollments = new HashSet<Enrollment>();
+            TraineeExplanationFavourites = new HashSet<TraineeExplanationFavourite>();
+            PodcastFavourites = new HashSet<PodcastFavourite>();
         }
 
         public string Id { get; set; }
@@ -33,10 +35,13 @@ namespace Hedaya.Domain.Entities
         public virtual ICollection<Friendship> Friends { get; set; }
         public virtual ICollection<Post> Posts { get; set; }
         public virtual ICollection<Comment> Comments { get; set; }
-        public virtual ICollection<TraineeCourseFavorite> Favorites { get; set; }
+      
         public virtual ICollection<TraineeLesson> TraineeLessons { get; set; }
         public virtual ICollection<TraineeAnswer> TraineeAnswers { get; set; }
         public virtual ICollection<TraineeFavouriteProgram> FavouritePrograms { get; set; }
+        public virtual ICollection<TraineeExplanationFavourite> TraineeExplanationFavourites { get; set; }
+        public virtual ICollection<TraineeCourseFavorite> Favorites { get; set; }
+        public virtual ICollection<PodcastFavourite> PodcastFavourites { get; set; }
         public virtual ICollection<Enrollment> Enrollments { get; set; }
 
 

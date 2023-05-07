@@ -33,7 +33,7 @@ namespace Hedaya.Application.Podcasts.Commands.Create
             {
                 // Save the audio file
                 string audioFilePath = await PodcastHelper.SavePodcastAudio(request.AudioFile, _hostingEnvironment);
-                var duration = PodcastHelper.GetAudioDuration(audioFilePath);
+                //var duration = PodcastHelper.GetAudioDuration(audioFilePath);
                 // Create the new podcast entity
                 var podcast = new Podcast
                 {
@@ -43,11 +43,11 @@ namespace Hedaya.Application.Podcasts.Commands.Create
                     PublishDate = DateTime.UtcNow,
                     Duration = TimeSpan.Zero,
                     CreatedById = "Hedaya Admin", // set the created by id as appropriate
-                    CreationDate = DateTime.UtcNow,
+                    CreationDate = DateTime.Now,
                     Deleted = false
                 };
 
-                var x = PodcastHelper.GetAudioDuration(audioFilePath);
+           
 
                 // Add the new podcast entity to the database and save changes
                 _context.Podcasts.Add(podcast);

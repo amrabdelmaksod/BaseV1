@@ -9,6 +9,7 @@ namespace Hedaya.Application.Podcasts.Queries
     public class GetAllPodcastsQuery : IRequest<object>
     {
         public int PageNumber { get; set; }
+        public string UserId { get; set; }
 
         public class GetAllPodcastsQueryHandler : IRequestHandler<GetAllPodcastsQuery, object>
         {
@@ -25,6 +26,10 @@ namespace Hedaya.Application.Podcasts.Queries
             {
                 try
                 {
+                    var traineeId = await _context.Trainees
+       .Where(a => a.AppUserId == request.UserId && !a.Deleted)
+       .Select(a => a.Id)
+       .FirstOrDefaultAsync(cancellationToken);
 
                     var pageSize = 10;
                     var totalCount = await _context.Podcasts.CountAsync(cancellationToken);
@@ -40,7 +45,9 @@ namespace Hedaya.Application.Podcasts.Queries
                             Duration = a.Duration,
                             Id = a.Id,
                             PublishDate = a.PublishDate,
-                            Title = a.Title
+                            Title = a.Title,
+                            IsFav = _context.PodcastFavourites.Any(f => f.PodcastId == a.Id && f.TraineeId == traineeId),
+
                         })
                         .ToListAsync(cancellationToken);
 

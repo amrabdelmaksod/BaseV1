@@ -67,7 +67,8 @@ namespace Hedaya.WebApi.Controllers.v1
                 FullName = dto.FullName ,
                 MobileNumber = dto.MobileNumber ,
                 ProgramId = dto.ProgramId ,
-                UserId = userId
+                UserId = userId,
+                CourseIds= dto.CourseIds ,
             };
             await Mediator.Send(command);
 

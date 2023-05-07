@@ -60,7 +60,9 @@ namespace Hedaya.Application.Favourites.Queries
                 IsFav = true,
                 InstructorName = c.Instructor.GetFullName(),
                 InstructorImageUrl = c.Instructor.ImageUrl,
-                Category = CultureInfo.CurrentCulture.TwoLetterISOLanguageName == "ar" ? c.SubCategory.NameAr : c.SubCategory.NameEn
+                Category = CultureInfo.CurrentCulture.TwoLetterISOLanguageName == "ar" ? c.SubCategory.NameAr : c.SubCategory.NameEn,
+                TrainingProgramId = c.TrainingProgramId,
+                CategoryId = c.SubCategoryId,
             }).ToList();
 
             return new { Result = new PaginatedList<CourseDto>(courseDtos, totalCount, request.PageNumber, PageSize, totalPages) };

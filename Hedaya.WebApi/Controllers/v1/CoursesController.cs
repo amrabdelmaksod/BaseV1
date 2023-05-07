@@ -4,7 +4,6 @@ using Hedaya.Application.Courses.Models;
 using Hedaya.Application.Courses.Queries;
 using Hedaya.Application.CourseTests.Commands;
 using Hedaya.Application.CourseTests.Queries;
-using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using System.Globalization;
 
@@ -55,7 +54,7 @@ namespace Hedaya.WebApi.Controllers.v1
             }
             var query = new FilterCoursesQuery 
             { 
-                CategoryIds = model.CategoryIds ,
+                CategoryId = model.CategoryId ,
                 PageNumber = model.PageNumber,
                 searchKeyword = model.searchKeyword,
                 SortByDurationAscending = model.SortByDurationAscending,
@@ -154,19 +153,7 @@ namespace Hedaya.WebApi.Controllers.v1
             return Ok(degree);
         }
 
-        [HttpGet("GetCoursesByInstructorId")]
-        public async Task<IActionResult> GetCoursesByInstructorId(string instructorId)
-        {
-            var userId = User.Claims.FirstOrDefault(c => c.Type == "uid")?.Value;
-            if (userId == null)
-            {
-                return Unauthorized();
-            }
-            var query = new GetCoursesByInstructorIdQuery { InstructorId = instructorId, UserId = userId };
-            var courses = await Mediator.Send(query);
-
-            return Ok(courses);
-        }
+    
 
 
 

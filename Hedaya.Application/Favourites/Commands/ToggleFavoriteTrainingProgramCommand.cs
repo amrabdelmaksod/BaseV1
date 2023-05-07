@@ -27,19 +27,7 @@ namespace Hedaya.Application.Favourites.Commands
             {
                 try
                 {
-                    var notes = new List<TrainingProgramNote>
-{
-    new TrainingProgramNote { TextAr = "كيفية التسجيل في البرنامج", TextEn = "How to register for the program", SortIndex = 1,TrainingProgramId = 2 ,},
-    new TrainingProgramNote { TextAr = "تفاصيل المحاضرات والدورات التدريبية", TextEn = "Details of lectures and training courses", SortIndex = 2 ,TrainingProgramId = 2},
-    new TrainingProgramNote { TextAr = "المواضيع التي سيتم تغطيتها في البرنامج", TextEn = "Topics to be covered in the program", SortIndex = 3 , TrainingProgramId = 2},
-    new TrainingProgramNote { TextAr = "متطلبات الحضور والمشاركة في البرنامج", TextEn = "Requirements for attendance and participation in the program", SortIndex = 4 , TrainingProgramId = 2},
-    new TrainingProgramNote { TextAr = "طرق الدفع المتاحة لرسوم البرنامج", TextEn = "Available payment methods for program fees", SortIndex = 5 ,TrainingProgramId = 2}
-};
-
-                    _context.TrainingProgramNotes.AddRange(notes);
-                    await _context.SaveChangesAsync();
-
-
+                   
 
                     var program = await _context.TrainingPrograms.FindAsync(request.Id);
                     if (program == null)

@@ -13,6 +13,7 @@ namespace Hedaya.Application.MethodologicalExplanations.Queries
         public int? SubCategoryId { get; set; } // optional filter by subcategory ID
         public bool SortByDurationAscending { get; set; } // true for ascending order, false for descending order
         public string searchKeyword { get; set; }
+        public string UserId { get; set; }
         public class FilterMethodologicalExplanationsQueryHandler : IRequestHandler<FilterMethodologicalExplanationsQuery, object>
         {
             private readonly IApplicationDbContext _context;
@@ -24,6 +25,12 @@ namespace Hedaya.Application.MethodologicalExplanations.Queries
 
             public async Task<object> Handle(FilterMethodologicalExplanationsQuery request, CancellationToken cancellationToken)
             {
+
+
+                var traineeId = await _context.Trainees
+                .Where(a => a.AppUserId == request.UserId && !a.Deleted)
+                .Select(a => a.Id)
+                .FirstOrDefaultAsync(cancellationToken);
                 // Filter by subcategory ID if provided
                 IQueryable<MethodologicalExplanation> query = _context.MethodologicalExplanations;
                 if (request.SubCategoryId.HasValue)
@@ -58,7 +65,7 @@ namespace Hedaya.Application.MethodologicalExplanations.Queries
                         Id = x.Id,
                         Title = CultureInfo.CurrentCulture.TwoLetterISOLanguageName == "ar" ? x.TitleAr : x.TitleEn,
                         Description = x.Description,
-                        IsFav = false,
+                        IsFav = _context.TraineeExplanationFavourite.Any(f => f.MethodologicalExplanationId == x.Id && f.TraineeId == traineeId),
                         Duration = CultureInfo.CurrentCulture.TwoLetterISOLanguageName == "ar" ? $"{x.Duration} ساعات" : $"{x.Duration} hours",
                         SubCategoryId = x.SubCategoryId,
                         ImageUrl = x.ImageUrl,
