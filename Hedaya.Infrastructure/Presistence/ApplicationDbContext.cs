@@ -72,6 +72,9 @@ namespace Hedaya.Infrastructure.Presistence
 
         public DbSet<TraineeExplanationFavourite> TraineeExplanationFavourite { get; set; }
         public DbSet<PodcastFavourite> PodcastFavourites { get; set; }
+        public DbSet<PostLike> PostLikes { get; set; }
+        public DbSet<PostImage> PostImages { get; set; }
+        public DbSet<Offer> Offers { get; set; }
         #endregion
 
 

@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Hedaya.Application.SuggestionsAndComplaints.Commands.Create
 {
-    public class CreateSuggestionAndComplaintCommand : IRequest<int>
+    public class CreateSuggestionAndComplaintCommand : IRequest<object>
     {
         public string TraineeName { get; set; }
         public string Phone { get; set; }
@@ -13,7 +13,7 @@ namespace Hedaya.Application.SuggestionsAndComplaints.Commands.Create
         public string Message { get; set; }
 
 
-        public class CreateSuggestionAndComplaintCommandHandler : IRequestHandler<CreateSuggestionAndComplaintCommand, int>
+        public class CreateSuggestionAndComplaintCommandHandler : IRequestHandler<CreateSuggestionAndComplaintCommand, object>
         {
             private readonly IApplicationDbContext _context;
 
@@ -22,7 +22,7 @@ namespace Hedaya.Application.SuggestionsAndComplaints.Commands.Create
                 _context = context;
             }
 
-            public async Task<int> Handle(CreateSuggestionAndComplaintCommand request, CancellationToken cancellationToken)
+            public async Task<object> Handle(CreateSuggestionAndComplaintCommand request, CancellationToken cancellationToken)
             {
                 try
                 {
@@ -38,7 +38,7 @@ namespace Hedaya.Application.SuggestionsAndComplaints.Commands.Create
 
                      await _context.SuggestionAndComplaints.AddAsync(Entity);
                     await _context.SaveChangesAsync(cancellationToken);
-                    return Entity.Id;
+                    return new {ItemId = Entity.Id };
                 }
                 catch (Exception ex )
                 {

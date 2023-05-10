@@ -1,6 +1,6 @@
 ﻿namespace Hedaya.Domain.Entities
 {
-    public class SubCategory
+    public class SubCategory : BaseEntity
     {
         public SubCategory()
         {

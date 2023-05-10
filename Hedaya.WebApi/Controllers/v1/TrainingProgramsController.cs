@@ -76,5 +76,18 @@ namespace Hedaya.WebApi.Controllers.v1
         }
 
 
+        [HttpGet("GetMyPrograms")]
+        public async Task<ActionResult<object>> GetMyPrograms(int PageNumber)
+        {
+            var userId = User.Claims.FirstOrDefault(c => c.Type == "uid")?.Value;
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
+
+            var result = await Mediator.Send(new GetMyProgramsQuery { PageNumber = PageNumber, UserId = userId});
+            return Ok(result);
+        }
+
     }
 }

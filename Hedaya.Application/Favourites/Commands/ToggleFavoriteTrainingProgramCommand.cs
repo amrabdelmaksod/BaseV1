@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Hedaya.Application.Favourites.Commands
 {
-    public class ToggleFavoriteTrainingProgramCommand : IRequest
+    public class ToggleFavoriteTrainingProgramCommand : IRequest<object>
     {
         public int Id { get; set; }
         public bool IsFavourite { get; set; }
@@ -14,7 +14,7 @@ namespace Hedaya.Application.Favourites.Commands
 
 
 
-        public class ToggleFavoriteTrainingProgramCommandHandler : IRequestHandler<ToggleFavoriteTrainingProgramCommand>
+        public class ToggleFavoriteTrainingProgramCommandHandler : IRequestHandler<ToggleFavoriteTrainingProgramCommand,object>
         {
             private readonly IApplicationDbContext _context;
 
@@ -23,7 +23,7 @@ namespace Hedaya.Application.Favourites.Commands
                 _context = context;
             }
 
-            public async Task<Unit> Handle(ToggleFavoriteTrainingProgramCommand request, CancellationToken cancellationToken)
+            public async Task<object> Handle(ToggleFavoriteTrainingProgramCommand request, CancellationToken cancellationToken)
             {
                 try
                 {
@@ -63,7 +63,7 @@ namespace Hedaya.Application.Favourites.Commands
 
                     await _context.SaveChangesAsync(cancellationToken);
 
-                    return Unit.Value;
+                    return new { ItemId = program.Id };
                 }
                 catch (Exception ex)
                 {

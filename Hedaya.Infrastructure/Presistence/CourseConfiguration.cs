@@ -19,10 +19,17 @@ namespace Hedaya.Infrastructure.Presistence
             builder.Property(c => c.CourseFeatures).HasMaxLength(500).IsRequired();
             builder.Property(c => c.AboutCourse).HasMaxLength(500).IsRequired();
             builder.Property(c => c.StartDate).IsRequired();
+            builder.Property(tp => tp.EndDate)
+                .IsRequired();
             builder.Property(c => c.Duration).IsRequired();
             builder.Property(c => c.InstructorId).IsRequired();
             builder.Property(c => c.SubCategoryId)
            .IsRequired();
+            builder.Property(a => a.Deleted).HasDefaultValue(false);
+            builder.Property(a => a.CreatedById).HasMaxLength(50).IsRequired();
+            builder.Property(b => b.CreationDate).HasColumnType("DATETIME").HasDefaultValueSql("GETDATE()").IsRequired();
+            builder.Property(b => b.ModificationDate).HasColumnType("DATETIME");
+            builder.Property(a => a.ModifiedById).HasMaxLength(50);
 
             builder.HasOne(c => c.Instructor)
                    .WithMany(i => i.Courses)

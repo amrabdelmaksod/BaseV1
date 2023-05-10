@@ -26,12 +26,17 @@ namespace Hedaya.Application.PrayerTimes.Queries
 
 
      
-            var timeZoneOffset = TimeSpan.FromHours(3);
+            var timeZoneOffset = TimeSpan.FromHours(4);
             var times = prayerTimes.GetPrayerTimes(new DateTimeOffset(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 0, 0, 0, timeZoneOffset));
 
             PrayerTimeType GetNextPrayer()
             {
-
+                
+                // التوقيت الشتوي
+                //var egyptTime = DateTime.Now.AddHours(-1);
+                
+                
+                // التوقيت الصيفي
                 var egyptTime = DateTime.Now.AddHours(-1);
                 // Determine the name of the next prayer
                 switch (egyptTime.TimeOfDay)

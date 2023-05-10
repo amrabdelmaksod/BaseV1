@@ -22,7 +22,7 @@
         public int TrainingProgramId { get; set; }
         public bool IsEnrolled { get; set; }
         public List<CourseTopicDto> Topics { get; set; }
-        public Object Forum { get; set; }
+      
         public List<CourseTestDto> Tests { get; set; }
 
     }

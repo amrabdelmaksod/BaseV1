@@ -42,6 +42,7 @@
     <Folder Include="Enrollments\Queries\" />
     <Folder Include="Favourites\Models\" />
     <Folder Include="GentlemenScholars\Commands\" />
+    <Folder Include="Home\Commands\" />
     <Folder Include="MassCultures\Commands\" />
     <Folder Include="MethodologicalExplanations\Commands\" />
     <Folder Include="Notifications\Commands\" />

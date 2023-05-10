@@ -91,8 +91,8 @@ namespace Hedaya.WebApi.Controllers.v1
                 IsFavourite = IsFavourite
             };
 
-            await Mediator.Send(command);
-            return Ok();
+           
+            return Ok(await Mediator.Send(command));
 
         }
 
@@ -113,9 +113,8 @@ namespace Hedaya.WebApi.Controllers.v1
                 IsFavourite = isFavorite
             };
 
-            await Mediator.Send(command);
 
-            return Ok();
+            return Ok(await Mediator.Send(command));
         }
 
 
@@ -135,9 +134,9 @@ namespace Hedaya.WebApi.Controllers.v1
                 IsFavourite = isFavorite
             };
 
-            await Mediator.Send(command);
+          
 
-            return Ok();
+            return Ok(await Mediator.Send(command));
         }
         [HttpPut("ChangePodcastFavouriteStatus")]
         public async Task<IActionResult> TogglePodcastFavourite(int id, bool isFavorite)
@@ -155,9 +154,7 @@ namespace Hedaya.WebApi.Controllers.v1
                 IsFavourite = isFavorite
             };
 
-            await Mediator.Send(command);
-
-            return Ok();
+            return Ok(await Mediator.Send(command));
         }
 
 

@@ -4,6 +4,8 @@ using Hedaya.Application.Courses.Models;
 using Hedaya.Application.Courses.Queries;
 using Hedaya.Application.CourseTests.Commands;
 using Hedaya.Application.CourseTests.Queries;
+using Hedaya.Application.Enrollments.Commands;
+using Hedaya.Application.Enrollments.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Globalization;
 
@@ -82,6 +84,28 @@ namespace Hedaya.WebApi.Controllers.v1
         }
 
 
+        [HttpGet("GetForumByCourseId")]
+        public async Task<ActionResult<object>> GetForumByCourseId(int courseId)
+        {
+            var userId = User.Claims.FirstOrDefault(c => c.Type == "uid")?.Value;
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
+
+            var query = new GetForumByCourseIdQuery
+            {
+                CourseId = courseId,
+                UserId = userId
+            };
+
+            var result = await Mediator.Send(query);
+
+            return Ok(result);
+        }
+
+
+
         [HttpPost("AddCourseToFavourite")]
         public async Task<IActionResult> AddCourseToFavourite(int courseId)
         {
@@ -153,8 +177,52 @@ namespace Hedaya.WebApi.Controllers.v1
             return Ok(degree);
         }
 
-    
 
+
+
+
+        [HttpGet("GetMyCourses")]
+        public async Task<ActionResult<object>> GetMyCourses(int PageNumber, int Type)
+        {
+            var userId = User.Claims.FirstOrDefault(c => c.Type == "uid")?.Value;
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
+
+            var query = new GetMyCoursesQuery
+            {
+                PageNumber = PageNumber,
+                UserId = userId,
+                TypeId = Type
+            };
+
+            var result = await Mediator.Send(query);
+
+            return Ok(result);
+        }
+
+
+
+        [HttpPost("EnrollInCourse")]
+        public async Task<ActionResult> EnrollInCourse(int CourseId)
+        {
+            var userId = User.Claims.FirstOrDefault(c => c.Type == "uid")?.Value;
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
+
+            var command = new EnrollInCourseCommand
+            {
+               
+                UserId = userId,
+                CourseId = CourseId,
+            };
+          
+
+            return Ok(await Mediator.Send(command));
+        }
 
 
 

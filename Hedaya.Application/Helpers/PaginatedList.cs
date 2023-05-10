@@ -16,6 +16,10 @@
             PageSize = pageSize;
             TotalPages = totalPages;
         }
+        public PaginatedList()
+        {
+            
+        }
     }
 
 }

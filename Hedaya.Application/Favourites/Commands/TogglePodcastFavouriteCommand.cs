@@ -5,13 +5,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Hedaya.Application.Favourites.Commands
 {
-    public class TogglePodcastFavouriteCommand : IRequest
+    public class TogglePodcastFavouriteCommand : IRequest<object>
     {
         public int Id { get; set; }
         public bool IsFavourite { get; set; }
         public string UserId { get; set; }
 
-        public class TogglePodcastFavouriteCommandHandler : IRequestHandler<TogglePodcastFavouriteCommand>
+        public class TogglePodcastFavouriteCommandHandler : IRequestHandler<TogglePodcastFavouriteCommand, object>
         {
             private readonly IApplicationDbContext _context;
 
@@ -20,7 +20,7 @@ namespace Hedaya.Application.Favourites.Commands
                 _context = context;
             }
 
-            public async Task<Unit> Handle(TogglePodcastFavouriteCommand request, CancellationToken cancellationToken)
+            public async Task<object> Handle(TogglePodcastFavouriteCommand request, CancellationToken cancellationToken)
             {
                 try
                 {
@@ -59,7 +59,7 @@ namespace Hedaya.Application.Favourites.Commands
 
                     await _context.SaveChangesAsync(cancellationToken);
 
-                    return Unit.Value;
+                    return new { ItemId = podcast.Id };
                 }
                 catch (Exception ex)
                 {

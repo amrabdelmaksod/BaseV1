@@ -1,6 +1,6 @@
 ﻿namespace Hedaya.Domain.Entities
 {
-    public class Course 
+    public class Course  : BaseEntity
     {
         public Course()
         {
@@ -18,6 +18,7 @@
         public  string ImageUrl { get; set; }
         public  string VideoUrl { get; set; }
         public  DateTime StartDate { get; set; }
+        public  DateTime EndDate { get; set; }
         public  TimeSpan Duration { get; set; }
         public string InstructorId { get; set; }
         public int SubCategoryId { get; set; }

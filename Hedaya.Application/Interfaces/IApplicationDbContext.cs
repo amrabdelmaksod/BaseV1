@@ -55,6 +55,9 @@ namespace Hedaya.Application.Interfaces
         DbSet<Enrollment> Enrollments { get; set; }
         DbSet<TraineeExplanationFavourite> TraineeExplanationFavourite { get; set; }
         DbSet<PodcastFavourite> PodcastFavourites { get; set; }
+        DbSet<PostLike> PostLikes { get; set; }
+        DbSet<PostImage> PostImages { get; set; }
+        DbSet<Offer> Offers { get; set; }
 
        
         

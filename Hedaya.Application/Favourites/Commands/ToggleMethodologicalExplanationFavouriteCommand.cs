@@ -5,13 +5,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Hedaya.Application.Favourites.Commands
 {
-    public class ToggleMethodologicalExplanationFavouriteCommand : IRequest
+    public class ToggleMethodologicalExplanationFavouriteCommand : IRequest<object>
     {
         public int Id { get; set; }
         public bool IsFavourite { get; set; }
         public string UserId { get; set; }
 
-        public class ToggleMethodologicalExplanationFavouriteCommandHandler : IRequestHandler<ToggleMethodologicalExplanationFavouriteCommand>
+        public class ToggleMethodologicalExplanationFavouriteCommandHandler : IRequestHandler<ToggleMethodologicalExplanationFavouriteCommand, object>
         {
             private readonly IApplicationDbContext _context;
 
@@ -20,7 +20,7 @@ namespace Hedaya.Application.Favourites.Commands
                 _context = context;
             }
 
-            public async Task<Unit> Handle(ToggleMethodologicalExplanationFavouriteCommand request, CancellationToken cancellationToken)
+            public async Task<object> Handle(ToggleMethodologicalExplanationFavouriteCommand request, CancellationToken cancellationToken)
             {
                 try
                 {
@@ -59,7 +59,7 @@ namespace Hedaya.Application.Favourites.Commands
 
                     await _context.SaveChangesAsync(cancellationToken);
 
-                    return Unit.Value;
+                    return new { ItemId = methodologicalExplanation.Id };
                 }
                 catch (Exception ex)
                 {

@@ -13,8 +13,7 @@ namespace Hedaya.Infrastructure.Presistence.Configurations
             builder.Property(p => p.Text)
                 .IsRequired();
 
-            builder.Property(p => p.ImagePath)
-                .HasMaxLength(200);
+        
 
             builder.HasOne(p => p.Forum)
                 .WithMany(f => f.Posts)

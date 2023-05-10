@@ -21,7 +21,11 @@ namespace Hedaya.Infrastructure.Presistence.Configurations
                 .WithMany(x => x.SubCategories)
                 .HasForeignKey(x => x.MainCategoryId)
                 .OnDelete(DeleteBehavior.Restrict);
-
+            builder.Property(a => a.Deleted).HasDefaultValue(false);
+            builder.Property(a => a.CreatedById).HasMaxLength(50).IsRequired();
+            builder.Property(b => b.CreationDate).HasColumnType("DATETIME").HasDefaultValueSql("GETDATE()").IsRequired();
+            builder.Property(b => b.ModificationDate).HasColumnType("DATETIME");
+            builder.Property(a => a.ModifiedById).HasMaxLength(50);
 
             builder.HasMany(sc => sc.TrainingPrograms)
          .WithOne(tp => tp.SubCategory)

@@ -1,6 +1,6 @@
 ﻿namespace Hedaya.Domain.Entities
 {
-    public class MethodologicalExplanation
+    public class MethodologicalExplanation : BaseEntity
     {
         public MethodologicalExplanation()
         {
@@ -17,8 +17,7 @@
         public string Whatsapp { get; set; }
         public string Youtube { get; set; }
         public string Telegram { get; set; }
-        public string ImageUrl { get; set; }
-      
+        public string ImageUrl { get; set; }     
         public TimeSpan Duration { get; set; }
         public int SubCategoryId { get; set; }
         public string InstructorId { get; set; }

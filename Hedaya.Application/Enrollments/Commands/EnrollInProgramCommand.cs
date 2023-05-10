@@ -6,7 +6,7 @@ using SendGrid.Helpers.Errors.Model;
 
 namespace Hedaya.Application.Enrollments.Commands
 {
-    public class EnrollInProgramCommand : IRequest
+    public class EnrollInProgramCommand : IRequest<object>
     {
         public string FullName { get; set; }
         public string MobileNumber { get; set; }
@@ -15,7 +15,7 @@ namespace Hedaya.Application.Enrollments.Commands
         public List<int> CourseIds { get; set; } 
         public string UserId { get; set; }
 
-        public class EnrollInProgramCommandHandler : IRequestHandler<EnrollInProgramCommand>
+        public class EnrollInProgramCommandHandler : IRequestHandler<EnrollInProgramCommand,object>
         {
             private readonly IApplicationDbContext _context;
 
@@ -24,7 +24,7 @@ namespace Hedaya.Application.Enrollments.Commands
                 _context = context;
             }
 
-            public async Task<Unit> Handle(EnrollInProgramCommand request, CancellationToken cancellationToken)
+            public async Task<object> Handle(EnrollInProgramCommand request, CancellationToken cancellationToken)
             {
                 try
                 {
@@ -48,10 +48,14 @@ namespace Hedaya.Application.Enrollments.Commands
                         throw new NotFoundException(nameof(Trainee));
                     }
 
+
+                   
+
                     foreach (var courseId in request.CourseIds)
                     {
+                        var courseExists = await _context.Courses.Where(a=>a.Id== courseId&&a.TrainingProgramId == request.ProgramId).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
                         var enrollmentExist = await _context.Enrollments.Where(a => !a.Deleted && a.CourseId == courseId && a.TraineeId == traineeId).FirstOrDefaultAsync(cancellationToken);
-                        if (enrollmentExist == null)
+                        if (enrollmentExist == null&&courseExists!=null)
                         {
                             // Add the enrollment to the database for each course
                             var enrollment = new Enrollment
@@ -78,7 +82,7 @@ namespace Hedaya.Application.Enrollments.Commands
 
                     await _context.SaveChangesAsync(cancellationToken);
 
-                    return Unit.Value;
+                    return new {ItemId = program.Id};
                 }
                 catch (Exception ex)
                 {
